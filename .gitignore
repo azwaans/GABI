@@ -1,0 +1,6 @@
+#ignore compiled out
+out
+
+# intelliJ
+.idea
+*.iml
