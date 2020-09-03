@@ -24,9 +24,9 @@ public class startingTree extends Tree implements StateNodeInitialiser {
 
     // set up useful parameters
     int[][] matchMatrix;
-    Vector<Double> rootMatch;
     int nTaxa;
 
+    Node treeNode;
 
     @Override
     public void initAndValidate() {
@@ -53,6 +53,8 @@ public class startingTree extends Tree implements StateNodeInitialiser {
 
 
         Node treeNode = get_tree(rootHeight, scarringHeight, taxa, nClusters, matchMatrix);
+        initArrays();
+        assignFromWithoutID(new Tree(treeNode));
 
         initStateNodes();
         super.initAndValidate();
@@ -64,14 +66,14 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         //TODO when does super.initAndValidate have to be called?
 
         if (m_initial.get() != null) {
-            m_initial.get().assignFrom(this);
+            m_initial.get().assignFromWithoutID(this);
         }
 
     }
 
     @Override
     public void getInitialisedStateNodes(List<StateNode> stateNodes) {
-        
+        stateNodes.add(m_initial.get());
     }
 
     public int[][] set_match_matrix(Alignment taxa){
@@ -119,8 +121,8 @@ public class startingTree extends Tree implements StateNodeInitialiser {
             // space internal nodes at equal intervals until scarringHeight
             parent.setHeight(divTimes * iMatch);
             parent.setNr(taxaNames.size() -1 + iSeq + iMatch);
-            parent.setChild(0, nodeLeft);
-            parent.setChild(1, nodeRight);
+            parent.addChild(nodeLeft);
+            parent.addChild(nodeRight);
 
             nodeLeft = parent;
         }
@@ -159,8 +161,8 @@ public class startingTree extends Tree implements StateNodeInitialiser {
             // Number of nodes in the final tree - number of nodes that have yet to be created
             parent.setNr(nTaxa + (nTaxa - 1)     - (nClusters-iCluster)); // check
 
-            parent.setChild(0, subtreeLeft);
-            parent.setChild(1, subtreeRight);
+            parent.addChild(subtreeLeft);
+            parent.addChild(subtreeRight);
 
             // setup as left tree to end recursion
             subtreeLeft = parent;
