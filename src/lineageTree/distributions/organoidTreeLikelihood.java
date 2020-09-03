@@ -39,7 +39,7 @@ public class organoidTreeLikelihood extends GenericTreeLikelihood {
         final double scarTime = scarTimeInput.get();
         final Alignment alignment = dataInput.get();
         final TreeInterface tree = treeInput.get();
-        double scarringHeight = tree.getRoot().getHeight() - scarTime;
+        double scarringHeight = 32 - scarTime; //tree.getRoot().getHeight()
 
 
         List<Node> nodesAfterScarring = getNodesAfterScarring(tree, scarringHeight);
@@ -47,9 +47,6 @@ public class organoidTreeLikelihood extends GenericTreeLikelihood {
         for  (int i=0; i < nodesAfterScarring.size(); i++){
 
             Node subTreeRoot = nodesAfterScarring.get(i);
-            //String subTreeRootSeq  = alignment.getTaxonIndex(subTreeRoot)
-                    //alignment.getSequenceAsString(subTreeRoot.getID());
-
             List<Node> leafNodes = subTreeRoot.getAllLeafNodes();
             String seqToCompare = alignment.getSequenceAsString(leafNodes.get(0).getID());
 

@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><beast beautitemplate='Standard' beautistatus='' namespace="lineageTree.distributions:lineageTree.tree:beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood" required="" version="2.6">
+
+
+    <data
+id="Bahl_H3N2"
+spec="Alignment" dataType="integer"
+name="alignment">
+        <sequence id="LTv2_NEd32_iNE32_AACTCCCGTAAGGGCT" spec="Sequence" taxon="1" totalcount="1" value="1"/>
+        <sequence id="LTv2_NEd32_iNE32_ATTTCTGTCAAGGCTT" spec="Sequence" taxon="2" totalcount="1" value="1"/>
+        <sequence id="LTv2_NEd32_iNE32_CATATGGCATGTCCTC" spec="Sequence" taxon="3" totalcount="1" value="1"/>
+        <sequence id="LTv2_NEd32_iNE32_CCATTCGGTGTAATGA" spec="Sequence" taxon="4" totalcount="1" value="1"/>
+        <sequence id="LTv2_NEd32_iNE32_CGCTATCGTATTACCG" spec="Sequence" taxon="5" totalcount="1" value="1"/>
+        <sequence id="LTv2_NEd32_iNE32_CGCTTCAGTCACAAGG" spec="Sequence" taxon="6" totalcount="1" value="1"/>
+        <sequence id="LTv2_NEd32_iNE32_CTCTAATGTGGCTCCA" spec="Sequence" taxon="7" totalcount="1" value="1"/>
+        <sequence id="LTv2_NEd32_iNE32_CTGAAACCAATGAAAC" spec="Sequence" taxon="8" totalcount="1" value="1"/>
+        <sequence id="LTv2_NEd32_iNE32_CTGATCCTCGCTAGCG" spec="Sequence" taxon="9" totalcount="1" value="1"/>
+        <sequence id="LTv2_NEd32_iNE32_CTGTGCTAGGCCCTTG" spec="Sequence" taxon="10" totalcount="1" value="1"/>
+        <sequence id="LTv2_NEd32_iNE32_GTTCTCGCAGTACACT" spec="Sequence" taxon="11" totalcount="1" value="1"/>
+        <sequence id="LTv2_NEd32_iNE32_TGAGAGGTCTGGTATG" spec="Sequence" taxon="12" totalcount="1" value="1"/>
+        <sequence id="LTv2_NEd32_iNE32_TGCTACCAGTACACCT" spec="Sequence" taxon="13" totalcount="1" value="1"/>
+        <sequence id="LTv2_NEd32_iNE32_TTCTTAGAGGACCACA" spec="Sequence" taxon="14" totalcount="1" value="1"/>
+        <sequence id="LTv2_NEd32_iNE32_AGCTCTCAGACAAAGG" spec="Sequence" taxon="15" totalcount="1" value="2"/>
+        <sequence id="LTv2_NEd32_iNE32_AGCTCTCCAGATAATG" spec="Sequence" taxon="16" totalcount="1" value="2"/>
+        <sequence id="LTv2_NEd32_iNE32_ATTGGACTCTCACATT" spec="Sequence" taxon="17" totalcount="1" value="2"/>
+        <sequence id="LTv2_NEd32_iNE32_CCTACACTCACTCCTG" spec="Sequence" taxon="18" totalcount="1" value="2"/>
+        <sequence id="LTv2_NEd32_iNE32_CGGACGTTCAGGTTCA" spec="Sequence" taxon="19" totalcount="1" value="2"/>
+        <sequence id="LTv2_NEd32_iNE32_CTAATGGGTGTGGCTC" spec="Sequence" taxon="20" totalcount="1" value="2"/>
+        <sequence id="LTv2_NEd32_iNE32_CTGATCCAGGCAAAGA" spec="Sequence" taxon="21" totalcount="1" value="2"/>
+        <sequence id="LTv2_NEd32_iNE32_GTCTTCGCATTCGACA" spec="Sequence" taxon="22" totalcount="1" value="2"/>
+        <sequence id="LTv2_NEd32_iNE32_GTGCGGTCAGGAATCG" spec="Sequence" taxon="23" totalcount="1" value="2"/>
+        <sequence id="LTv2_NEd32_iNE32_TCCCGATGTTCTCATT" spec="Sequence" taxon="24" totalcount="1" value="2"/>
+        <sequence id="LTv2_NEd32_iNE32_TTGCGTCAGGTAAACT" spec="Sequence" taxon="25" totalcount="1" value="2"/>
+        <sequence id="LTv2_NEd32_iNE32_TTTGGTTGTGGTACAG" spec="Sequence" taxon="26" totalcount="1" value="2"/>
+        <sequence id="LTv2_NEd32_iNE32_AAGGAGCCATGCGCAC" spec="Sequence" taxon="27" totalcount="1" value="3"/>
+        <sequence id="LTv2_NEd32_iNE32_ACATGGTTCCTAGTGA" spec="Sequence" taxon="28" totalcount="1" value="3"/>
+        <sequence id="LTv2_NEd32_iNE32_CAGTCCTGTTCTCATT" spec="Sequence" taxon="29" totalcount="1" value="3"/>
+        <sequence id="LTv2_NEd32_iNE32_CGGAGCTGTCCCTACT" spec="Sequence" taxon="30" totalcount="1" value="3"/>
+        <sequence id="LTv2_NEd32_iNE32_CTCTAATGTATCTGCA" spec="Sequence" taxon="31" totalcount="1" value="3"/>
+        <sequence id="LTv2_NEd32_iNE32_GAGTCCGGTGAGGGTT" spec="Sequence" taxon="32" totalcount="1" value="3"/>
+        <sequence id="LTv2_NEd32_iNE32_AATCCAGTCAAGATCC" spec="Sequence" taxon="33" totalcount="1" value="4"/>
+        <sequence id="LTv2_NEd32_iNE32_CATTCGCGTGAAAGAG" spec="Sequence" taxon="34" totalcount="1" value="4"/>
+        <sequence id="LTv2_NEd32_iNE32_GACACGCAGATCCTGT" spec="Sequence" taxon="35" totalcount="1" value="4"/>
+        <sequence id="LTv2_NEd32_iNE32_GCTCTGTCATGGAATA" spec="Sequence" taxon="36" totalcount="1" value="4"/>
+        <sequence id="LTv2_NEd32_iNE32_TCAGCTCGTGGTCCGT" spec="Sequence" taxon="37" totalcount="1" value="4"/>
+        <sequence id="LTv2_NEd32_iNE32_TTTACTGGTATGGTTC" spec="Sequence" taxon="38" totalcount="1" value="4"/>
+        <sequence id="LTv2_NEd32_iNE32_ACCTTTACACTCTGTC" spec="Sequence" taxon="39" totalcount="1" value="5"/>
+        <sequence id="LTv2_NEd32_iNE32_ACGGGCTGTATTACCG" spec="Sequence" taxon="40" totalcount="1" value="5"/>
+        <sequence id="LTv2_NEd32_iNE32_ATCATGGAGTAACCCT" spec="Sequence" taxon="41" totalcount="1" value="5"/>
+        <sequence id="LTv2_NEd32_iNE32_GCAGTTATCCACGACG" spec="Sequence" taxon="42" totalcount="1" value="5"/>
+        <sequence id="LTv2_NEd32_iNE32_GGCCGATCATCCTTGC" spec="Sequence" taxon="43" totalcount="1" value="5"/>
+        <sequence id="LTv2_NEd32_iNE32_GGGTTGCAGCTACCGC" spec="Sequence" taxon="44" totalcount="1" value="5"/>
+        <sequence id="LTv2_NEd32_iNE32_ACTATCTTCCGTAGGC" spec="Sequence" taxon="45" totalcount="1" value="6"/>
+        <sequence id="LTv2_NEd32_iNE32_AGAGCGATCCAAACAC" spec="Sequence" taxon="46" totalcount="1" value="6"/>
+        <sequence id="LTv2_NEd32_iNE32_CATGGCGCATCGGGTC" spec="Sequence" taxon="47" totalcount="1" value="6"/>
+        <sequence id="LTv2_NEd32_iNE32_CCGTACTAGGGAGTAA" spec="Sequence" taxon="48" totalcount="1" value="6"/>
+        <sequence id="LTv2_NEd32_iNE32_GACTGCGCACTAAGTC" spec="Sequence" taxon="49" totalcount="1" value="7"/>
+        <sequence id="LTv2_NEd32_iNE32_GGAACTTCAGACGCCT" spec="Sequence" taxon="50" totalcount="1" value="7"/>
+        <sequence id="LTv2_NEd32_iNE32_GTTTCTACACGGACAA" spec="Sequence" taxon="51" totalcount="1" value="7"/>
+        <sequence id="LTv2_NEd32_iNE32_TTAACTCGTTACAGAA" spec="Sequence" taxon="52" totalcount="1" value="7"/>
+        <sequence id="LTv2_NEd32_iNE32_GGCCGATAGATTACCC" spec="Sequence" taxon="53" totalcount="1" value="8"/>
+        <sequence id="LTv2_NEd32_iNE32_TGCCCATTCTTCAACT" spec="Sequence" taxon="54" totalcount="1" value="8"/>
+        <sequence id="LTv2_NEd32_iNE32_CGAATGTGTCCGAACC" spec="Sequence" taxon="55" totalcount="1" value="9"/>
+        <sequence id="LTv2_NEd32_iNE32_GCTGCTTGTTGGACCC" spec="Sequence" taxon="56" totalcount="1" value="9"/>
+    </data>
+
+
+
+    
+<map name="Uniform" >beast.math.distributions.Uniform</map>
+<map name="Exponential" >beast.math.distributions.Exponential</map>
+<map name="LogNormal" >beast.math.distributions.LogNormalDistributionModel</map>
+<map name="Normal" >beast.math.distributions.Normal</map>
+<map name="Beta" >beast.math.distributions.Beta</map>
+<map name="Gamma" >beast.math.distributions.Gamma</map>
+<map name="LaplaceDistribution" >beast.math.distributions.LaplaceDistribution</map>
+<map name="prior" >beast.math.distributions.Prior</map>
+<map name="InverseGamma" >beast.math.distributions.InverseGamma</map>
+<map name="OneOnX" >beast.math.distributions.OneOnX</map>
+
+
+<run id="mcmc" spec="MCMC" chainLength="10000000" numInitializationAttempts="1000">
+    <state id="state" spec="State" storeEvery="5000">
+        <tree id="Tree.t:Bahl_H3N2" spec="beast.evolution.tree.Tree" name="stateNode">
+            <trait id="dateTrait.t:Bahl_H3N2" spec="beast.evolution.tree.TraitSet" traitname="date-forward"
+                   value="1=32,2=32,3=32,4=32,5=32,6=32,7=32,8=32,9=32,10=32,11=32,12=32,13=32,14=32,15=32,16=32,17=32,18=32,19=32,20=32,21=32,22=32,23=32,24=32,25=32,26=32,27=32,28=32,29=32,30=32,31=32,32=32,33=32,34=32,35=32,36=32,37=32,38=32,39=32,40=32,41=32,42=32,43=32,44=32,45=32,46=32,47=32,48=32,49=32,50=32,51=32,52=32,53=32,54=32,55=32,56=32">
+                <taxa id="TaxonSet.Bahl_H3N2" spec="TaxonSet">
+                    <alignment idref="Bahl_H3N2"/>
+                </taxa>
+            </trait>
+            <taxonset idref="TaxonSet.Bahl_H3N2"/>
+        </tree>
+        <parameter id="clockRate.c:Bahl_H3N2" spec="parameter.RealParameter" name="stateNode">1.0</parameter>
+        <parameter id="birthRateCanonical.t:Bahl_H3N2" spec="parameter.RealParameter" name="stateNode">3.0</parameter>
+        <parameter id="deathRateCanonical.t:Bahl_H3N2" spec="parameter.RealParameter" name="stateNode">1.0</parameter>
+        <parameter id="samplingRateCanonical.t:Bahl_H3N2" spec="parameter.RealParameter" name="stateNode">0.0</parameter>
+        <parameter id="originBDMMPrime.t:Bahl_H3N2" spec="parameter.RealParameter" name="stateNode">10.0</parameter>
+        <parameter id="rhoSampling" spec="parameter.RealParameter" name="stateNode"> 0.01 </parameter>
+        <parameter id="typeFrequencies.t:Bahl_H3N2" spec="parameter.RealParameter" lower="0.0" name="stateNode" upper="1.0">1.0</parameter>
+    </state>
+
+    <!--<init id="RandomTree.t:Bahl_H3N2" spec="beast.evolution.tree.RandomTree" estimate="false" initial="@Tree.t:Bahl_H3N2" taxa="@Bahl_H3N2" rootHeight="32">
+        <populationModel id="ConstantPopulation0.t:Bahl_H3N2" spec="ConstantPopulation">
+            <parameter id="randomPopSize.t:Bahl_H3N2" spec="parameter.RealParameter" name="popSize">1.0</parameter>
+        </populationModel>
+    </init>-->
+    <init id="RandomTree.t:Bahl_H3N2" spec="lineageTree.tree.startingTree" taxa="@Bahl_H3N2" rootHeight="32" scarringHeight="25" nClusters="9"/>
+    <distribution id="posterior" spec="util.CompoundDistribution">
+        <distribution id="prior" spec="util.CompoundDistribution">
+            <distribution id="BDMMPrime.t:Bahl_H3N2" spec="bdmmprime.distributions.BirthDeathMigrationDistribution" conditionOnSurvival="false" frequencies="@typeFrequencies.t:Bahl_H3N2" tree="@Tree.t:Bahl_H3N2">
+                <parameterization id="CanonicalBDMMPrimeParameterization.t:Bahl_H3N2" spec="bdmmprime.parameterization.CanonicalParameterization" origin="@originBDMMPrime.t:Bahl_H3N2">
+                    <birthRate id="birthRateSVCanonical.t:Bahl_H3N2" spec="bdmmprime.parameterization.SkylineVectorParameter" origin="@originBDMMPrime.t:Bahl_H3N2" skylineValues="@birthRateCanonical.t:Bahl_H3N2" timesAreAges="false">
+                        <typeSet id="typeSetBDMMPrime.t:Bahl_H3N2" spec="bdmmprime.parameterization.TypeSet">
+                            <typeTraitSet id="typeTraitSet.t:Bahl_H3N2" spec="bdmmprime.util.InitializedTraitSet" traitname="type" value="1=1,2=1,3=1,4=1,5=1,6=1,7=1,8=1,9=1,10=1,11=1,12=1,13=1,14=1,15=1,16=1,17=1,18=1,19=1,20=1,21=1,22=1,23=1,24=1,25=1,26=1,27=1,28=1,29=1,30=1,31=1,32=1,33=1,34=1,35=1,36=1,37=1,38=1,39=1,40=1,41=1,42=1,43=1,44=1,45=1,46=1,47=1,48=1,49=1,50=1,51=1,52=1,53=1,54=1,55=1,56=1">
+                                <taxa id="TaxonSet.1" spec="TaxonSet" alignment="@Bahl_H3N2"/>
+                            </typeTraitSet>
+                        </typeSet>
+                    </birthRate>
+                    <deathRate id="deathRateSVCanonical.t:Bahl_H3N2" spec="bdmmprime.parameterization.SkylineVectorParameter" origin="@originBDMMPrime.t:Bahl_H3N2" skylineValues="@deathRateCanonical.t:Bahl_H3N2" timesAreAges="false" typeSet="@typeSetBDMMPrime.t:Bahl_H3N2"/>
+                    <samplingRate id="samplingRateSVCanonical.t:Bahl_H3N2" spec="bdmmprime.parameterization.SkylineVectorParameter" origin="@originBDMMPrime.t:Bahl_H3N2" skylineValues="@samplingRateCanonical.t:Bahl_H3N2" timesAreAges="false" typeSet="@typeSetBDMMPrime.t:Bahl_H3N2"/>
+                    <rhoSampling id="rhoSamplingProbTPCanonical.t:Bahl_H3N2" spec="bdmmprime.parameterization.TimedParameter" origin="@originBDMMPrime.t:Bahl_H3N2" times="0.0" values="@rhoSampling" timesAreAges="true" typeSet="@typeSetBDMMPrime.t:Bahl_H3N2"/>
+                    <removalProb id="removalProbSVCanonical.t:Bahl_H3N2" spec="bdmmprime.parameterization.SkylineVectorParameter" origin="@originBDMMPrime.t:Bahl_H3N2" timesAreAges="false" typeSet="@typeSetBDMMPrime.t:Bahl_H3N2">
+                        <parameter id="removalProbCanonical.t:Bahl_H3N2" spec="parameter.RealParameter" estimate="false" lower="0.0" name="skylineValues" upper="1.0">1.0</parameter>
+                    </removalProb>
+                    <migrationRate id="migrationRateSMCanonical.t:Bahl_H3N2" spec="bdmmprime.parameterization.SkylineMatrixParameter" origin="@originBDMMPrime.t:Bahl_H3N2" timesAreAges="false" typeSet="@typeSetBDMMPrime.t:Bahl_H3N2">
+                        <parameter id="migrationRateCanonical.t:Bahl_H3N2" spec="parameter.RealParameter" estimate="false" name="skylineValues">1.0</parameter>
+                    </migrationRate>
+                    <birthRateAmongDemes id="birthRateAmongDemesSMCanonical.t:Bahl_H3N2" spec="bdmmprime.parameterization.SkylineMatrixParameter" origin="@originBDMMPrime.t:Bahl_H3N2" timesAreAges="false" typeSet="@typeSetBDMMPrime.t:Bahl_H3N2">
+                        <parameter id="birthRateAmongDemesCanonical.t:Bahl_H3N2" spec="parameter.RealParameter" estimate="false" name="skylineValues">1.0</parameter>
+                    </birthRateAmongDemes>
+                    <typeSet idref="typeSetBDMMPrime.t:Bahl_H3N2"/>
+                </parameterization>
+                <typeTraitSet idref="typeTraitSet.t:Bahl_H3N2"/>
+            </distribution>
+            <distribution id="birthRateCanonicalPrior.t:Bahl_H3N2" spec="bdmmprime.util.ZeroExcludingPrior" x="@birthRateCanonical.t:Bahl_H3N2">
+                <LogNormal id="LogNormalDistributionModel.0" name="distr">
+                    <parameter id="RealParameter.1" spec="parameter.RealParameter" estimate="false" name="M">1.0</parameter>
+                    <parameter id="RealParameter.2" spec="parameter.RealParameter" estimate="false" lower="0.0" name="S" upper="5.0">1.25</parameter>
+                </LogNormal>
+            </distribution>
+            <!--<prior id="ClockPrior.c:Bahl_H3N2" name="distribution" x="@clockRate.c:Bahl_H3N2">
+                <Uniform id="Uniform.0" name="distr" upper="Infinity"/>
+            </prior>-->
+            <distribution id="deathRateCanonicalPrior.t:Bahl_H3N2" spec="bdmmprime.util.ZeroExcludingPrior" x="@deathRateCanonical.t:Bahl_H3N2">
+                <Exponential id="Exponential.1" name="distr">
+                    <parameter id="RealParameter.3" spec="parameter.RealParameter" estimate="false" name="mean">1.0</parameter>
+                </Exponential>
+            </distribution>
+            <prior id="originBDMMPrimePrior.t:Bahl_H3N2" name="distribution" x="@originBDMMPrime.t:Bahl_H3N2">
+                <OneOnX id="OneOnX.1" name="distr"/>
+            </prior>
+            <!--<distribution id="samplingRateCanonicalPrior.t:Bahl_H3N2" spec="bdmmprime.util.ZeroExcludingPrior" x="@samplingRateCanonical.t:Bahl_H3N2">
+                <OneOnX id="OneOnX.6" name="distr"/>
+            </distribution>-->
+        </distribution>
+        <distribution id="likelihood" spec="util.CompoundDistribution" useThreads="false">
+            <distribution id="treeLikelihood.Bahl_H3N2" spec="organoidTreeLikelihood" data="@Bahl_H3N2" tree="@Tree.t:Bahl_H3N2" scarringTime="7.0">
+                <siteModel id="SiteModel.s:Bahl_H3N2" spec="SiteModel">
+                    <parameter id="mutationRate.s:Bahl_H3N2" spec="parameter.RealParameter" estimate="false" name="mutationRate">1.0</parameter>
+                    <parameter id="gammaShape.s:Bahl_H3N2" spec="parameter.RealParameter" estimate="false" name="shape">1.0</parameter>
+                    <parameter id="proportionInvariant.s:Bahl_H3N2" spec="parameter.RealParameter" estimate="false" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
+                    <substModel id="JC69.s:Bahl_H3N2" spec="JukesCantor"/>
+                </siteModel>
+                <branchRateModel id="StrictClock.c:Bahl_H3N2" spec="beast.evolution.branchratemodel.StrictClockModel" clock.rate="@clockRate.c:Bahl_H3N2"/>
+            </distribution>
+        </distribution>
+    </distribution>
+
+<!--    <operator id="StrictClockRateScaler.c:Bahl_H3N2" spec="ScaleOperator" parameter="@clockRate.c:Bahl_H3N2" scaleFactor="0.75" weight="3.0"/>-->
+
+<!--    <operator id="strictClockUpDownOperator.c:Bahl_H3N2" spec="UpDownOperator" scaleFactor="0.75" weight="3.0">-->
+<!--        <up idref="clockRate.c:Bahl_H3N2"/>-->
+<!--        <down idref="Tree.t:Bahl_H3N2"/>-->
+<!--    </operator>-->
+
+    <operator id="birthRateCanonicalScaler.t:Bahl_H3N2" spec="ScaleOperator" parameter="@birthRateCanonical.t:Bahl_H3N2" scaleFactor="0.75" weight="3.0"/>
+
+    <operator id="deathRateCanonicalScaler.t:Bahl_H3N2" spec="ScaleOperator" parameter="@deathRateCanonical.t:Bahl_H3N2" scaleFactor="0.75" weight="3.0"/>
+
+    <operator id="rhoSamplingScaler.t:Bahl_H3N2" spec="ScaleOperator" parameter="@rhoSampling" scaleFactor="0.75" weight="3.0"/>
+
+<!--    <operator id="BDMMPrimeLeafToSA.t:Bahl_H3N2" spec="LeafToSampledAncestorJump" tree="@Tree.t:Bahl_H3N2" weight="10.0"/>-->
+
+<!--    <operator id="BDMMPrimeSAWilsonBalding.t:Bahl_H3N2" spec="SAWilsonBalding" tree="@Tree.t:Bahl_H3N2" weight="10.0"/>-->
+
+<!--    <operator id="BDMMPrimeSAWide.t:Bahl_H3N2" spec="SAExchange" isNarrow="false" tree="@Tree.t:Bahl_H3N2" weight="10.0"/>-->
+
+<!--    <operator id="BDMMPrimeSANarrow.t:Bahl_H3N2" spec="SAExchange" tree="@Tree.t:Bahl_H3N2" weight="10.0"/>-->
+
+<!--    <operator id="BDMMPrimeSAUniformOperator.t:Bahl_H3N2" spec="SAUniform" tree="@Tree.t:Bahl_H3N2" weight="20.0"/>-->
+
+<!--    <operator id="BDMMPrimeSATreeRootScaler.t:Bahl_H3N2" spec="SAScaleOperator" rootOnly="true" scaleFactor="0.95" tree="@Tree.t:Bahl_H3N2" weight="1.0"/>-->
+
+    <operator id="BDMMPrimeSATreeScaler.t:Bahl_H3N2" spec="SAScaleOperator" scaleFactor="0.95" tree="@Tree.t:Bahl_H3N2" weight="3.0"/>
+
+    <operator id="originBDMMPrimeScaler.t:Bahl_H3N2" spec="ScaleOperator" parameter="@originBDMMPrime.t:Bahl_H3N2" scaleFactor="0.75" weight="3.0"/>
+
+    <operator id="typeFrequenciesExchanger.t:Bahl_H3N2" spec="DeltaExchangeOperator" delta="0.1" weight="1.0">
+        <parameter idref="typeFrequencies.t:Bahl_H3N2"/>
+    </operator>
+
+    <logger id="tracelog" spec="Logger" fileName="Bahl_H3N2.log" logEvery="1000" model="@posterior" sanitiseHeaders="true" sort="smart">
+        <log idref="posterior"/>
+        <log idref="likelihood"/>
+        <log idref="prior"/>
+        <log idref="treeLikelihood.Bahl_H3N2"/>
+        <log id="TreeHeight.t:Bahl_H3N2" spec="beast.evolution.tree.TreeHeightLogger" tree="@Tree.t:Bahl_H3N2"/>
+        <log idref="clockRate.c:Bahl_H3N2"/>
+        <log idref="birthRateSVCanonical.t:Bahl_H3N2"/>
+        <log idref="birthRateAmongDemesSMCanonical.t:Bahl_H3N2"/>
+        <log idref="deathRateSVCanonical.t:Bahl_H3N2"/>
+        <log idref="migrationRateSMCanonical.t:Bahl_H3N2"/>
+        <log idref="samplingRateSVCanonical.t:Bahl_H3N2"/>
+        <log idref="removalProbSVCanonical.t:Bahl_H3N2"/>
+        <log idref="rhoSamplingProbTPCanonical.t:Bahl_H3N2"/>
+        <log idref="birthRateAmongDemesCanonical.t:Bahl_H3N2"/>
+        <log idref="originBDMMPrime.t:Bahl_H3N2"/>
+        <log idref="typeFrequencies.t:Bahl_H3N2"/>
+        <log id="typedTreeStats.t:Bahl_H3N2" spec="bdmmprime.mapping.TypedTreeStatsLogger" includeRootEdgeChanges="true" typeLabel="type" typeSet="@typeSetBDMMPrime.t:Bahl_H3N2">
+            <typedTree id="typeMappedTree.t:Bahl_H3N2" spec="bdmmprime.mapping.TypeMappedTree" bdmmDistrib="@BDMMPrime.t:Bahl_H3N2" frequencies="@typeFrequencies.t:Bahl_H3N2" mapOnInit="false" remapOnLog="true" typeLabel="type" typeTraitSet="@typeTraitSet.t:Bahl_H3N2" untypedTree="@Tree.t:Bahl_H3N2"/>
+        </log>
+    </logger>
+
+    <logger id="screenlog" spec="Logger" logEvery="1000">
+        <log idref="posterior"/>
+        <log idref="likelihood"/>
+        <log idref="prior"/>
+    </logger>
+
+    <logger id="treelog.t:Bahl_H3N2" spec="Logger" fileName="$(tree).trees" logEvery="1000" mode="tree">
+        <log id="TreeWithMetaDataLogger.t:Bahl_H3N2" spec="beast.evolution.tree.TreeWithMetaDataLogger" tree="@Tree.t:Bahl_H3N2"/>
+    </logger>
+
+    <logger id="typedTreeLogger.t:Bahl_H3N2" spec="Logger" fileName="$(filebase).$(tree).typed.trees" logEvery="1000" mode="tree">
+        <log idref="typeMappedTree.t:Bahl_H3N2"/>
+    </logger>
+
+    <logger id="nodeTypedTreeLogger.t:Bahl_H3N2" spec="Logger" fileName="$(filebase).$(tree).typed.node.trees" logEvery="1000" mode="tree">
+        <log id="nodeTypedTree.t:Bahl_H3N2" spec="bdmmprime.mapping.TypedNodeTreeLogger" typedTree="@typeMappedTree.t:Bahl_H3N2"/>
+    </logger>
+
+    <operatorschedule id="OperatorSchedule" spec="OperatorSchedule"/>
+
+</run>
+
+</beast>
