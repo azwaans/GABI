@@ -24,9 +24,10 @@ public class startingTree extends Tree implements StateNodeInitialiser {
 
     // set up useful parameters
     int[][] matchMatrix;
+    int nClusters;
+    double scarringHeight;
+    double rootHeight;
     int nTaxa;
-
-    Node treeNode;
 
     @Override
     public void initAndValidate() {
@@ -52,9 +53,13 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         matchMatrix = set_match_matrix(taxa);
 
 
-        Node treeNode = get_tree(rootHeight, scarringHeight, taxa, nClusters, matchMatrix);
-        initArrays();
-        assignFromWithoutID(new Tree(treeNode));
+        root = get_tree(rootHeight, scarringHeight, taxa, nClusters, matchMatrix);
+        leafNodeCount = nTaxa;
+        nodeCount = leafNodeCount *2 -1 ;
+        internalNodeCount = leafNodeCount -1;
+
+        //initArrays();
+        //assignFromWithoutID();
 
         initStateNodes();
         super.initAndValidate();
@@ -109,10 +114,10 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         nodeLeft.setNr(iSeq);
         nodeLeft.setID(taxaNames.get(iSeq));
 
-        for (int iMatch=1; iMatch<nMatches; iMatch++){
+        for (int iMatch=1; iMatch <= nMatches; iMatch++){
             //set up right node
             Node nodeRight = new Node();
-            nodeRight.setHeight(0);
+            nodeRight.setHeight(0.0);
             nodeRight.setID(taxaNames.get(iSeq + iMatch));
             nodeRight.setNr(iSeq + iMatch);
 
