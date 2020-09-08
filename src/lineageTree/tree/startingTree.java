@@ -5,13 +5,10 @@ import beast.core.Input;
 import beast.core.StateNode;
 import beast.core.StateNodeInitialiser;
 import beast.evolution.alignment.Alignment;
-import beast.evolution.tree.Tree;
 import beast.evolution.tree.Node;
+import beast.evolution.tree.Tree;
 
-import javax.management.RuntimeErrorException;
 import java.util.List;
-import java.util.Vector;
-import java.util.Arrays;
 import java.util.stream.IntStream;
 
 @Description("This class provides the basic engine for generating a valid starting tree given information on the scarring experiment ")
@@ -28,24 +25,27 @@ public class startingTree extends Tree implements StateNodeInitialiser {
     double scarringHeight;
     double rootHeight;
     int nTaxa;
+    Alignment taxa;
+    int cSeq; //running index counting the number of nodes build up in the tree
 
     @Override
     public void initAndValidate() {
 
         // init taxa
-        Alignment taxa = taxaInput.get();
+        taxa = taxaInput.get();
         List<String> taxanames = taxa.getTaxaNames();
 
         nTaxa = taxanames.size();
+        cSeq = nTaxa-1;
 
-        double rootHeight = rootHeightInput.get();
-        double scarringHeight = scarringHeightInput.get();
+        rootHeight = rootHeightInput.get();
+        scarringHeight = scarringHeightInput.get();
 
         if (scarringHeight >= rootHeight){
             throw new RuntimeException("ScarringHeight has to be strictly smaller than rootHeight");
         }
 
-        int nClusters = nClustersInput.get();
+        nClusters = nClustersInput.get();
         if (nClusters < 1){
             throw new RuntimeException("Cluster size has to be positive");
         }
@@ -53,10 +53,10 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         matchMatrix = set_match_matrix(taxa);
 
 
-        root = get_tree(rootHeight, scarringHeight, taxa, nClusters, matchMatrix);
+        /*root = get_tree(rootHeight, scarringHeight, taxa, nClusters, matchMatrix);
         leafNodeCount = nTaxa;
         nodeCount = leafNodeCount *2 -1 ;
-        internalNodeCount = leafNodeCount -1;
+        internalNodeCount = leafNodeCount -1;*/
 
         //initArrays();
         //assignFromWithoutID();
@@ -69,6 +69,13 @@ public class startingTree extends Tree implements StateNodeInitialiser {
     public void initStateNodes() {
         //TODO which statenodes have to be initialised? -  the tree
         //TODO when does super.initAndValidate have to be called?
+
+        root = get_tree(rootHeight, scarringHeight, taxa, nClusters, matchMatrix);
+        leafNodeCount = nTaxa;
+        nodeCount = leafNodeCount *2 -1 ;
+        internalNodeCount = leafNodeCount -1;
+
+        initArrays();
 
         if (m_initial.get() != null) {
             m_initial.get().assignFromWithoutID(this);
@@ -120,12 +127,14 @@ public class startingTree extends Tree implements StateNodeInitialiser {
             nodeRight.setHeight(0.0);
             nodeRight.setID(taxaNames.get(iSeq + iMatch));
             nodeRight.setNr(iSeq + iMatch);
+            cSeq++;
 
             //set up parent node
             Node parent = new Node();
             // space internal nodes at equal intervals until scarringHeight
             parent.setHeight(divTimes * iMatch);
-            parent.setNr(taxaNames.size() -1 + iSeq + iMatch);
+            int nr = taxaNames.size() -1 + iSeq + iMatch;
+            parent.setNr(cSeq);
             parent.addChild(nodeLeft);
             parent.addChild(nodeRight);
 
@@ -140,8 +149,8 @@ public class startingTree extends Tree implements StateNodeInitialiser {
 
         //find starting sequence for cluster
         int iSeq = 0;
+        //MutableInt cSeq = new MutableInt(nTaxa);
         int nMatches;
-        int nTaxa = taxa.getTaxonCount(); // check that this is what I want
 
         // time between the internal nodes connecting the cluster trees
         double divTime = (rootHeight - scarringHeight) / nClusters;
@@ -150,7 +159,7 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         Node subtreeLeft = get_cluster_tree(iSeq, scarringHeight, taxa);
         // update iSeq to next cluster start
         nMatches = IntStream.of(matchMatrix[iSeq]).sum();
-        iSeq += (nMatches + 1);
+        iSeq += (nMatches +1);
 
 
         for (int iCluster=1; iCluster < nClusters; iCluster++){
@@ -158,7 +167,7 @@ public class startingTree extends Tree implements StateNodeInitialiser {
             // get right subtree
             Node subtreeRight = get_cluster_tree(iSeq, scarringHeight, taxa);
             nMatches = IntStream.of(matchMatrix[iSeq]).sum();
-            iSeq += (nMatches + 1);
+            iSeq += (nMatches+1);
 
             // get parent
             Node parent = new Node();
@@ -175,7 +184,7 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         }
 
         if (iSeq > nTaxa){
-            throw new RuntimeException("iSeq reached " + iSeq + " but it should never exceed the number of sequences: " + nTaxa + "!");
+            //throw new RuntimeException("iSeq reached " + iSeq + " but it should never exceed the number of sequences: " + nTaxa + "!");
         }
         return subtreeLeft;
     }

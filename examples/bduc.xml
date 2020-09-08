@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><beast beautitemplate='MultiTypeBirthDeath' beautistatus='' namespace="beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood" required="" version="2.6">
+
+<!-- dataType has to be set to integer and the value must contain a ',' s.t. the class recognizes it as a comma separated string of integers-->
+    <data  id="h3n2_2deme" spec="Alignment" name="alignment" dataType="integer">
+        <sequence id="LTv2_NEd32_iNE32_AACTCCCGTAAGGGCT" spec="Sequence" taxon="1" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_ATTTCTGTCAAGGCTT" spec="Sequence" taxon="2" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_CATATGGCATGTCCTC" spec="Sequence" taxon="3" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_CCATTCGGTGTAATGA" spec="Sequence" taxon="4" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_CGCTATCGTATTACCG" spec="Sequence" taxon="5" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_CGCTTCAGTCACAAGG" spec="Sequence" taxon="6" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_CTCTAATGTGGCTCCA" spec="Sequence" taxon="7" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_CTGAAACCAATGAAAC" spec="Sequence" taxon="8" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_CTGATCCTCGCTAGCG" spec="Sequence" taxon="9" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_CTGTGCTAGGCCCTTG" spec="Sequence" taxon="10" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_GTTCTCGCAGTACACT" spec="Sequence" taxon="11" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_TGAGAGGTCTGGTATG" spec="Sequence" taxon="12" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_TGCTACCAGTACACCT" spec="Sequence" taxon="13" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_TTCTTAGAGGACCACA" spec="Sequence" taxon="14" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_AGCTCTCAGACAAAGG" spec="Sequence" taxon="15" totalcount="1" value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_AGCTCTCCAGATAATG" spec="Sequence" taxon="16" totalcount="1" value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_ATTGGACTCTCACATT" spec="Sequence" taxon="17" totalcount="1" value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_CCTACACTCACTCCTG" spec="Sequence" taxon="18" totalcount="1" value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_CGGACGTTCAGGTTCA" spec="Sequence" taxon="19" totalcount="1" value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_CTAATGGGTGTGGCTC" spec="Sequence" taxon="20" totalcount="1" value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_CTGATCCAGGCAAAGA" spec="Sequence" taxon="21" totalcount="1" value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_GTCTTCGCATTCGACA" spec="Sequence" taxon="22" totalcount="1" value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_GTGCGGTCAGGAATCG" spec="Sequence" taxon="23" totalcount="1" value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_TCCCGATGTTCTCATT" spec="Sequence" taxon="24" totalcount="1" value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_TTGCGTCAGGTAAACT" spec="Sequence" taxon="25" totalcount="1" value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_TTTGGTTGTGGTACAG" spec="Sequence" taxon="26" totalcount="1" value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_AAGGAGCCATGCGCAC" spec="Sequence" taxon="27" totalcount="1" value="3,"/>
+        <sequence id="LTv2_NEd32_iNE32_ACATGGTTCCTAGTGA" spec="Sequence" taxon="28" totalcount="1" value="3,"/>
+        <sequence id="LTv2_NEd32_iNE32_CAGTCCTGTTCTCATT" spec="Sequence" taxon="29" totalcount="1" value="3,"/>
+        <sequence id="LTv2_NEd32_iNE32_CGGAGCTGTCCCTACT" spec="Sequence" taxon="30" totalcount="1" value="3,"/>
+        <sequence id="LTv2_NEd32_iNE32_CTCTAATGTATCTGCA" spec="Sequence" taxon="31" totalcount="1" value="3,"/>
+        <sequence id="LTv2_NEd32_iNE32_GAGTCCGGTGAGGGTT" spec="Sequence" taxon="32" totalcount="1" value="3,"/>
+        <sequence id="LTv2_NEd32_iNE32_AATCCAGTCAAGATCC" spec="Sequence" taxon="33" totalcount="1" value="4,"/>
+        <sequence id="LTv2_NEd32_iNE32_CATTCGCGTGAAAGAG" spec="Sequence" taxon="34" totalcount="1" value="4,"/>
+        <sequence id="LTv2_NEd32_iNE32_GACACGCAGATCCTGT" spec="Sequence" taxon="35" totalcount="1" value="4,"/>
+        <sequence id="LTv2_NEd32_iNE32_GCTCTGTCATGGAATA" spec="Sequence" taxon="36" totalcount="1" value="4,"/>
+        <sequence id="LTv2_NEd32_iNE32_TCAGCTCGTGGTCCGT" spec="Sequence" taxon="37" totalcount="1" value="4,"/>
+        <sequence id="LTv2_NEd32_iNE32_TTTACTGGTATGGTTC" spec="Sequence" taxon="38" totalcount="1" value="4,"/>
+        <sequence id="LTv2_NEd32_iNE32_ACCTTTACACTCTGTC" spec="Sequence" taxon="39" totalcount="1" value="5,"/>
+        <sequence id="LTv2_NEd32_iNE32_ACGGGCTGTATTACCG" spec="Sequence" taxon="40" totalcount="1" value="5,"/>
+        <sequence id="LTv2_NEd32_iNE32_ATCATGGAGTAACCCT" spec="Sequence" taxon="41" totalcount="1" value="5,"/>
+        <sequence id="LTv2_NEd32_iNE32_GCAGTTATCCACGACG" spec="Sequence" taxon="42" totalcount="1" value="5,"/>
+        <sequence id="LTv2_NEd32_iNE32_GGCCGATCATCCTTGC" spec="Sequence" taxon="43" totalcount="1" value="5,"/>
+        <sequence id="LTv2_NEd32_iNE32_GGGTTGCAGCTACCGC" spec="Sequence" taxon="44" totalcount="1" value="5,"/>
+        <sequence id="LTv2_NEd32_iNE32_ACTATCTTCCGTAGGC" spec="Sequence" taxon="45" totalcount="1" value="6,"/>
+        <sequence id="LTv2_NEd32_iNE32_AGAGCGATCCAAACAC" spec="Sequence" taxon="46" totalcount="1" value="6,"/>
+        <sequence id="LTv2_NEd32_iNE32_CATGGCGCATCGGGTC" spec="Sequence" taxon="47" totalcount="1" value="6,"/>
+        <sequence id="LTv2_NEd32_iNE32_CCGTACTAGGGAGTAA" spec="Sequence" taxon="48" totalcount="1" value="6,"/>
+        <sequence id="LTv2_NEd32_iNE32_GACTGCGCACTAAGTC" spec="Sequence" taxon="49" totalcount="1" value="7,"/>
+        <sequence id="LTv2_NEd32_iNE32_GGAACTTCAGACGCCT" spec="Sequence" taxon="50" totalcount="1" value="7,"/>
+        <sequence id="LTv2_NEd32_iNE32_GTTTCTACACGGACAA" spec="Sequence" taxon="51" totalcount="1" value="7,"/>
+        <sequence id="LTv2_NEd32_iNE32_TTAACTCGTTACAGAA" spec="Sequence" taxon="52" totalcount="1" value="7,"/>
+        <sequence id="LTv2_NEd32_iNE32_GGCCGATAGATTACCC" spec="Sequence" taxon="53" totalcount="1" value="8,"/>
+        <sequence id="LTv2_NEd32_iNE32_TGCCCATTCTTCAACT" spec="Sequence" taxon="54" totalcount="1" value="8,"/>
+        <sequence id="LTv2_NEd32_iNE32_CGAATGTGTCCGAACC" spec="Sequence" taxon="55" totalcount="1" value="9,"/>
+        <sequence id="LTv2_NEd32_iNE32_GCTGCTTGTTGGACCC" spec="Sequence" taxon="56" totalcount="1" value="9,"/>
+
+    </data>
+
+
+    
+<map name="Uniform" >beast.math.distributions.Uniform</map>
+<map name="Exponential" >beast.math.distributions.Exponential</map>
+<map name="LogNormal" >beast.math.distributions.LogNormalDistributionModel</map>
+<map name="Normal" >beast.math.distributions.Normal</map>
+<map name="Beta" >beast.math.distributions.Beta</map>
+<map name="Gamma" >beast.math.distributions.Gamma</map>
+<map name="LaplaceDistribution" >beast.math.distributions.LaplaceDistribution</map>
+<map name="prior" >beast.math.distributions.Prior</map>
+<map name="InverseGamma" >beast.math.distributions.InverseGamma</map>
+<map name="OneOnX" >beast.math.distributions.OneOnX</map>
+
+<!-- specify tip types, so far all one type -->
+    <typeTraitSet id="typeTraitSetInput.t:h3n2_2deme" spec="beast.evolution.tree.TraitSet" traitname="type" value="1=1,2=1,3=1,4=1,5=1,6=1,7=1,8=1,9=1,10=1,11=1,12=1,13=1,14=1,15=1,16=1,17=1,18=1,19=1,20=1,21=1,22=1,23=1,24=1,25=1,26=1,27=1,28=1,29=1,30=1,31=1,32=1,33=1,34=1,35=1,36=1,37=1,38=1,39=1,40=1,41=1,42=1,43=1,44=1,45=1,46=1,47=1,48=1,49=1,50=1,51=1,52=1,53=1,54=1,55=1,56=1">
+        <taxa id="TaxonSet.0" spec="TaxonSet">
+            <alignment idref="h3n2_2deme"/>
+        </taxa>
+    </typeTraitSet>
+    <!--specify tip dates -->
+    <traitSet id="dateTrait.t:h3n2_2deme"
+              spec="beast.evolution.tree.TraitSet"
+              taxa="@TaxonSet.0" traitname="date-forward" value="1=32,2=32,3=32,4=32,5=32,6=32,7=32,8=32,9=32,10=32,11=32,12=32,13=32,14=32,15=32,16=32,17=32,18=32,19=32,20=32,21=32,22=32,23=32,24=32,25=32,26=32,27=32,28=32,29=32,30=32,31=32,32=32,33=32,34=32,35=32,36=32,37=32,38=32,39=32,40=32,41=32,42=32,43=32,44=32,45=32,46=32,47=32,48=32,49=32,50=32,51=32,52=32,53=32,54=32,55=32,56=32"/>
+
+    <!-- specify migration model -->
+    <migrationModel id="migModel.t:h3n2_2deme" spec="beast.evolution.tree.SCMigrationModel">
+        <parameter id="RealParameter.0" spec="parameter.RealParameter" dimension="2" estimate="false" name="rateMatrix">1.0 1.0</parameter>
+        <parameter id="RealParameter.1" spec="parameter.RealParameter" estimate="false" name="rateMatrixScaleFactor">1.0</parameter>
+        <parameter id="RealParameter.2" spec="parameter.RealParameter" dimension="2" estimate="false" name="popSizes">1.0 1.0</parameter>
+        <parameter id="RealParameter.3" spec="parameter.RealParameter" estimate="false" name="popSizesScaleFactor">1.0</parameter>
+        <typeSet id="typeSet.t:h3n2_2deme" spec="beast.evolution.tree.TypeSet" typeTraitSet="@typeTraitSetInput.t:h3n2_2deme">
+
+        </typeSet>
+    </migrationModel>
+
+
+<run id="mcmc" spec="MCMC" chainLength="10000000">
+    <state id="state" spec="State" storeEvery="5000">
+        <!-- define state node -->
+        <stateNode id="Tree.t:h3n2_2deme"  spec="lineageTree.tree.startingTree" taxa="@h3n2_2deme" rootHeight="32" scarringHeight="25" nClusters="9" adjustTreeNodeHeights="false">
+            <!--typeTrait idref="typeTraitSetInput.t:h3n2_2deme"/-->
+            <!--typeSet idref="typeSet.t:h3n2_2deme"/-->
+            <trait idref="dateTrait.t:h3n2_2deme"/>
+            <taxonset idref="TaxonSet.0"/>
+        </stateNode>
+
+        <parameter id="R0.t:h3n2_2deme" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity">2.0 2.0</parameter>
+        <parameter id="becomeUninfectiousRate.t:h3n2_2deme" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity">1.0 1.0</parameter>
+        <parameter id="samplingProportion.t:h3n2_2deme" spec="parameter.RealParameter" dimension="4" lower="0.0" name="stateNode" upper="1.0">0.0 0.01 0.0 0.01</parameter>
+        <parameter id="rateMatrix.t:h3n2_2deme" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="100.0">0.1 0.1</parameter>
+        <parameter id="geo-frequencies.t:h3n2_2deme" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="1.0">0.5 0.5</parameter>
+        <parameter id="clockRate.c:h3n2_2deme" spec="parameter.RealParameter" name="stateNode">1.0</parameter>
+        <parameter id="kappa.s:h3n2_2deme" spec="parameter.RealParameter" lower="0.0" name="stateNode">2.0</parameter>
+        <parameter id="gammaShape.s:h3n2_2deme" spec="parameter.RealParameter" name="stateNode">1.0</parameter>
+        <parameter id="freqParameter.s:h3n2_2deme" spec="parameter.RealParameter" dimension="4" lower="0.0" name="stateNode" upper="1.0">0.25</parameter>
+    </state>
+
+    <distribution id="posterior" spec="util.CompoundDistribution">
+        <!-- tree prior -->
+        <distribution id="prior" spec="util.CompoundDistribution">
+            <distribution id="birthDeathMigration.t:h3n2_2deme" spec="beast.evolution.speciation.BirthDeathMigrationModelUncoloured"
+                          R0="@R0.t:h3n2_2deme" becomeUninfectiousRate="@becomeUninfectiousRate.t:h3n2_2deme" checkRho="false"
+                          frequencies="@geo-frequencies.t:h3n2_2deme" migrationMatrix="@rateMatrix.t:h3n2_2deme"
+                          samplingProportion="@samplingProportion.t:h3n2_2deme" stateNumber="2" tree="@Tree.t:h3n2_2deme" tiptypes="@typeTraitSetInput.t:h3n2_2deme">
+                <parameter id="samplingRateChangeTimes.s:h3n2_2deme" spec="parameter.RealParameter" dimension="2" name="samplingRateChangeTimes">0.0 31.9</parameter>
+                <reverseTimeArrays id="BooleanParameter.0" spec="parameter.BooleanParameter" dimension="6">false false true false false false</reverseTimeArrays>
+            </distribution>
+
+            <!-- prior distributions on parameters -->
+            <prior id="RPrior.t:h3n2_2deme" name="distribution" x="@R0.t:h3n2_2deme">
+                <LogNormal id="LogNormalDistributionModel.1" name="distr">
+                    <parameter id="RealParameter.7" spec="parameter.RealParameter" estimate="false" name="M">0.0</parameter>
+                    <parameter id="RealParameter.8" spec="parameter.RealParameter" estimate="false" name="S">1.0</parameter>
+                </LogNormal>
+            </prior>
+            <prior id="becomeUninfectiousRatePrior.t:h3n2_2deme" name="distribution" x="@becomeUninfectiousRate.t:h3n2_2deme">
+                <LogNormal id="LogNormalDistributionModel.0" name="distr">
+                    <parameter id="RealParameter.5" spec="parameter.RealParameter" estimate="false" name="M">0.25</parameter>
+                    <parameter id="RealParameter.6" spec="parameter.RealParameter" estimate="false" name="S">0.5</parameter>
+                </LogNormal>
+            </prior>
+            <prior id="ClockPrior.c:h3n2_2deme" name="distribution" x="@clockRate.c:h3n2_2deme">
+                <Uniform id="Uniform.0" name="distr" upper="Infinity"/>
+            </prior>
+            <prior id="FrequenciesPrior.s:h3n2_2deme" name="distribution" x="@freqParameter.s:h3n2_2deme">
+                <Uniform id="Uniform.3" name="distr"/>
+            </prior>
+            <prior id="GammaShapePrior.s:h3n2_2deme" name="distribution" x="@gammaShape.s:h3n2_2deme">
+                <Exponential id="Exponential.0" name="distr">
+                    <parameter id="RealParameter.4" spec="parameter.RealParameter" lower="0.0" name="mean" upper="0.0">1.0</parameter>
+                </Exponential>
+            </prior>
+            <prior id="KappaPrior.s:h3n2_2deme" name="distribution" x="@kappa.s:h3n2_2deme">
+                <LogNormal id="LogNormalDistributionModel.2" name="distr">
+                    <parameter id="RealParameter.9" spec="parameter.RealParameter" estimate="false" name="M">1.0</parameter>
+                    <parameter id="RealParameter.10" spec="parameter.RealParameter" estimate="false" name="S">1.25</parameter>
+                </LogNormal>
+            </prior>
+            <prior id="rateMatrixPrior.t:h3n2_2deme" name="distribution" x="@rateMatrix.t:h3n2_2deme">
+                <Exponential id="Exponential.1" name="distr">
+                    <parameter id="RealParameter.11" spec="parameter.RealParameter" estimate="false" name="mean">1.0</parameter>
+                </Exponential>
+            </prior>
+            <distribution id="samplingProportionPrior.t:h3n2_2deme" spec="multitypetree.distributions.ExcludablePrior" x="@samplingProportion.t:h3n2_2deme">
+                <xInclude id="samplingProportionXInclude.t:h3n2_2deme" spec="parameter.BooleanParameter" dimension="4">false true false true</xInclude>
+                <Uniform id="Uniform.2" name="distr"/>
+            </distribution>
+        </distribution>
+        <!-- Tree likelihood -->
+        <distribution id="likelihood" spec="util.CompoundDistribution">
+            <distribution id="treeLikelihood.h3n2_2deme" spec="lineageTree.distributions.organoidTreeLikelihood" data="@h3n2_2deme" tree="@Tree.t:h3n2_2deme" scarringTime="25" >
+                <siteModel id="SiteModel.s:h3n2_2deme" spec="SiteModel">
+                    <parameter id="mutationRate.s:h3n2_2deme" spec="parameter.RealParameter" estimate="false" name="mutationRate">1.0</parameter>
+                    <parameter idref="gammaShape.s:h3n2_2deme" spec="parameter.RealParameter" estimate="false" name="shape">1.0</parameter>
+                    <parameter id="proportionInvariant.s:h3n2_2deme" spec="parameter.RealParameter" estimate="false" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
+                    <substModel id="JC69.s:h3n2_2deme" spec="JukesCantor"/>
+                </siteModel>
+                <branchRateModel id="StrictClock.c:h3n2_2deme" spec="beast.evolution.branchratemodel.StrictClockModel" clock.rate="@clockRate.c:h3n2_2deme"/>
+            </distribution>
+        </distribution>
+    </distribution>
+
+   <!-- tree operators -->
+    <operator id="treeScaler" scaleFactor="0.75" spec="ScaleOperator"
+              tree="@Tree.t:h3n2_2deme" weight="0.0"/>
+
+    <operator id="R0Scaler.t:h3n2_2deme" spec="ScaleOperator" parameter="@R0.t:h3n2_2deme" scaleFactor="0.8" weight="3.0"/>
+
+    <operator id="becomeUninfectiousRateScaler.t:h3n2_2deme" spec="ScaleOperator" optimise="false" parameter="@becomeUninfectiousRate.t:h3n2_2deme" scaleAll="true" scaleFactor="0.9" weight="1.0"/>
+
+    <operator id="samplingScaler.t:h3n2_2deme" spec="ScaleOperator" parameter="@samplingProportion.t:h3n2_2deme" scaleFactor="0.9" weight="3.0"/>
+
+    <operator id="rateMatrixScaler.t:h3n2_2deme" spec="ScaleOperator" parameter="@rateMatrix.t:h3n2_2deme" scaleFactor="0.8" weight="1.0"/>
+
+    <operator id="geo-frequenciesExchange.t:h3n2_2deme" spec="DeltaExchangeOperator" delta="0.1" weight="0.1">
+        <parameter idref="geo-frequencies.t:h3n2_2deme"/>
+    </operator>
+
+    <operator id="updownBD.t:h3n2_2deme" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
+        <up idref="R0.t:h3n2_2deme"/>
+        <down idref="becomeUninfectiousRate.t:h3n2_2deme"/>
+    </operator>
+
+    <operator id="updownBM.t:h3n2_2deme" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
+        <up idref="R0.t:h3n2_2deme"/>
+        <down idref="rateMatrix.t:h3n2_2deme"/>
+    </operator>
+
+    <operator id="updownDS.t:h3n2_2deme" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
+        <up idref="samplingProportion.t:h3n2_2deme"/>
+        <down idref="becomeUninfectiousRate.t:h3n2_2deme"/>
+    </operator>
+
+    <operator id="StrictClockRateScaler.c:h3n2_2deme" spec="ScaleOperator" parameter="@clockRate.c:h3n2_2deme" scaleFactor="0.75" weight="3.0"/>
+
+    <operator id="KappaScaler.s:h3n2_2deme" spec="ScaleOperator" parameter="@kappa.s:h3n2_2deme" scaleFactor="0.5" weight="0.1"/>
+
+    <operator id="gammaShapeScaler.s:h3n2_2deme" spec="ScaleOperator" parameter="@gammaShape.s:h3n2_2deme" scaleFactor="0.5" weight="0.1"/>
+
+    <operator id="FrequenciesExchanger.s:h3n2_2deme" spec="DeltaExchangeOperator" delta="0.01" weight="0.1">
+        <parameter idref="freqParameter.s:h3n2_2deme"/>
+    </operator>
+
+    <logger id="tracelog" spec="Logger" fileName="$(filebase).log" logEvery="1000">
+        <log idref="posterior"/>
+        <log idref="likelihood"/>
+        <log idref="prior"/>
+        <log idref="treeLikelihood.h3n2_2deme"/>
+        <log id="treeHeight.t:h3n2_2deme" spec="beast.evolution.tree.TreeHeightLogger" tree="@Tree.t:h3n2_2deme"/>
+        <log id="treeLength.t:h3n2_2deme" spec="multitypetree.util.TreeLengthLogger" tree="@Tree.t:h3n2_2deme"/>
+         <log idref="R0.t:h3n2_2deme"/>
+        <log idref="samplingProportion.t:h3n2_2deme"/>
+        <log idref="becomeUninfectiousRate.t:h3n2_2deme"/>
+        <log idref="rateMatrix.t:h3n2_2deme"/>
+        <log idref="geo-frequencies.t:h3n2_2deme"/>
+        <log idref="clockRate.c:h3n2_2deme"/>
+        <log idref="kappa.s:h3n2_2deme"/>
+        <log idref="gammaShape.s:h3n2_2deme"/>
+        <log idref="freqParameter.s:h3n2_2deme"/>
+    </logger>
+
+    <logger id="screenlog" spec="Logger" logEvery="1000">
+        <log idref="posterior"/>
+        <log id="ESS.0" spec="util.ESS" arg="@posterior"/>
+        <log idref="likelihood"/>
+        <log idref="prior"/>
+    </logger>
+
+    <logger id="treelog.t:h3n2_2deme" spec="Logger" fileName="$(filebase).$(tree).trees" logEvery="10000" mode="tree">
+        <log idref="Tree.t:h3n2_2deme"/>
+    </logger>
+
+
+</run>
+
+</beast>
