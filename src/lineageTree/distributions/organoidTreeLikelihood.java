@@ -8,6 +8,8 @@ import beast.evolution.likelihood.GenericTreeLikelihood;
 import beast.evolution.tree.Node;
 import beast.evolution.tree.TreeInterface;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +18,7 @@ import java.util.Queue;
 @Description("Accepts or reject trees, given that they conform with assumptions on the scarring process")
 public class organoidTreeLikelihood extends GenericTreeLikelihood {
 
-    final public Input<Double> scarTimeInput = new Input<>("scarringTime", "Duration between the root and the onset of scarring", -1.0);
-    //final public Input<Alignment> dataInput = new Input<>("data", "sequence data for the beast.tree", Input.Validate.REQUIRED);
-    //final public Input<TreeInterface> treeInput = new Input<>("tree", "phylogenetic beast.tree with sequence data in the leafs", Input.Validate.REQUIRED);
+    final public Input<Double> scarringHeightInput = new Input<>("scarringHeight", "Duration between the onset of scarring and sampling of the cells", -1.0);
 
 
     public void initAndValidate() {
@@ -36,13 +36,19 @@ public class organoidTreeLikelihood extends GenericTreeLikelihood {
      */
     public double calculateLogP(){
 
-        final double scarTime = scarTimeInput.get();
+        // achtung ich suche nur nach subtreenodes, die unter der scarring height anfangen
+        // damit "strafe ich keine nodes ab, die über der scarring height sind
+
+        // füge funktion hinzu, die prüft, dass der rootnode aller identical sequences unter der scarringheight ist.
+        // -> and <-
+
+        final double scarringHeight = scarringHeightInput.get();
         final Alignment alignment = dataInput.get();
         final TreeInterface tree = treeInput.get();
-        double scarringHeight = 32 - scarTime; //tree.getRoot().getHeight()
 
-
+        //check that leaves below the subTreeRoot are identical (->)
         List<Node> nodesAfterScarring = getNodesAfterScarring(tree, scarringHeight);
+
 
         for  (int i=0; i < nodesAfterScarring.size(); i++){
 
@@ -59,13 +65,39 @@ public class organoidTreeLikelihood extends GenericTreeLikelihood {
             }
         }
 
+        // check that all identical leave nodes coalesce before the scarringHeight (<-)
+        List<Node> leaves = tree.getExternalNodes();
+
+        for (int i=0; i<leaves.size(); i++){
+            for (int j=i+1; j<leaves.size(); j++){
+
+                Node leaf_1 = leaves.get(i);
+                Node leaf_2 = leaves.get(j);
+
+                String seq_1 = alignment.getSequenceAsString(leaf_1.getID());
+                String seq_2 = alignment.getSequenceAsString(leaf_2.getID());
+
+                //if the sequences are identical, their MRCA's height has to be <= scarringHeight
+                if (seq_1.compareTo(seq_2) == 0 ){
+                    // if the MRCA's height is above the scarring event, reject tree
+                    if (! MRCA_before_scarring(scarringHeight, leaf_1, leaf_2)){
+                        return (Double.NEGATIVE_INFINITY);
+                    }
+                }
+
+            }
+        }
+
         return(0);
     }
 
+    void calcLogP() {
+        logP = 0.0;
+    }
 
 
-    /** Collects all nodes, that appear immediately after (~ toward the leaves) the scarring event using BFS
-    **/
+        /** Collects all nodes, that appear immediately after (~ toward the leaves) the scarring event using BFS
+        **/
     public List<Node> getNodesAfterScarring(final TreeInterface tree, final double scarringHeight){
 
         List<Node> nodesAfterScarring = new ArrayList<>();
@@ -90,6 +122,40 @@ public class organoidTreeLikelihood extends GenericTreeLikelihood {
         }
 
         return  nodesAfterScarring;
+    }
+
+
+    /**
+     * Determines, whether the nodes 1 and 2 coalesce before (between the present and) the scarring event
+     * @param scarringHeight
+     * @return
+     */
+    public boolean MRCA_before_scarring(final double scarringHeight, Node leaf_1, Node leaf_2){
+
+        Node parent = leaf_1.getParent();
+
+        while (true){
+
+            //System.out.println("Error from leaf1: "+leaf_1.getNr() + " leaf2 :  " + leaf_2.getNr());
+            List<Node> childrenOfParent = parent.getAllChildNodesAndSelf();
+
+            //if parent is the MRCA of leaf_1 and leaf_2
+            if (childrenOfParent.contains(leaf_2)){
+                // check whether MRCA is between leaves and scarringHeight
+                MathContext m = new MathContext((3));
+                BigDecimal parentHeight = new BigDecimal(parent.getHeight());
+                BigDecimal roundedParentHeight = parentHeight.round(m);
+
+                if( roundedParentHeight.doubleValue() <= scarringHeight){
+                    return true;
+                }else{
+                    return false;
+                }
+            // if parent is not MRCA, choose its parent and test again
+            }else{
+                parent = parent.getParent();
+            }
+        }
     }
 
 

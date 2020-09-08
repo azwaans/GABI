@@ -171,7 +171,7 @@
         </distribution>
         <!-- Tree likelihood -->
         <distribution id="likelihood" spec="util.CompoundDistribution">
-            <distribution id="treeLikelihood.h3n2_2deme" spec="lineageTree.distributions.organoidTreeLikelihood" data="@h3n2_2deme" tree="@Tree.t:h3n2_2deme" scarringTime="25" >
+            <distribution id="treeLikelihood.h3n2_2deme" spec="lineageTree.distributions.organoidTreeLikelihood" data="@h3n2_2deme" tree="@Tree.t:h3n2_2deme" scarringHeight="25" >
                 <siteModel id="SiteModel.s:h3n2_2deme" spec="SiteModel">
                     <parameter id="mutationRate.s:h3n2_2deme" spec="parameter.RealParameter" estimate="false" name="mutationRate">1.0</parameter>
                     <parameter idref="gammaShape.s:h3n2_2deme" spec="parameter.RealParameter" estimate="false" name="shape">1.0</parameter>
@@ -184,8 +184,12 @@
     </distribution>
 
    <!-- tree operators -->
-    <operator id="treeScaler" scaleFactor="0.75" spec="ScaleOperator"
-              tree="@Tree.t:h3n2_2deme" weight="0.0"/>
+    <operator id="treeWB" spec="WilsonBalding"
+              tree="@Tree.t:h3n2_2deme" weight="3.0"/>
+
+    <operator id="Unif" spec="Uniform" tree="@Tree.t:h3n2_2deme" weight="3.0"/>
+
+    <!-- operator id="nodeReheight" spec="NodeReheight" tree="@Tree.t:h3n2_2deme"  taxonset="@TaxonSet.0" weight="3.0" /-->
 
     <operator id="R0Scaler.t:h3n2_2deme" spec="ScaleOperator" parameter="@R0.t:h3n2_2deme" scaleFactor="0.8" weight="3.0"/>
 
