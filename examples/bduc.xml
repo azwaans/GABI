@@ -61,8 +61,6 @@
 
     </data>
 
-
-    
 <map name="Uniform" >beast.math.distributions.Uniform</map>
 <map name="Exponential" >beast.math.distributions.Exponential</map>
 <map name="LogNormal" >beast.math.distributions.LogNormalDistributionModel</map>
@@ -96,6 +94,19 @@
         </typeSet>
     </migrationModel>
 
+    <!-- calculate birth, death and sampling rates -->
+    <RPNcalculator spec="beast.math.statistic.RPNcalculator" id="birth" expression="R0 becomeUninfectiousRate *"> <!-- s/(d+s) -->
+        <parameter idref="deathRate"/>
+        <parameter idref="birthRate"/>
+    </RPNcalculator>
+    <RPNcalculator spec="beast.math.statistic.RPNcalculator" id="sampling" expression="becomeUninfectiousRate samplingRateortion *">
+        <parameter idref="deathRate"/>
+        <parameter idref="samplingRate"/>
+    </RPNcalculator>
+    <RPNcalculator spec="beast.math.statistic.RPNcalculator" id="death" expression="becomeUninfectiousRate 1 samplingRate - *"> <!-- b*S0/(d+s) -->
+        <parameter idref="deathRate"/>
+        <parameter idref="samplingRate"/>
+    </RPNcalculator>
 
 <run id="mcmc" spec="MCMC" chainLength="10000000">
     <state id="state" spec="State" storeEvery="5000">
@@ -107,9 +118,9 @@
             <taxonset idref="TaxonSet.0"/>
         </stateNode>
 
-        <parameter id="R0.t:h3n2_2deme" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity">2.0 2.0</parameter>
-        <parameter id="becomeUninfectiousRate.t:h3n2_2deme" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity">1.0 1.0</parameter>
-        <parameter id="samplingProportion.t:h3n2_2deme" spec="parameter.RealParameter" dimension="4" lower="0.0" name="stateNode" upper="1.0">0.0 0.01 0.0 0.01</parameter>
+        <parameter id="birthRate" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity">2.0 2.0</parameter>
+        <parameter id="deathRate" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity">0.001 0.001</parameter>
+        <parameter id="samplingRate" spec="parameter.RealParameter" dimension="4" lower="0.0" name="stateNode" upper="1.0">0.0 0.0001 0.0 0.0001</parameter>
         <parameter id="rateMatrix.t:h3n2_2deme" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="100.0">0.1 0.1</parameter>
         <parameter id="geo-frequencies.t:h3n2_2deme" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="1.0">0.5 0.5</parameter>
         <parameter id="clockRate.c:h3n2_2deme" spec="parameter.RealParameter" name="stateNode">1.0</parameter>
@@ -122,21 +133,21 @@
         <!-- tree prior -->
         <distribution id="prior" spec="util.CompoundDistribution">
             <distribution id="birthDeathMigration.t:h3n2_2deme" spec="beast.evolution.speciation.BirthDeathMigrationModelUncoloured"
-                          R0="@R0.t:h3n2_2deme" becomeUninfectiousRate="@becomeUninfectiousRate.t:h3n2_2deme" checkRho="false"
+                          birthRate="@birthRate" deathRate="@deathRate" checkRho="false"
                           frequencies="@geo-frequencies.t:h3n2_2deme" migrationMatrix="@rateMatrix.t:h3n2_2deme"
-                          samplingProportion="@samplingProportion.t:h3n2_2deme" stateNumber="2" tree="@Tree.t:h3n2_2deme" tiptypes="@typeTraitSetInput.t:h3n2_2deme">
+                          samplingRate="@samplingRate" stateNumber="2" tree="@Tree.t:h3n2_2deme" tiptypes="@typeTraitSetInput.t:h3n2_2deme">
                 <parameter id="samplingRateChangeTimes.s:h3n2_2deme" spec="parameter.RealParameter" dimension="2" name="samplingRateChangeTimes">0.0 31.9</parameter>
                 <reverseTimeArrays id="BooleanParameter.0" spec="parameter.BooleanParameter" dimension="6">false false true false false false</reverseTimeArrays>
             </distribution>
 
             <!-- prior distributions on parameters -->
-            <prior id="RPrior.t:h3n2_2deme" name="distribution" x="@R0.t:h3n2_2deme">
+            <prior id="RPrior.t:h3n2_2deme" name="distribution" x="@birthRate">
                 <LogNormal id="LogNormalDistributionModel.1" name="distr">
                     <parameter id="RealParameter.7" spec="parameter.RealParameter" estimate="false" name="M">0.0</parameter>
                     <parameter id="RealParameter.8" spec="parameter.RealParameter" estimate="false" name="S">1.0</parameter>
                 </LogNormal>
             </prior>
-            <prior id="becomeUninfectiousRatePrior.t:h3n2_2deme" name="distribution" x="@becomeUninfectiousRate.t:h3n2_2deme">
+            <prior id="becomeUninfectiousRatePrior.t:h3n2_2deme" name="distribution" x="@deathRate">
                 <LogNormal id="LogNormalDistributionModel.0" name="distr">
                     <parameter id="RealParameter.5" spec="parameter.RealParameter" estimate="false" name="M">0.25</parameter>
                     <parameter id="RealParameter.6" spec="parameter.RealParameter" estimate="false" name="S">0.5</parameter>
@@ -164,8 +175,8 @@
                     <parameter id="RealParameter.11" spec="parameter.RealParameter" estimate="false" name="mean">1.0</parameter>
                 </Exponential>
             </prior>
-            <distribution id="samplingProportionPrior.t:h3n2_2deme" spec="multitypetree.distributions.ExcludablePrior" x="@samplingProportion.t:h3n2_2deme">
-                <xInclude id="samplingProportionXInclude.t:h3n2_2deme" spec="parameter.BooleanParameter" dimension="4">false true false true</xInclude>
+            <distribution id="samplingRateortionPrior.t:h3n2_2deme" spec="multitypetree.distributions.ExcludablePrior" x="@samplingRate">
+                <xInclude id="samplingRateortionXInclude.t:h3n2_2deme" spec="parameter.BooleanParameter" dimension="4">false true false true</xInclude>
                 <Uniform id="Uniform.2" name="distr"/>
             </distribution>
         </distribution>
@@ -189,33 +200,36 @@
 
     <operator id="Unif" spec="Uniform" tree="@Tree.t:h3n2_2deme" weight="3.0"/>
 
+    <operator id="SubtreeSlideOperator" spec="SubtreeSlide" tree="@Tree.t:h3n2_2deme" weight="3.0"/>
+
+
     <!-- operator id="nodeReheight" spec="NodeReheight" tree="@Tree.t:h3n2_2deme"  taxonset="@TaxonSet.0" weight="3.0" /-->
 
-    <operator id="R0Scaler.t:h3n2_2deme" spec="ScaleOperator" parameter="@R0.t:h3n2_2deme" scaleFactor="0.8" weight="3.0"/>
+    <operator id="birthRateScaler" spec="ScaleOperator" parameter="@birthRate" scaleFactor="0.8" weight="3.0"/>
 
-    <operator id="becomeUninfectiousRateScaler.t:h3n2_2deme" spec="ScaleOperator" optimise="false" parameter="@becomeUninfectiousRate.t:h3n2_2deme" scaleAll="true" scaleFactor="0.9" weight="1.0"/>
+    <!--operator id="deathRateScaler" spec="ScaleOperator" optimise="false" parameter="@deathRate" scaleAll="true" scaleFactor="0.9" weight="1.0"/-->
 
-    <operator id="samplingScaler.t:h3n2_2deme" spec="ScaleOperator" parameter="@samplingProportion.t:h3n2_2deme" scaleFactor="0.9" weight="3.0"/>
+    <operator id="samplingScaler" spec="ScaleOperator" parameter="@samplingRate" scaleFactor="0.9" weight="3.0"/>
 
-    <operator id="rateMatrixScaler.t:h3n2_2deme" spec="ScaleOperator" parameter="@rateMatrix.t:h3n2_2deme" scaleFactor="0.8" weight="1.0"/>
+    <operator id="rateMatrixScaler" spec="ScaleOperator" parameter="@rateMatrix.t:h3n2_2deme" scaleFactor="0.8" weight="1.0"/>
 
     <operator id="geo-frequenciesExchange.t:h3n2_2deme" spec="DeltaExchangeOperator" delta="0.1" weight="0.1">
         <parameter idref="geo-frequencies.t:h3n2_2deme"/>
     </operator>
 
     <operator id="updownBD.t:h3n2_2deme" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
-        <up idref="R0.t:h3n2_2deme"/>
-        <down idref="becomeUninfectiousRate.t:h3n2_2deme"/>
+        <up idref="birthRate"/>
+        <down idref="samplingRate"/>
     </operator>
 
     <operator id="updownBM.t:h3n2_2deme" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
-        <up idref="R0.t:h3n2_2deme"/>
+        <up idref="birthRate"/>
         <down idref="rateMatrix.t:h3n2_2deme"/>
     </operator>
 
     <operator id="updownDS.t:h3n2_2deme" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
-        <up idref="samplingProportion.t:h3n2_2deme"/>
-        <down idref="becomeUninfectiousRate.t:h3n2_2deme"/>
+        <up idref="samplingRate"/>
+        <down idref="rateMatrix.t:h3n2_2deme"/>
     </operator>
 
     <operator id="StrictClockRateScaler.c:h3n2_2deme" spec="ScaleOperator" parameter="@clockRate.c:h3n2_2deme" scaleFactor="0.75" weight="3.0"/>
@@ -228,16 +242,19 @@
         <parameter idref="freqParameter.s:h3n2_2deme"/>
     </operator>
 
-    <logger id="tracelog" spec="Logger" fileName="$(filebase).log" logEvery="1000">
+    <logger id="tracelog" spec="Logger" fileName="$(filebase).$(seed).log" logEvery="1000">
         <log idref="posterior"/>
         <log idref="likelihood"/>
         <log idref="prior"/>
         <log idref="treeLikelihood.h3n2_2deme"/>
         <log id="treeHeight.t:h3n2_2deme" spec="beast.evolution.tree.TreeHeightLogger" tree="@Tree.t:h3n2_2deme"/>
         <log id="treeLength.t:h3n2_2deme" spec="multitypetree.util.TreeLengthLogger" tree="@Tree.t:h3n2_2deme"/>
-         <log idref="R0.t:h3n2_2deme"/>
-        <log idref="samplingProportion.t:h3n2_2deme"/>
-        <log idref="becomeUninfectiousRate.t:h3n2_2deme"/>
+       <!-- <log idref="birth"/>
+        <log idref="death"/>
+        <log idref="sampling"/>-->
+        <log idref="birthRate"/>
+        <log idref="samplingRate"/>
+        <log idref="deathRate"/>
         <log idref="rateMatrix.t:h3n2_2deme"/>
         <log idref="geo-frequencies.t:h3n2_2deme"/>
         <log idref="clockRate.c:h3n2_2deme"/>
@@ -253,8 +270,8 @@
         <log idref="prior"/>
     </logger>
 
-    <logger id="treelog.t:h3n2_2deme" spec="Logger" fileName="$(filebase).$(tree).trees" logEvery="10000" mode="tree">
-        <log idref="Tree.t:h3n2_2deme"/>
+    <logger id="treelog.t:h3n2_2deme" spec="Logger" fileName="$(filebase).$(tree).$(seed).trees" logEvery="10000" mode="tree">
+        <log idref="Tree.t:h3n2_2deme" printMetaData="true"/>
     </logger>
 
 
