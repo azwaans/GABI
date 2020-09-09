@@ -68,23 +68,33 @@ public class organoidTreeLikelihood extends GenericTreeLikelihood {
         // check that all identical leave nodes coalesce before the scarringHeight (<-)
         List<Node> leaves = tree.getExternalNodes();
 
+        outerloop:
         for (int i=0; i<leaves.size(); i++){
             for (int j=i+1; j<leaves.size(); j++){
 
                 Node leaf_1 = leaves.get(i);
                 Node leaf_2 = leaves.get(j);
 
-                String seq_1 = alignment.getSequenceAsString(leaf_1.getID());
-                String seq_2 = alignment.getSequenceAsString(leaf_2.getID());
+                // if either leaf has no edits (is marked with cluster 0)
+                if(leaf_1.getMetaData("cluster").equals(0)){
+                    break;
 
-                //if the sequences are identical, their MRCA's height has to be <= scarringHeight
-                if (seq_1.compareTo(seq_2) == 0 ){
-                    // if the MRCA's height is above the scarring event, reject tree
-                    if (! MRCA_before_scarring(scarringHeight, leaf_1, leaf_2)){
-                        return (Double.NEGATIVE_INFINITY);
+                }else if(leaf_2.getMetaData("cluster").equals(0)){
+                    continue;
+
+                // else enforce condition
+                }else{
+                    String seq_1 = alignment.getSequenceAsString(leaf_1.getID());
+                    String seq_2 = alignment.getSequenceAsString(leaf_2.getID());
+
+                    //if the sequences are identical, their MRCA's height has to be <= scarringHeight
+                    if (seq_1.compareTo(seq_2) == 0 ) {
+                        // if the MRCA's height is above the scarring event, reject tree
+                        if (!MRCA_before_scarring(scarringHeight, leaf_1, leaf_2)) {
+                            return (Double.NEGATIVE_INFINITY);
+                        }
                     }
                 }
-
             }
         }
 
