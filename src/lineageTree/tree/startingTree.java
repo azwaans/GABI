@@ -107,7 +107,7 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         return matchMatrix;
     }
 
-    public Node get_cluster_tree(int iSeq, double scarringHeight, Alignment taxa){
+    public Node get_cluster_tree(int iSeq, double scarringHeight, Alignment taxa, int iCluster){
         //build subtree for identical sequences with equally spaced divergence
         // times between the internal nodes up until the scarring event
 
@@ -120,6 +120,8 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         nodeLeft.setHeight(0);
         nodeLeft.setNr(iSeq);
         nodeLeft.setID(taxaNames.get(iSeq));
+        nodeLeft.setMetaData("cluster", iCluster);
+        nodeLeft.metaDataString = ("cluster=" + iCluster);
 
         for (int iMatch=1; iMatch <= nMatches; iMatch++){
             //set up right node
@@ -127,6 +129,8 @@ public class startingTree extends Tree implements StateNodeInitialiser {
             nodeRight.setHeight(0.0);
             nodeRight.setID(taxaNames.get(iSeq + iMatch));
             nodeRight.setNr(iSeq + iMatch);
+            nodeRight.setMetaData("cluster", iCluster);
+            nodeRight.metaDataString = ("cluster=" + iCluster);
             cSeq++;
 
             //set up parent node
@@ -137,6 +141,8 @@ public class startingTree extends Tree implements StateNodeInitialiser {
             parent.setNr(cSeq);
             parent.addChild(nodeLeft);
             parent.addChild(nodeRight);
+            parent.setMetaData("cluster", iCluster);
+            parent.metaDataString = ("cluster=" + iCluster);
 
             nodeLeft = parent;
         }
@@ -156,7 +162,7 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         double divTime = (rootHeight - scarringHeight) / nClusters;
 
         // get left subtree
-        Node subtreeLeft = get_cluster_tree(iSeq, scarringHeight, taxa);
+        Node subtreeLeft = get_cluster_tree(iSeq, scarringHeight, taxa, 0);
         // update iSeq to next cluster start
         nMatches = IntStream.of(matchMatrix[iSeq]).sum();
         iSeq += (nMatches +1);
@@ -165,7 +171,7 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         for (int iCluster=1; iCluster < nClusters; iCluster++){
 
             // get right subtree
-            Node subtreeRight = get_cluster_tree(iSeq, scarringHeight, taxa);
+            Node subtreeRight = get_cluster_tree(iSeq, scarringHeight, taxa, iCluster);
             nMatches = IntStream.of(matchMatrix[iSeq]).sum();
             iSeq += (nMatches+1);
 
@@ -173,10 +179,12 @@ public class startingTree extends Tree implements StateNodeInitialiser {
             Node parent = new Node();
             parent.setHeight(scarringHeight + iCluster * divTime);
             // Number of nodes in the final tree - number of nodes that have yet to be created
-            parent.setNr(nTaxa + (nTaxa - 1)     - (nClusters-iCluster)); // check
-
+            parent.setNr(nTaxa + (nTaxa - 1)     - (nClusters-iCluster));
             parent.addChild(subtreeLeft);
             parent.addChild(subtreeRight);
+            parent.setMetaData("cluster", 0);
+            parent.metaDataString = "cluster=0";
+
 
             // setup as left tree to end recursion
             subtreeLeft = parent;
