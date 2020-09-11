@@ -67,8 +67,6 @@ public class startingTree extends Tree implements StateNodeInitialiser {
 
     @Override
     public void initStateNodes() {
-        //TODO which statenodes have to be initialised? -  the tree
-        //TODO when does super.initAndValidate have to be called?
 
         root = get_tree(rootHeight, scarringHeight, taxa, nClusters, matchMatrix);
         leafNodeCount = nTaxa;
