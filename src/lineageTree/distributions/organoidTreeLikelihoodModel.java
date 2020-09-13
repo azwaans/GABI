@@ -197,7 +197,8 @@ public class organoidTreeLikelihoodModel extends GenericTreeLikelihood {
 
             // set scarring sequnce as metadata
             node.setMetaData("state", intList);
-            node.metaDataString = (node.metaDataString + ",state="+ intList.stream().toString());
+            node.metaDataString = (node.metaDataString + ",state="+
+                    intList.toString().replace(",", "").replace("[", "").replace("]", "").trim());
             return(intList);
 
         // given internal node, check childrens sequences and ...
@@ -243,7 +244,8 @@ public class organoidTreeLikelihoodModel extends GenericTreeLikelihood {
             }
 
             node.setMetaData("state", node_seq);
-            node.metaDataString = (node.metaDataString + ",state="+ node_seq.stream().toString());
+            node.metaDataString = (node.metaDataString + ",state="+
+                    node_seq.toString().replace(",", "").replace("[", "").replace("]", "").trim());
 
             return node_seq;
         }
