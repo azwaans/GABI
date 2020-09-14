@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
+
 @Description("Computes probability of the tree given a simple model")
 public class organoidTreeLikelihoodModel extends GenericTreeLikelihood {
 
@@ -52,7 +53,6 @@ public class organoidTreeLikelihoodModel extends GenericTreeLikelihood {
 
 
         // assign state to internal nodes
-        //TODO check number of scars! Make state list available in metadastring to facilitate trouble shooting
         List<Integer> rootSeq = assign_internal_node_states(tree.getRoot(), alignment);
 
 
@@ -190,7 +190,7 @@ public class organoidTreeLikelihoodModel extends GenericTreeLikelihood {
     public List<Integer> assign_internal_node_states(Node node, Alignment alignment){
         DataType datT = new IntegerData();
 
-        // given node is leaf, report leaf sequence
+        // leaf node (1)
         if (node.isLeaf()){
             String leafSeq = alignment.getSequenceAsString(node.getID());
             List<Integer> intList = datT.stringToEncoding(leafSeq);
@@ -201,46 +201,44 @@ public class organoidTreeLikelihoodModel extends GenericTreeLikelihood {
                     intList.toString().replace(",", "").replace("[", "").replace("]", "").trim());
             return(intList);
 
-        // given internal node, check childrens sequences and ...
+        // internal node
         }else{
             List<Integer> child1_seq = assign_internal_node_states(node.getChild(0), alignment);
             List<Integer> child2_seq = assign_internal_node_states(node.getChild(1), alignment);
+            List<Integer> node_seq =  new ArrayList<>(child1_seq.size());
 
-
-            // ... create sequence for this node
-            // use the same seq element from either child if they are equal
-            // otw use the larger integer from either child
-            List<Integer> node_seq =  new ArrayList<>();
-
-            for (int i=0; i <child1_seq.size(); i++){
-                Integer elem1 = child1_seq.get(i);
-                Integer elem2 = child2_seq.get(i);
-
-                if (elem1.equals(elem2)){
-                        node_seq.add(elem1);
-
-                }else if (elem1 > elem2){
-                        node_seq.add(elem1);
-
-                } else if (elem2 > elem1){
-                        node_seq.add(elem2);
-                } else{
-                        System.err.println("Integer should be either equal, smaller or larger");
-                }
-            }
-
-            // if node appears before scarring, then the number of scars have to be unedited scarring sites
+            // internal node above scarring event (3), (4)
             if (node.getHeight() > scarringHeight){
-                int nScars = 0;
-                for ( int i=0; i<node_seq.size(); i++){
-                    int nScarsOfType = node_seq.get(i);
-                    nScars += nScarsOfType;
-                    // set all edited scars to 0, as they were aquired during the scarring event
-                    node_seq.set(i, 0);
-                }
+                int nScars_1 = 0;
+                int nScars_2 = 0;
 
-                // set new sequence of unedited scars
-                node_seq.set(0, nScars);
+                for (int i=0; i<child1_seq.size(); i++){
+                    nScars_1 += child1_seq.get(i);
+                    nScars_2 += child2_seq.get(i);
+                    node_seq.add(0);
+                }
+                int max = java.lang.Math.max(nScars_1, nScars_2);
+                node_seq.set(0, max); // unedited scar type  == pos 0
+
+            // internal node up to scarring event (2)
+            }else {
+
+                for (int i = 0; i < child1_seq.size(); i++) {
+                    Integer elem1 = child1_seq.get(i);
+                    Integer elem2 = child2_seq.get(i);
+
+                    if (elem1.equals(elem2)) {
+                        node_seq.add(elem1);
+
+                    } else if (elem1 > elem2) {
+                        node_seq.add(elem1);
+
+                    } else if (elem2 > elem1) {
+                        node_seq.add(elem2);
+                    } else {
+                        System.err.println("Integer should be either equal, smaller or larger");
+                    }
+                }
             }
 
             node.setMetaData("state", node_seq);
