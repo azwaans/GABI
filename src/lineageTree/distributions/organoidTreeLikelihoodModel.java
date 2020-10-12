@@ -1,29 +1,39 @@
 package lineageTree.distributions;
 
-
 import beast.core.Description;
 import beast.core.Input;
 import beast.evolution.alignment.Alignment;
-import beast.evolution.likelihood.GenericTreeLikelihood;
-import beast.evolution.tree.Node;
-import beast.evolution.tree.TreeInterface;
 import beast.evolution.datatype.DataType;
 import beast.evolution.datatype.IntegerData;
+import beast.evolution.likelihood.GenericTreeLikelihood;
+import beast.evolution.sitemodel.SiteModel;
+import beast.evolution.substitutionmodel.SubstitutionModel;
+import beast.evolution.tree.Node;
+import beast.evolution.tree.TreeInterface;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 
 @Description("Computes probability of the tree given a simple model")
 public class organoidTreeLikelihoodModel extends GenericTreeLikelihood {
 
     final public Input<Double> scarringHeightInput = new Input<>("scarringHeight", "Duration between the onset of scarring and sampling of the cells", -1.0);
+    final public Input<Double> scarringDurationInput = new Input<>("scarringDuration", "Duration of scarring");
+    /**
+     * BEASTObject associated with inputs. Since none of the inputs are StateNodes, it
+     * is safe to link to them only once, during initAndValidate.
+     */
+    protected SiteModel.Base m_siteModel;
+    protected SubstitutionModel substitutionModel;
 
+    public SubstitutionModel getSubstitutionModel() {return substitutionModel;}
+
+
+    double[] probabilities;
     double scarringHeight;
+    double scarringDuration;
 
     public void initAndValidate() {
         // sanity check: alignment should have same #taxa as tree
@@ -31,8 +41,20 @@ public class organoidTreeLikelihoodModel extends GenericTreeLikelihood {
             throw new IllegalArgumentException("The number of nodes in the tree does not match the number of sequences");
         }
 
+        //init site and substitution model related things
+        if (!(siteModelInput.get() instanceof SiteModel.Base)) {
+            throw new IllegalArgumentException("siteModel input should be of type SiteModel.Base");
+        }
+        m_siteModel = (SiteModel.Base) siteModelInput.get();
+        m_siteModel.setDataType(dataInput.get().getDataType());
+        substitutionModel = m_siteModel.substModelInput.get();
+        probabilities = new double[4];
+        Arrays.fill(probabilities, 1.0);
+
+        // init input arguments
         Alignment alignment = dataInput.get();
         scarringHeight = scarringHeightInput.get();
+        scarringDuration = scarringDurationInput.get();
     }
 
     /**
@@ -41,13 +63,7 @@ public class organoidTreeLikelihoodModel extends GenericTreeLikelihood {
      */
     public double calculateLogP(){
 
-        // achtung ich suche nur nach subtreenodes, die unter der scarring height anfangen
-        // damit "strafe ich keine nodes ab, die über der scarring height sind
-
-        // füge funktion hinzu, die prüft, dass der rootnode aller identical sequences unter der scarringheight ist.
-        // -> and <-
-
-
+        // init
         final Alignment alignment = dataInput.get();
         TreeInterface tree = treeInput.get();
 
@@ -55,64 +71,172 @@ public class organoidTreeLikelihoodModel extends GenericTreeLikelihood {
         // assign state to internal nodes
         List<Integer> rootSeq = assign_internal_node_states(tree.getRoot(), alignment);
 
+        double logP = 0;
+        List<Node> intNodes = tree.getInternalNodes();
 
-        //check that leaves below the subTreeRoot are identical (->)
-        List<Node> nodesAfterScarring = getNodesAfterScarring(tree, scarringHeight);
+        //loop over all branch lengths
+        for (int i=0; i<intNodes.size(); i++){
 
+            Node parent = intNodes.get(i);
+            double ph = parent.getHeight();
+            List<Integer> pSeq = (List<Integer>)parent.getMetaData("state");
 
-        for  (int i=0; i < nodesAfterScarring.size(); i++){
+            List<Node> children = parent.getChildren();
 
-            Node subTreeRoot = nodesAfterScarring.get(i);
-            List<Node> leafNodes = subTreeRoot.getAllLeafNodes();
-            String seqToCompare = alignment.getSequenceAsString(leafNodes.get(0).getID());
+            for(int j=0; j<children.size(); j++){
 
-            for (int j=0; j < leafNodes.size(); j++){
-                String leafNodeSeq = alignment.getSequenceAsString(leafNodes.get(j).getID());
+                Node child = children.get(j);
+                double ch = child.getHeight();
+                List<Integer> cSeq = (List<Integer>)child.getMetaData("state");
 
-                if( seqToCompare.compareTo(leafNodeSeq) != 0){
-                    return (Double.NEGATIVE_INFINITY);
-                }
-            }
-        }
+                // test to which tree segment parent and child belong to get transition probabilities
+                if (ph > scarringHeight){
+                    if (ch > scarringHeight){
+                        substitutionModel.getTransitionProbabilities(child, ph, ch, 1, probabilities);
 
-        // check that all identical leave nodes coalesce before the scarringHeight (<-)
-        List<Node> leaves = tree.getExternalNodes();
+                        logP += calcBranchLogPLoss(pSeq, cSeq, probabilities);
 
-        outerloop:
-        for (int i=0; i<leaves.size(); i++){
-            for (int j=i+1; j<leaves.size(); j++){
+                    }else if(ch > (scarringHeight - scarringDuration)){
+                        Node intermediate = new Node();
+                        intermediate.setHeight(scarringHeight);
 
-                Node leaf_1 = leaves.get(i);
-                Node leaf_2 = leaves.get(j);
+                        // add up segment 1 prob
+                        substitutionModel.getTransitionProbabilities(intermediate, ph, scarringHeight, 1, probabilities);
+                        // NOTE: Here I make an assumption on the assignment of internal node states as implemented in the
+                        // function below. On the branch between a node in the scarring window and a node above the scarring window, only scarring occurs
+                        // -> no loss -> therefore I set the seq here to the parent sequence
+                        int nBarcodeP = pSeq.stream().mapToInt(Integer::intValue).sum();
+                        int nBarcodeC = cSeq.stream().mapToInt(Integer::intValue).sum();
 
-                // if either leaf has no edits (is marked with cluster 0)
-                if(leaf_1.getMetaData("cluster").equals(0)){
-                    break;
-
-                }else if(leaf_2.getMetaData("cluster").equals(0)){
-                    continue;
-
-                // else enforce condition
-                }else{
-                    String seq_1 = alignment.getSequenceAsString(leaf_1.getID());
-                    String seq_2 = alignment.getSequenceAsString(leaf_2.getID());
-
-                    //if the sequences are identical, their MRCA's height has to be <= scarringHeight
-                    if (seq_1.compareTo(seq_2) == 0 ) {
-                        // if the MRCA's height is above the scarring event, reject tree
-                        if (!MRCA_before_scarring(scarringHeight, leaf_1, leaf_2)) {
-                            return (Double.NEGATIVE_INFINITY);
+                        // no loss event
+                        if( nBarcodeP == nBarcodeC){
+                            logP += probabilities[0] * nBarcodeC; // not lost
+                        // loss event needed
+                        } else if(nBarcodeP > nBarcodeC){
+                            int diff = nBarcodeP - nBarcodeC;
+                            logP += probabilities[1]* diff;       // lost
+                            logP += probabilities[0] * nBarcodeC; //not lost
+                        }else {
+                            throw new RuntimeException("Parent has " + nBarcodeP +" and child has " + nBarcodeC + " barcodes. Wrong internal node assignment!");
                         }
+
+                        // segment 2 prob
+                        substitutionModel.getTransitionProbabilities(child, scarringHeight, ch, 1, probabilities);
+                        logP += calcBranchLogPScar(pSeq, cSeq, probabilities);
+
+                    } else if (ch < (scarringHeight - scarringDuration)){
+                        Node intermediate1 = new Node();
+                        Node intermediate2 = new Node();
+                        intermediate1.setHeight(scarringHeight);
+                        intermediate2.setHeight(scarringHeight-scarringDuration);
+
+                        // add up segment 1 prob
+                        substitutionModel.getTransitionProbabilities(intermediate1, ph, scarringHeight, 1, probabilities);
+                        logP += calcBranchLogPLoss(pSeq, pSeq, probabilities);
+
+                        // segment 2 prob
+                        substitutionModel.getTransitionProbabilities(intermediate2, scarringHeight, scarringHeight-scarringDuration, 1, probabilities);
+                        logP += calcBranchLogPScar(pSeq, cSeq, probabilities);
+
+                        //segment 3 prob
+                        substitutionModel.getTransitionProbabilities(child, scarringHeight-scarringDuration, ch, 1, probabilities);
+                        //logP += calcBranchLogPLoss();
+
+
+                    }else{
+                        throw new RuntimeException("Strange child height: "+ ch +"!");
                     }
+                }else if(ph > (scarringHeight - scarringDuration)){
+                    if(ch > (scarringHeight-scarringDuration)){
+
+                        substitutionModel.getTransitionProbabilities(child, ph, ch, 1, probabilities);
+
+                    } else if (ch < (scarringHeight - scarringDuration)) {
+                        Node intermediate = new Node();
+                        intermediate.setHeight(scarringHeight-scarringDuration);
+
+                        //add segment 1
+                        substitutionModel.getTransitionProbabilities(intermediate, ph, intermediate.getHeight(), 1, probabilities);
+                        // and segment 2
+                        substitutionModel.getTransitionProbabilities(child, intermediate.getHeight(), ch, 1, probabilities);
+                    }else{
+                        throw new RuntimeException("Strange child height: "+ ch +"!");
+                    }
+                }else if (ph < (scarringHeight - scarringDuration)){
+                    substitutionModel.getTransitionProbabilities(child, ph, ch, 1, probabilities);
+                } else{
+                    throw new RuntimeException("Parent height: " + ph + " is not valid!");
+                }
+
+
+
+                // test how states relate to each other
+                if (child.getMetaData("state").equals(parent.getMetaData("state")) ){
+                    substitutionModel.getTransitionProbabilities(child, parent.getHeight(), child.getHeight(), 1, probabilities);
+
                 }
             }
+
         }
 
         return(0);
     }
 
-    void calcLogP() {
-        logP = 0.0;
+    //TODO potentially split this for before scarring window (then only diff of first array element needed) and after scarring
+    double calcBranchLogPLoss(List<Integer> pSeq, List<Integer> cSeq, double[] probabilities) {
+
+        double branchLogP = 0;
+        // test for sequence similarity
+        for (int scarType=0; scarType<pSeq.size(); scarType++){
+            int pScar = pSeq.get(scarType);
+            int cScar = cSeq.get(scarType);
+
+            //identical barcodes
+            if ( (pScar == cScar) & (pScar > 0)){
+                 branchLogP += Math.log(probabilities[0]);
+
+            // parent has more barcodes than child -> loss event
+            }else if (pScar > cScar){
+                int diff = pScar - cScar;
+                branchLogP += Math.log(probabilities[1]) * diff;
+
+            // parent has less barcodes than child -> impossible
+            }else{
+                return Double.NEGATIVE_INFINITY;
+            }
+        }
+
+        return branchLogP;
+    }
+
+    double calcBranchLogPScar(List<Integer> pSeq, List<Integer> cSeq, double[] probabilities){
+
+        double branchLogP =0;
+
+        // in the first array element are the number of unedited barcodes
+        int nNewScars = pSeq.get(0) - cSeq.get(0);
+
+
+        branchLogP += Math.log(probabilities[1]) * nNewScars;
+        branchLogP += Math.log(probabilities[0]) * cSeq.get(0);
+
+        for (int scarType=1; scarType<pSeq.size(); scarType++) {
+            int pScar = pSeq.get(scarType);
+            int cScar = cSeq.get(scarType);
+
+            //identical scars
+            if ((pScar == cScar) & (pScar > 0)){
+                // as this
+                branchLogP += Math.log(probabilities[4]);
+
+                // parent has more scars than child -> loss event which is not allowed during scarring
+            }else if (pScar > cScar){
+                return Double.NEGATIVE_INFINITY;
+            }
+        }
+
+        return 0;
+
     }
 
 
@@ -217,8 +341,8 @@ public class organoidTreeLikelihoodModel extends GenericTreeLikelihood {
                     nScars_2 += child2_seq.get(i);
                     node_seq.add(0);
                 }
-                int max = java.lang.Math.max(nScars_1, nScars_2);
-                node_seq.set(0, max); // unedited scar type  == pos 0
+
+                node_seq.set(0, java.lang.Math.max(nScars_1, nScars_2)); // unedited scar type  == pos 0
 
             // internal node up to scarring event (2)
             }else {
