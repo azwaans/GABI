@@ -87,19 +87,41 @@ public class GeneralScarringLoss extends SubstitutionModel.Base {
         scarringDuration = scarringDurationInput.get();
     }
 
+    /*
+    Calculate transition probability matrix for loss without scarring
+    The transition probability matrix for loss with scarring differs only in the first row.
+     */
+    public void getLossProbabilities(double[] matrix, double expOfDeltaLoss){
+
+        // fill diagonal and final column
+        for (int i=0; i<nrOfStates; i++){
+            for (int j=0; j<nrOfStates; j++){
+
+                if ( i==j ){
+                    matrix[i*nrOfStates + j] = expOfDeltaLoss;
+                }else if(j == nrOfStates-1){
+                    matrix[i*nrOfStates + j] = 1 - expOfDeltaLoss;
+                }else{
+                    matrix[i*nrOfStates + j] = 0;
+                }
+            }
+        }
+        // set final diagonal element to 1
+        matrix[nrOfStates * nrOfStates - 1] = 1;
+    }
+
     @Override
     public void getTransitionProbabilities(Node node, double startTime, double endTime, double rate, double[] matrix) {
 
         double delta = startTime - endTime;
+        double expOfDeltaLoss = Math.exp(-delta * lossRate);
 
-        if (endTime >= scarringHeight){
+        // calculate transition probabilities for loss process
+        getLossProbabilities(matrix, expOfDeltaLoss);
 
-
-        }else if (endTime >= (scarringHeight - scarringDuration)){
-
-            // pre-calculate frequent expressions
+        // for loss & scarring, add the scarring transition probabilities
+        if (endTime >= (scarringHeight - scarringDuration)){
             double scarRateSum = Arrays.stream(scarRates).sum();
-            double expOfDeltaLoss = Math.exp(-delta * lossRate);
 
             // fill first row
             matrix[0] = Math.exp(-delta * (lossRate + scarRateSum));
@@ -107,28 +129,6 @@ public class GeneralScarringLoss extends SubstitutionModel.Base {
                 matrix[i+1] = (scarRates[i] * expOfDeltaLoss - scarRates[i] * Math.exp(-delta * (lossRate + scarRateSum))) / scarRateSum;
             }
             matrix[nrOfStates-1] = 1 - expOfDeltaLoss;
-
-
-            // fill remaining rows
-            for (int i=1; i<nrOfStates; i++){
-                for (int j=0; j<nrOfStates; j++){
-
-                    if (i == j) {
-                        matrix[i*nrOfStates + j] = expOfDeltaLoss;
-                    }else if (j == (nrOfStates-1)){
-                        matrix[i*nrOfStates + j] = 1 - expOfDeltaLoss;
-                    }else{
-                        matrix[i*nrOfStates + j] = 0;
-                    }
-                }
-            }
-            // set final diagonal element to 1
-            matrix[nrOfStates * nrOfStates -1] = 1;
-
-        }else if (endTime < (scarringHeight - scarringDuration)){
-
-        }else{
-            throw new RuntimeException("Endtime: " + endTime + " invalid!");
         }
     }
 
