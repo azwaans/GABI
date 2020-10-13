@@ -5,6 +5,7 @@ Beast package to perform Phylodynamic analysis of organoid data
 # TODO
 
 1) Phylogenetic tree inference
-   -> implement organoidTreeLikelihood
+   -> data type for scar states
+   -> Check treelikelihood (whether single child helper nodes are implemented)
 
 2) Phylodynamic model
