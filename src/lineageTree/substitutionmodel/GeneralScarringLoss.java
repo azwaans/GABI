@@ -1,21 +1,22 @@
 package lineageTree.substitutionmodel;
 
 import beast.core.Input;
+import beast.core.parameter.RealParameter;
 import beast.evolution.datatype.DataType;
 import beast.evolution.substitutionmodel.EigenDecomposition;
 import beast.evolution.substitutionmodel.SubstitutionModel;
 import beast.evolution.tree.Node;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class GeneralScarringLoss extends SubstitutionModel.Base {
 
-        final public Input<List<Double>> scarringRatesInput = new Input<>("scarringRates",
+        final public Input<List<RealParameter>> scarringRatesInput = new Input<>("scarringRates",
                 "Rates, at which scars types are introduced into the scarring region",
                 new ArrayList<>(), Input.Validate.REQUIRED);
-        final public Input<Double> lossRateInput = new Input<>("lossRate",
+        final public Input<RealParameter> lossRateInput = new Input<>("lossRate",
                 "Rate, at which scarring regions are lost");
         public Input<Double> scarringHeightInput = new Input<>("scarringHeight",
                 "Duration between the onset of scarring and sampling of the cells");
@@ -46,42 +47,39 @@ public class GeneralScarringLoss extends SubstitutionModel.Base {
         double scarringHeight;
         double scarringDuration;
         double[] frequencies;
-        //potentially delete
+        //TODO potentially delete or add loss rates
         double[][] rateMatrix;
-        double[] scarRates;
-        double lossRate;
+        Double[] scarRates;
+        Double lossRate;
 
     @Override
     public void initAndValidate() {
 
-        List<Double> scarringRates = scarringRatesInput.get();
-
         // one state for each scar type + unedited + lost
-        nrOfStates = scarringRates.size() + 2;
+        nrOfStates = scarringRatesInput.get().get(0).getDimension() + 2;
         rateMatrix = new double[nrOfStates][nrOfStates];
-
-        scarRates = new double[nrOfStates-2];
+        scarRates = scarringRatesInput.get().get(0).getValues();
 
         // assert positive rates; fill rate matrix
         double sumScarringRates = 0;
-        for (int i =0; i <scarringRates.size(); i++){
+        for (int i=0; i<scarRates.length; i++){
 
-            Double scarringRate = scarringRates.get(i);
-            if (scarringRate <= 0) {
+            if (scarRates[i] <= 0) {
                 throw new RuntimeException("All scarring rates must be positive!");
             }
-            sumScarringRates += scarringRate;
-            rateMatrix[0][i+1] = scarringRate;
-            scarRates[i] = scarringRate;
-
+            sumScarringRates += scarRates[i];
+            rateMatrix[0][i+1] = scarRates[i];
         }
 
-        lossRate = lossRateInput.get();
+
+        lossRate = lossRateInput.get().getValue();
         if (lossRate <= 0) {
             throw new RuntimeException("Loss rate must be positive!");
         }
 
-        frequencies = new double[]{1, 0};
+        // center root frequency on unedited state
+        frequencies = new double[nrOfStates];
+        frequencies[0] = 1;
 
         scarringHeight = scarringHeightInput.get();
         scarringDuration = scarringDurationInput.get();
@@ -121,7 +119,10 @@ public class GeneralScarringLoss extends SubstitutionModel.Base {
 
         // for loss & scarring, add the scarring transition probabilities
         if (endTime >= (scarringHeight - scarringDuration)){
-            double scarRateSum = Arrays.stream(scarRates).sum();
+
+            Stream<Double> scarSum = Stream.of(scarRates);
+            Double scarRateSum = scarSum.reduce(0.0, (subtotal, element) -> subtotal + element);
+            //.sum();
 
             // fill first row
             matrix[0] = Math.exp(-delta * (lossRate + scarRateSum));
@@ -141,6 +142,11 @@ public class GeneralScarringLoss extends SubstitutionModel.Base {
     @Override
     public boolean canHandleDataType(DataType dataType) {
         return false;
+    }
+
+    @Override
+    public double[] getFrequencies() {
+        return frequencies;
     }
 }
 
