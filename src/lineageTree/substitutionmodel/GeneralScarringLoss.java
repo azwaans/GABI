@@ -118,7 +118,7 @@ public class GeneralScarringLoss extends SubstitutionModel.Base {
         getLossProbabilities(matrix, expOfDeltaLoss);
 
         // for loss & scarring, add the scarring transition probabilities
-        if (endTime >= (scarringHeight - scarringDuration)){
+        if ( (endTime >= (scarringHeight - scarringDuration)) & (endTime < scarringHeight)){
 
             Stream<Double> scarSum = Stream.of(scarRates);
             Double scarRateSum = scarSum.reduce(0.0, (subtotal, element) -> subtotal + element);
@@ -148,5 +148,9 @@ public class GeneralScarringLoss extends SubstitutionModel.Base {
     public double[] getFrequencies() {
         return frequencies;
     }
+
+    public double getScarringHeight(){return scarringHeight;}
+
+    public double getScarringDuration(){return scarringDuration;}
 }
 
