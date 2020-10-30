@@ -161,6 +161,7 @@ public class startingTree extends Tree implements StateNodeInitialiser {
 
         // get left subtree
         Node subtreeLeft = get_cluster_tree(iSeq, scarringHeight, taxa, 0);
+
         // update iSeq to next cluster start
         nMatches = IntStream.of(matchMatrix[iSeq]).sum();
         iSeq += (nMatches +1);
