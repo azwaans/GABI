@@ -13,30 +13,32 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 
 public class OTL2_Test {
 
     organoidTreeLikelihood2 likelihood;
+    Tree tree;
 
     @Before
     public void setUp(){
 
         // init alignment
-        Sequence a = new Sequence("0", "0,0,0");
-        Sequence b = new Sequence("1", "0,1,2");
+        Sequence a = new Sequence("0", "0,");
+        Sequence b = new Sequence("1", "0,");
 
         Alignment alignment = new Alignment();
         alignment.initByName("sequence", a, "sequence", b, "dataType", "integer", "stateCount", 3);
 
 
         //init tree
-        Tree tree = new TreeParser();
+        tree = new TreeParser();
         tree.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
                 "(0[&cluster=0]:28.5,1[&cluster=1]:28.5)2[&cluster=0]:0.0",
                 "adjustTipHeights", false, "offset", 0);
 
         //init scarring model
-        RealParameter lossRate = new RealParameter("1.0");
+        RealParameter lossRate = new RealParameter("0.2");
         RealParameter scarRates = new RealParameter("1.0 1.0");
 
         RealParameter freqs = new RealParameter("1.0 0 0");
@@ -65,8 +67,14 @@ public class OTL2_Test {
     @Test
     public void testLikelihood(){
 
-        likelihood.calculateLogP();
+        double [] partials = likelihood.calculatePartialsBeforeParent(tree.getRoot(), tree.getRoot().getChild(0), 0, 0,
+                new double[]{0, 23.0, 25.0}, 1.0, 2);
 
+        assertArrayEquals("Assert correct likelihood calc across scarring window", partials, new double[]{0.0001234098040866, 0,0,0}, 1e-15);
+
+
+
+        //likelihood.calculateLogP();
 
 
     assertEquals(1.0, 1.0, 0.001);
