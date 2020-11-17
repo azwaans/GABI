@@ -60,8 +60,10 @@ public class GeneralScarringLoss extends SubstitutionModel.Base {
         rateMatrix = new double[nrOfStates][nrOfStates];
         scarRates = scarringRatesInput.get().get(0).getValues();
 
-        // assert positive rates; fill rate matrix
+        // assert positive rates
         double sumScarringRates = 0;
+
+        // add scar rates to rate matrix
         for (int i=0; i<scarRates.length; i++){
 
             if (scarRates[i] <= 0) {
@@ -71,10 +73,12 @@ public class GeneralScarringLoss extends SubstitutionModel.Base {
             rateMatrix[0][i+1] = scarRates[i];
         }
 
-
         lossRate = lossRateInput.get().getValue();
         if (lossRate <= 0) {
             throw new RuntimeException("Loss rate must be positive!");
+        }
+        for (int i = 0; i<nrOfStates-1; i++){
+            rateMatrix[i][nrOfStates-1] = lossRate;
         }
 
         // center root frequency on unedited state
@@ -152,5 +156,7 @@ public class GeneralScarringLoss extends SubstitutionModel.Base {
     public double getScarringHeight(){return scarringHeight;}
 
     public double getScarringDuration(){return scarringDuration;}
+
+    public double[][] getRateMatrix(){return rateMatrix;}
 }
 
