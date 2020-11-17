@@ -5,7 +5,10 @@ import beast.core.util.Log;
 import beast.evolution.alignment.Alignment;
 import beast.evolution.branchratemodel.BranchRateModel;
 import beast.evolution.branchratemodel.StrictClockModel;
-import beast.evolution.likelihood.*;
+import beast.evolution.likelihood.BeerLikelihoodCore;
+import beast.evolution.likelihood.BeerLikelihoodCore4;
+import beast.evolution.likelihood.GenericTreeLikelihood;
+import beast.evolution.likelihood.LikelihoodCore;
 import beast.evolution.sitemodel.SiteModel;
 import beast.evolution.substitutionmodel.Frequencies;
 import beast.evolution.tree.Node;
@@ -226,31 +229,29 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
                     likelihoodCore.setNodeStatesForUpdate(nodeIndex);
                 }
 
-                if (m_siteModel.integrateAcrossCategories()) {
+
                     // check whether the branch crosses windows for different rate matriced
                     // if yes then use different rate matrices to calculate the Partials
                     // if branch crosses scarring window
-                    boolean parentBeforeChildrenAfterScarringHeight = (node.getHeight() >= scarringStart ) &
+                boolean parentBeforeChildrenAfterScarringHeight = (node.getHeight() >= scarringStart ) &
                             ((child1.getHeight() < scarringStart) | (child2.getHeight() < scarringStart));
-                    boolean parentBeforeChildrenAfterScarringStop = (node.getHeight() >= scarringStop) &
+                boolean parentBeforeChildrenAfterScarringStop = (node.getHeight() >= scarringStop) &
                             ((child1.getHeight() < scarringStop)
                                     | (child2.getHeight() < scarringStop));
-                    if (parentBeforeChildrenAfterScarringHeight | parentBeforeChildrenAfterScarringStop) {
+                if (parentBeforeChildrenAfterScarringHeight | parentBeforeChildrenAfterScarringStop) {
 
                         //calculate partials
                         nodePartials = calculatePartialsForCrossBranches(nodePartials, node, child1, child2, parentBeforeChildrenAfterScarringHeight, parentBeforeChildrenAfterScarringStop);
 
                         //set partials at node
                         likelihoodCore.setNodePartials(nodeIndex, nodePartials);
-                    }
-                    // else use default calculation engine
-                    }else {
-
+                } else {
+                        // else use default calculation engine
                         likelihoodCore.calculatePartials(childNum1, childNum2, nodeIndex);
-                    }
+                }
                 } else {
                     throw new RuntimeException("Error TreeLikelihood 201: Site categories not supported");
-                    //m_pLikelihoodCore->calculatePartials(childNum1, childNum2, nodeNum, siteCategories);
+                    LikelihoodCore->calculatePartials(childNum1, childNum2, nodeNum, siteCategories);
                 }
 
                 if (node.isRoot()) {
@@ -281,92 +282,140 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
 
     double[] calculatePartialsForCrossBranches(double[] nodePartials, Node parent, Node child1, Node child2, boolean bool1, boolean bool2) {
 
-        int child1Index = child1.getNr();
-        int child2Index = child2.getNr();
-
         final double branchRate1 = branchRateModel.getRateForBranch(child1);
         final double branchRate2 = branchRateModel.getRateForBranch(child2);
 
         // TODO remove all this varying rates across sites stuff!
-        double jointBranchRate1 = m_siteModel.getRateForCategory(0, child1) * branchRate1;
-        double jointBranchRate2 = m_siteModel.getRateForCategory(0, child2) * branchRate1;
+        double jointBranchRate0 = m_siteModel.getRateForCategory(0, child1) * branchRate1;
+        double jointBranchRate1 = m_siteModel.getRateForCategory(0, child2) * branchRate2;
 
+        Node[] children = new Node[]{child1, child2};
+        int[] childIndices = new int[]{child1.getNr(), child2.getNr()};
+        double[] jointbranchRates = new double[]{jointBranchRate0, jointBranchRate1};
+
+        double[] heightsBeforeParent = new double[2];
+        boolean[] needsIntermediates = new boolean[2];
+
+        double[] probs0 = new double[(nrOfStates +1) * (nrOfStates + 1)];
         double[] probs1 = new double[(nrOfStates +1) * (nrOfStates + 1)];
-        double[] probs2 = new double[(nrOfStates + 1) * (nrOfStates +1)];
-
 
         // if parent is above scarring window
-        if (bool1){
-            if (child1.getHeight() < scarringStop){
+        if (bool1) {
 
-                if ( child2.getHeight() < scarringStop){
+            // determine the number of helper nodes to calculate the partials over
+            int nIntermediateNodes;
+            double[] intNodeTimes;
 
-                    if (child1.isLeaf()){
+            for (int i=0; i<children.length; i++) {
 
-                        int[] states1 = new int[nrOfPatterns];
-                        likelihoodCore.getNodeStates(child1Index, states1);
+                Node child = children[i];
 
-                        //calculate transition probability for all intermediate regions until parent
-                        // from leaf to first helper node
-                        substitutionModel.getTransitionProbabilities(null, scarringStop, child1.getHeight(), jointBranchRate1, probs1);
-                        helperNodePartials[0] = calculateStatesPruning(states1, probs1, helperNodePartials[0]);
+                if (child.getHeight() < scarringStop){
+                    nIntermediateNodes = 2;
+                    intNodeTimes = new double[]{child.getHeight(), scarringStop, scarringStart};
+                    heightsBeforeParent[i] = scarringStart;
+                    needsIntermediates[i] = true;
 
-                        // from first to second helper node
-                        substitutionModel.getTransitionProbabilities(null, scarringStart, scarringStop, jointBranchRate1, probs1);
-                        helperNodePartials[1] =  calculatePartialsPruning(helperNodePartials[0], probs1, helperNodePartials[1]);
+                    helperNodePartials[i *2 + 1] = calculatePartialsBeforeParent(parent, child, i, childIndices[i], intNodeTimes, jointbranchRates[i], nIntermediateNodes);
 
-                        substitutionModel.getTransitionProbabilities(null, parent.getHeight(), scarringStart, jointBranchRate1, probs1);
+                }else if(child.getHeight() < scarringStart){
+                    nIntermediateNodes = 1;
+                    intNodeTimes = new double[]{child.getHeight(), scarringStart, Double.NEGATIVE_INFINITY};
+                    heightsBeforeParent[i] = scarringStart;
+                    needsIntermediates[i] = true;
 
-                        if(child2.isLeaf()){
-                            int[] states2 = new int[nrOfPatterns];
-                            likelihoodCore.getNodeStates(child2Index, states2);
-
-                            //calculate transition probability for all intermediate regions until parent
-                            //from leaf to first helper node
-                            substitutionModel.getTransitionProbabilities(null, scarringStop, child2.getHeight(), jointBranchRate2, probs2);
-                            helperNodePartials[2] = calculateStatesPruning(states2, probs2, helperNodePartials[2]);
-
-                            // from first to second helper node
-                            substitutionModel.getTransitionProbabilities(null, scarringStart, scarringStop, jointBranchRate2, probs2);
-                            helperNodePartials[3] = calculatePartialsPruning(helperNodePartials[2], probs2, helperNodePartials[3]);
-
-                            //from second helper node to parent
-                            substitutionModel.getTransitionProbabilities(null, parent.getHeight(), scarringStart, jointBranchRate2, probs2);
-                            nodePartials = calculatePartialsPartialsPruning(helperNodePartials[1], probs1, helperNodePartials[3], probs2, nodePartials);
-
-                        }else{
-                            double [] partials2 = new double[nrOfPatterns];
-                            likelihoodCore.getNodePartials(child2Index, partials2);
-                            helperNodePartials[0] = calculateStatesPartialsPruning(states1, probs1, partials2, probs2, helperNodePartials[0]);
-                        }
-                    }else{
-                        double [] partials1 = new double[nrOfPatterns];
-                        likelihoodCore.getNodePartials(child1Index, partials1);
-                        if(child2.isLeaf()){
-                            int[] states2 = new int[nrOfPatterns];
-                            likelihoodCore.getNodeStates(child2Index, states2);
-                            helperNodePartials[0] = calculateStatesPartialsPruning(states2, probs2, partials1, probs1, helperNodePartials[0]);
-                        }else{
-                            double [] partials2 = new double[nrOfPatterns];
-                            likelihoodCore.getNodePartials(child2Index, partials2);
-                            helperNodePartials[0] = calculatePartialsPartialsPruning(partials1, probs1, partials2, probs2, helperNodePartials[0]);
-                        }
-                    }
-
-                    }
+                    helperNodePartials[i *2 + 1] = calculatePartialsBeforeParent(parent, child, i, childIndices[i], intNodeTimes, jointbranchRates[i], nIntermediateNodes);
+                }else{
+                    nIntermediateNodes = 0;
+                    heightsBeforeParent[i] = child.getHeight();
+                    needsIntermediates[i] = false;
                 }
-
-
-                // call special function for child 1
-
-                // call beerlikelihood function for child 2
-            }else if(child2.getHeight() < substitutionModel.getScarringHeight()){
-                // call special function for child 2
-
-                // call beerlikelihood function for child 1
             }
 
+            //TODO calculate partials at parent
+            if (needsIntermediates[0] == true){
+                substitutionModel.getTransitionProbabilities(null, parent.getHeight(), heightsBeforeParent[0], jointBranchRate0, probs0);
+
+                if (needsIntermediates[1] == true) {
+                    substitutionModel.getTransitionProbabilities(null, parent.getHeight(), heightsBeforeParent[1], jointBranchRate1, probs1);
+                    calculatePartialsPartialsPruning(helperNodePartials[1], probs0, helperNodePartials[3], probs1, nodePartials);
+
+                }else{
+                    substitutionModel.getTransitionProbabilities(null, parent.getHeight(), child2.getHeight(), jointBranchRate1, probs1);
+
+                    if(child2.isLeaf()){
+                        int[] states = new int[nrOfPatterns];
+                        likelihoodCore.getNodeStates(childIndices[1], states);
+
+                        calculateStatesPartialsPruning(states, probs1, helperNodePartials[1], probs0, nodePartials);
+
+                    }else{
+                        double[] partials = new double[nrOfPatterns];
+                        likelihoodCore.getNodePartials(childIndices[1], partials);
+                    }
+                }
+            }else {
+                substitutionModel.getTransitionProbabilities(null, parent.getHeight(), child1.getHeight(), jointBranchRate0, probs0);
+                int[] states1 = new int[nrOfPatterns];
+                likelihoodCore.getNodeStates(childIndices[0], states1);
+
+                if(needsIntermediates[1] == true){
+                    substitutionModel.getTransitionProbabilities(null, parent.getHeight(), heightsBeforeParent[1], jointBranchRate1, probs1);
+                    calculateStatesPartialsPruning(states1, probs0, helperNodePartials[3], probs1, nodePartials);
+
+                }else{
+                    int[] states2 = new int[nrOfPatterns];
+                    likelihoodCore.getNodeStates(childIndices[1], states2);
+                    substitutionModel.getTransitionProbabilities(null, parent.getHeight(), child2.getHeight(), jointBranchRate1, probs1);
+                    calculateStatesStatesPruning(states1, probs0, states2, probs1, nodePartials);
+                }
+            }
+        }
+
         return nodePartials;
+    }
+
+    double[] calculatePartialsBeforeParent(Node parent, Node child, int i, int childIndex, double[] intNodeTimes, double jointBranchRate, int nIntermediateNodes){
+
+        double[] probs = new double[(nrOfStates +1) * (nrOfStates + 1)];
+
+        if (child.isLeaf()) {
+            int[] states = new int[nrOfPatterns];
+            likelihoodCore.getNodeStates(childIndex, states);
+
+            if (nIntermediateNodes == 0) {
+                substitutionModel.getTransitionProbabilities(null, parent.getHeight(), child.getHeight(), jointBranchRate, probs);
+                helperNodePartials[i*2+1] = calculateStatesPruning(states, probs, helperNodePartials[i*2+1]);
+
+            } else {
+                substitutionModel.getTransitionProbabilities(null, intNodeTimes[1], intNodeTimes[0], jointBranchRate, probs);
+                helperNodePartials[i*2] = calculateStatesPruning(states, probs, helperNodePartials[i*2]);
+                helperNodePartials[i*2+1] = helperNodePartials[i*2];
+
+                if (nIntermediateNodes > 1) {
+                    substitutionModel.getTransitionProbabilities(null, intNodeTimes[2], intNodeTimes[1], jointBranchRate, probs);
+                    helperNodePartials[i*2+1] = calculatePartialsPruning(helperNodePartials[i*2], probs, helperNodePartials[i*2+1]);
+                }
+            }
+        } else {
+            double[] partials = new double[nrOfPatterns];
+            likelihoodCore.getNodePartials(childIndex, partials);
+
+            if (nIntermediateNodes == 0) {
+                substitutionModel.getTransitionProbabilities(null, parent.getHeight(), child.getHeight(), jointBranchRate, probs);
+                helperNodePartials[i*2+1] = calculatePartialsPruning(partials, probs, helperNodePartials[i*2+1]);
+            } else {
+
+                helperNodePartials[i*2] = partials;
+                for (int j = 0; j < nIntermediateNodes; j++) {
+                    substitutionModel.getTransitionProbabilities(null, intNodeTimes[j + 1], intNodeTimes[j], jointBranchRate, probs);
+                    helperNodePartials[i*2+1] = calculatePartialsPruning(helperNodePartials[i*2], probs, helperNodePartials[i*2+1]);
+                    helperNodePartials[i*2] = helperNodePartials[i*2+1];
+                }
+            }
+        }
+
+        return helperNodePartials[i*2+1];
     }
 
 
