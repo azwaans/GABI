@@ -6,7 +6,6 @@ import beast.evolution.alignment.Alignment;
 import beast.evolution.branchratemodel.BranchRateModel;
 import beast.evolution.branchratemodel.StrictClockModel;
 import beast.evolution.likelihood.BeerLikelihoodCore;
-import beast.evolution.likelihood.BeerLikelihoodCore4;
 import beast.evolution.likelihood.GenericTreeLikelihood;
 import beast.evolution.likelihood.LikelihoodCore;
 import beast.evolution.sitemodel.SiteModel;
@@ -26,8 +25,11 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
     /**
      * calculation engine *
      */
-    protected LikelihoodCore likelihoodCore;
-    public LikelihoodCore getLikelihoodCore() {return likelihoodCore;}
+    protected BeerLikelihoodCore likelihoodCore;
+
+    public LikelihoodCore getLikelihoodCore() {
+        return likelihoodCore;
+    }
 
     /**
      * BEASTObject associated with inputs. Since none of the inputs are StateNodes, it
@@ -93,6 +95,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
     // number of states in substitution rate matrix
     protected int nrOfStates;
 
+    boolean useScaling = false;
 
 
     public void initAndValidate() {
@@ -123,12 +126,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
         nrOfPatterns = dataInput.get().getPatternCount();
         nrOfMatrices = m_siteModel.getCategoryCount();
 
-        if (nrOfStates == 4) {
-            likelihoodCore = new BeerLikelihoodCore4();
-        } else {
-            likelihoodCore = new BeerLikelihoodCore(nrOfStates);
-        }
-
+        likelihoodCore = new BeerLikelihoodCore(nrOfStates);
         Node rootNode = treeInput.get().getRoot();
 
         String className = getClass().getSimpleName();
@@ -148,7 +146,6 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
         matrixSize = (nrOfStates + 1) * (nrOfStates + 1);
         probabilities = new double[(nrOfStates + 1) * (nrOfStates + 1)];
         Arrays.fill(probabilities, 1.0);
-
 
 
     }
@@ -185,7 +182,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
     /* Assumes there IS a branch rate model as opposed to traverse()*/
     protected int traverse(final Node node) {
 
-        int update = (node.isDirty() | hasDirt);
+        int update = 2; //(node.isDirty() | hasDirt);
 
         final int nodeIndex = node.getNr();
 
@@ -193,14 +190,14 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
         final double branchTime = node.getLength() * branchRate;
 
         // First update the transition probability matrix(ices) for this branch
-        //if (!node.isRoot() && (update != Tree.IS_CLEAN || branchTime != m_StoredBranchLengths[nodeIndex])) {
         if (!node.isRoot() && (update != Tree.IS_CLEAN || branchTime != m_branchLengths[nodeIndex])) {
             m_branchLengths[nodeIndex] = branchTime;
             final Node parent = node.getParent();
             likelihoodCore.setNodeMatrixForUpdate(nodeIndex);
 
             final double jointBranchRate = branchRate;
-            substitutionModel.getTransitionProbabilities(node, parent.getHeight(), node.getHeight(), jointBranchRate, probabilities);
+            substitutionModel.getTransitionProbabilities(node, parent.getHeight(), node.getHeight(),
+                    jointBranchRate, probabilities);
 
             likelihoodCore.setNodeMatrix(nodeIndex, 0, probabilities);
 
@@ -212,10 +209,12 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
 
             // Traverse down the two child nodes
             final Node child1 = node.getLeft(); //Two children
-            final int update1 = traverse(child1);
+            int update1 = traverse(child1);
 
             final Node child2 = node.getRight();
             final int update2 = traverse(child2);
+
+            update1 = 2;
 
             // If either child node was updated then update this node too
             if (update1 != Tree.IS_CLEAN || update2 != Tree.IS_CLEAN) {
@@ -232,26 +231,29 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
                 // if yes then use different rate matrices to calculate the Partials
                 // if branch crosses scarring window
                 //TODO think about <= or <?
-                boolean parentBeforeChildrenAfterScarringHeight = (node.getHeight() > scarringStart ) &
-                            ((child1.getHeight() < scarringStart) | (child2.getHeight() < scarringStart));
+                boolean parentBeforeChildrenAfterScarringHeight = (node.getHeight() > scarringStart) &
+                        ((child1.getHeight() < scarringStart) | (child2.getHeight() < scarringStart));
                 boolean parentBeforeChildrenAfterScarringStop = (node.getHeight() > scarringStop) &
-                            ((child1.getHeight() < scarringStop)
-                                    | (child2.getHeight() < scarringStop));
+                        ((child1.getHeight() < scarringStop)
+                                | (child2.getHeight() < scarringStop));
                 if (parentBeforeChildrenAfterScarringHeight | parentBeforeChildrenAfterScarringStop) {
 
-                        //calculate partials
-                        nodePartials = calculatePartialsForCrossBranches(nodePartials, node, child1, child2, parentBeforeChildrenAfterScarringHeight, parentBeforeChildrenAfterScarringStop);
+                    //calculate partials
+                    nodePartials = calculatePartialsForCrossBranches(nodePartials, node, child1, child2, parentBeforeChildrenAfterScarringHeight, parentBeforeChildrenAfterScarringStop);
 
-                        //set partials at node
-                        likelihoodCore.setNodePartials(nodeIndex, nodePartials);
+                    //set partials at node
+                    likelihoodCore.setNodePartials(nodeIndex, nodePartials);
+                    if(useScaling){
+                        likelihoodCore.scalePartials(nodeIndex);
+                    }
                 } else {
-                        // else use default calculation engine
-                        likelihoodCore.calculatePartials(childNum1, childNum2, nodeIndex);
+                    // else use default calculation engine
+                    likelihoodCore.calculatePartials(childNum1, childNum2, nodeIndex);
                 }
             }
 
             if (node.isRoot()) {
-            // No parent this is the root of the beast.tree - calculate the pattern likelihoods
+                // No parent this is the root of the beast.tree - calculate the pattern likelihoods
 
                 //final double[] proportions = m_siteModel.getCategoryProportions(node);
                 //likelihoodCore.integratePartials(node.getNr(), proportions, m_fRootPartials);
@@ -263,19 +265,19 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
                             m_fRootPartials[i] += proportionInvariant;
                         }
                     }*/
-                   m_fRootPartials = nodePartials;
-                   //likelihoodCore.getNodePartials(nodeIndex, m_fRootPartials);
+                m_fRootPartials = nodePartials;
+                //likelihoodCore.getNodePartials(nodeIndex, m_fRootPartials);
 
-                    double[] rootFrequencies = substitutionModel.getFrequencies();
-                    if (rootFrequenciesInput.get() != null) {
-                        rootFrequencies = rootFrequenciesInput.get().getFreqs();
-                    }
-                    likelihoodCore.calculateLogLikelihoods(m_fRootPartials, rootFrequencies, patternLogLikelihoods);
+                double[] rootFrequencies = substitutionModel.getFrequencies();
+                if (rootFrequenciesInput.get() != null) {
+                    rootFrequencies = rootFrequenciesInput.get().getFreqs();
                 }
-
+                likelihoodCore.calculateLogLikelihoods(m_fRootPartials, rootFrequencies, patternLogLikelihoods);
             }
-        return update;
+
         }
+        return 2; //update;
+    }
 
     double[] calculatePartialsForCrossBranches(double[] nodePartials, Node parent, Node child1, Node child2, boolean bool1, boolean bool2) {
 
@@ -293,8 +295,8 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
         double[] heightsBeforeParent = new double[2];
         boolean[] needsIntermediates = new boolean[2];
 
-        double[] probs0 = new double[(nrOfStates +1) * (nrOfStates + 1)];
-        double[] probs1 = new double[(nrOfStates +1) * (nrOfStates + 1)];
+        double[] probs0 = new double[(nrOfStates + 1) * (nrOfStates + 1)];
+        double[] probs1 = new double[(nrOfStates + 1) * (nrOfStates + 1)];
 
         // determine the number of helper nodes to calculate the partials over
         int nIntermediateNodes;
@@ -322,74 +324,106 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
 
                     helperNodePartials[i * 2 + 1] = calculatePartialsBeforeParent(parent, child, i, childIndices[i], intNodeTimes, jointbranchRates[i], nIntermediateNodes);
                 } else {
-                    nIntermediateNodes = 0;
                     heightsBeforeParent[i] = child.getHeight();
                     needsIntermediates[i] = false;
                 }
             }
-        }else if (bool2){
-            for (int i=0; i<children.length; i++){
+        } else if (bool2) {
+            for (int i = 0; i < children.length; i++) {
                 Node child = children[i];
 
-                if (child.getHeight() < scarringStop){
+                if (child.getHeight() < scarringStop) {
                     nIntermediateNodes = 1;
                     intNodeTimes = new double[]{child.getHeight(), scarringStop, Double.NEGATIVE_INFINITY};
                     heightsBeforeParent[i] = scarringStop;
                     needsIntermediates[i] = true;
                     helperNodePartials[i * 2 + 1] = calculatePartialsBeforeParent(parent, child, i, childIndices[i], intNodeTimes, jointbranchRates[i], nIntermediateNodes);
 
-                }else{
-                    nIntermediateNodes = 0;
+                } else {
                     heightsBeforeParent[i] = child.getHeight();
                     needsIntermediates[i] = false;
                 }
             }
         }
 
-            //calculate partials at parent
-        if (needsIntermediates[0]){
+        //calculate partials at parent
+        // if intermediates are necessary their *partials* were computed above - no leaf check necessary
+        if (needsIntermediates[0]) {
             substitutionModel.getTransitionProbabilities(null, parent.getHeight(), heightsBeforeParent[0], jointBranchRate0, probs0);
 
             if (needsIntermediates[1]) {
                 substitutionModel.getTransitionProbabilities(null, parent.getHeight(), heightsBeforeParent[1], jointBranchRate1, probs1);
                 calculatePartialsPartialsPruning(helperNodePartials[1], probs0, helperNodePartials[3], probs1, nodePartials);
 
-            }else{
+            } else {
                 substitutionModel.getTransitionProbabilities(null, parent.getHeight(), child2.getHeight(), jointBranchRate1, probs1);
 
-                if(child2.isLeaf()){
+                if (child2.isLeaf()) {
                     int[] states = new int[nrOfPatterns];
                     likelihoodCore.getNodeStates(childIndices[1], states);
 
                     calculateStatesPartialsPruning(states, probs1, helperNodePartials[1], probs0, nodePartials);
 
-                }else{
-                    double[] partials = new double[nrOfPatterns];
+                } else {
+                    double[] partials = new double[nrOfStates * nrOfPatterns];
                     likelihoodCore.getNodePartials(childIndices[1], partials);
                 }
             }
-        }else {
-            substitutionModel.getTransitionProbabilities(null, parent.getHeight(), child1.getHeight(), jointBranchRate0, probs0);
-            int[] states1 = new int[nrOfPatterns];
-            likelihoodCore.getNodeStates(childIndices[0], states1);
+        } else {
+            substitutionModel.getTransitionProbabilities(null, parent.getHeight(), child1.getHeight(),
+                    jointBranchRate0, probs0);
 
-            if(needsIntermediates[1]){
-                substitutionModel.getTransitionProbabilities(null, parent.getHeight(), heightsBeforeParent[1], jointBranchRate1, probs1);
-                calculateStatesPartialsPruning(states1, probs0, helperNodePartials[3], probs1, nodePartials);
+            if (needsIntermediates[1]) {
+                substitutionModel.getTransitionProbabilities(null, parent.getHeight(), heightsBeforeParent[1],
+                        jointBranchRate1, probs1);
+                if (child1.isLeaf()){
+                    int[] states1 = new int[nrOfPatterns];
+                    likelihoodCore.getNodeStates(childIndices[0], states1);
+                    calculateStatesPartialsPruning(states1, probs0, helperNodePartials[3], probs1, nodePartials);
+                }else{
+                    double [] partials0 = new double[nrOfStates * nrOfPatterns];
+                    likelihoodCore.getNodePartials(childIndices[0], partials0);
+                    calculatePartialsPartialsPruning(partials0,  probs0, helperNodePartials[3], probs1, nodePartials);
+                }
+           } else {
+                substitutionModel.getTransitionProbabilities(null, parent.getHeight(), child2.getHeight(),
+                        jointBranchRate1, probs1);
 
-            }else{
-                int[] states2 = new int[nrOfPatterns];
-                likelihoodCore.getNodeStates(childIndices[1], states2);
-                substitutionModel.getTransitionProbabilities(null, parent.getHeight(), child2.getHeight(), jointBranchRate1, probs1);
-                calculateStatesStatesPruning(states1, probs0, states2, probs1, nodePartials);
+                if (child1.isLeaf()) {
+                    int[] states1 = new int[nrOfPatterns];
+                    likelihoodCore.getNodeStates(childIndices[0], states1);
+
+                    if (child2.isLeaf()){
+                        int[] states2 = new int[nrOfPatterns];
+                        likelihoodCore.getNodeStates(childIndices[1], states2);
+                        calculateStatesStatesPruning(states1, probs0, states2, probs1, nodePartials);
+                    }else{
+                        double[] partials2 = new double[nrOfPatterns*nrOfStates];
+                        likelihoodCore.getNodePartials(childIndices[1], partials2);
+                        calculateStatesPartialsPruning(states1, probs0, partials2, probs1, nodePartials);
+                    }
+                }else{
+                    double[] partials1 = new double[nrOfPatterns*nrOfStates];
+                    likelihoodCore.getNodePartials(childIndices[0], partials1);
+
+                    if (child2.isLeaf()) {
+                        int[] states2 = new int[nrOfPatterns];
+                        likelihoodCore.getNodeStates(childIndices[1], states2);
+                        calculateStatesPartialsPruning(states2, probs1, partials1, probs0, nodePartials);
+                    }else{
+                        double[] partials2 = new double[nrOfPatterns*nrOfStates];
+                        likelihoodCore.getNodePartials(childIndices[1], partials2);
+                        calculatePartialsPartialsPruning(partials1, probs0, partials2, probs1, nodePartials);
+                    }
+                }
             }
         }
         return nodePartials;
     }
 
-    double[] calculatePartialsBeforeParent(Node parent, Node child, int i, int childIndex, double[] intNodeTimes, double jointBranchRate, int nIntermediateNodes){
+    double[] calculatePartialsBeforeParent(Node parent, Node child, int i, int childIndex, double[] intNodeTimes, double jointBranchRate, int nIntermediateNodes) {
 
-        double[] probs = new double[(nrOfStates +1) * (nrOfStates + 1)];
+        double[] probs = new double[(nrOfStates + 1) * (nrOfStates + 1)];
 
         if (child.isLeaf()) {
             int[] states = new int[nrOfPatterns];
@@ -397,48 +431,47 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
 
             if (nIntermediateNodes == 0) {
                 substitutionModel.getTransitionProbabilities(null, parent.getHeight(), child.getHeight(), jointBranchRate, probs);
-                helperNodePartials[i*2+1] = calculateStatesPruning(states, probs, helperNodePartials[i*2+1]);
+                helperNodePartials[i * 2 + 1] = calculateStatesPruning(states, probs, helperNodePartials[i * 2 + 1]);
 
             } else {
                 substitutionModel.getTransitionProbabilities(null, intNodeTimes[1], intNodeTimes[0], jointBranchRate, probs);
-                helperNodePartials[i*2] = calculateStatesPruning(states, probs, helperNodePartials[i*2]);
-                helperNodePartials[i*2+1] = helperNodePartials[i*2];
+                helperNodePartials[i * 2] = calculateStatesPruning(states, probs, helperNodePartials[i * 2]);
+                helperNodePartials[i * 2 + 1] = helperNodePartials[i * 2];
 
                 if (nIntermediateNodes > 1) {
                     substitutionModel.getTransitionProbabilities(null, intNodeTimes[2], intNodeTimes[1], jointBranchRate, probs);
-                    helperNodePartials[i*2+1] = calculatePartialsPruning(helperNodePartials[i*2], probs, helperNodePartials[i*2+1]);
+                    helperNodePartials[i * 2 + 1] = calculatePartialsPruning(helperNodePartials[i * 2], probs, helperNodePartials[i * 2 + 1]);
                 }
             }
         } else {
-            double[] partials = new double[nrOfPatterns];
+            double[] partials = new double[nrOfPatterns * nrOfStates];
             likelihoodCore.getNodePartials(childIndex, partials);
 
             if (nIntermediateNodes == 0) {
                 substitutionModel.getTransitionProbabilities(null, parent.getHeight(), child.getHeight(), jointBranchRate, probs);
-                helperNodePartials[i*2+1] = calculatePartialsPruning(partials, probs, helperNodePartials[i*2+1]);
+                helperNodePartials[i * 2 + 1] = calculatePartialsPruning(partials, probs, helperNodePartials[i * 2 + 1]);
             } else {
 
-                helperNodePartials[i*2] = partials;
+                helperNodePartials[i * 2] = partials;
                 for (int j = 0; j < nIntermediateNodes; j++) {
                     substitutionModel.getTransitionProbabilities(null, intNodeTimes[j + 1], intNodeTimes[j], jointBranchRate, probs);
-                    helperNodePartials[i*2+1] = calculatePartialsPruning(helperNodePartials[i*2], probs, helperNodePartials[i*2+1]);
-                    helperNodePartials[i*2] = helperNodePartials[i*2+1];
+                    helperNodePartials[i * 2 + 1] = calculatePartialsPruning(helperNodePartials[i * 2], probs, helperNodePartials[i * 2 + 1]);
+                    helperNodePartials[i * 2] = helperNodePartials[i * 2 + 1];
                 }
             }
         }
 
-        return helperNodePartials[i*2+1];
+        return helperNodePartials[i * 2 + 1];
     }
 
 
-
-        /**
-         * Calculates partial likelihoods at a node when both children have states.
-         * From BeerLikelihoodCore
-         */
-    protected double [] calculateStatesStatesPruning(int[] stateIndex1, double[] matrices1,
-                                                int[] stateIndex2, double[] matrices2,
-                                                double[] partials3) {
+    /**
+     * Calculates partial likelihoods at a node when both children have states.
+     * From BeerLikelihoodCore
+     */
+    protected double[] calculateStatesStatesPruning(int[] stateIndex1, double[] matrices1,
+                                                    int[] stateIndex2, double[] matrices2,
+                                                    double[] partials3) {
         int v = 0;
 
         for (int l = 0; l < nrOfMatrices; l++) {
@@ -493,8 +526,8 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
         return partials3;
     }
 
-    protected double [] calculateStatesPruning(int[] stateIndex1, double[] matrices1,
-                                                     double[] partials3) {
+    protected double[] calculateStatesPruning(int[] stateIndex1, double[] matrices1,
+                                              double[] partials3) {
         int v = 0;
 
         for (int l = 0; l < nrOfMatrices; l++) {
@@ -533,8 +566,8 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
      * From BeerLikelihoodCore
      */
     protected double[] calculateStatesPartialsPruning(int[] stateIndex1, double[] matrices1,
-                                                  double[] partials2, double[] matrices2,
-                                                  double[] partials3) {
+                                                      double[] partials2, double[] matrices2,
+                                                      double[] partials3) {
 
         double sum, tmp;
 
@@ -591,9 +624,9 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
     /**
      * Calculates partial likelihoods at a node when both children have partials.
      */
-    protected double [] calculatePartialsPartialsPruning(double[] partials1, double[] matrices1,
-                                                    double[] partials2, double[] matrices2,
-                                                    double[] partials3) {
+    protected double[] calculatePartialsPartialsPruning(double[] partials1, double[] matrices1,
+                                                        double[] partials2, double[] matrices2,
+                                                        double[] partials3) {
         double sum1, sum2;
 
         int u = 0;
@@ -626,8 +659,8 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
     }
 
     // calculate partials for single child nodes
-    protected double [] calculatePartialsPruning(double[] partials1, double[] matrices1,
-                                                         double[] partials3) {
+    protected double[] calculatePartialsPruning(double[] partials1, double[] matrices1,
+                                                double[] partials3) {
         double sum1;
 
         int u = 0;
@@ -641,7 +674,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
 
                 for (int i = 0; i < nrOfStates; i++) {
 
-                    sum1 =  0.0;
+                    sum1 = 0.0;
 
                     for (int j = 0; j < nrOfStates; j++) {
                         sum1 += matrices1[w] * partials1[v + j];
@@ -671,7 +704,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
             for (i = 0; i < patternCount; i++) {
                 int code = data.getPattern(taxonIndex, i);
                 int[] statesForCode = data.getDataType().getStatesForCode(code);
-                if (statesForCode.length==1)
+                if (statesForCode.length == 1)
                     states[i] = statesForCode[0];
                 else
                     states[i] = code; // Causes ambiguous states to be ignored.
@@ -685,11 +718,10 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
     }
 
     /**
-     *
      * @param taxon the taxon name as a string
-     * @param data the alignment
+     * @param data  the alignment
      * @return the taxon index of the given taxon name for accessing its sequence data in the given alignment,
-     *         or -1 if the taxon is not in the alignment.
+     * or -1 if the taxon is not in the alignment.
      */
     private int getTaxonIndex(String taxon, Alignment data) {
         int taxonIndex = data.getTaxonIndex(taxon);
@@ -703,6 +735,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
         }
         return taxonIndex;
     }
+
     /**
      * Calculate the log likelihood of the current state.
      *
@@ -720,8 +753,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
         try {
             if (traverse(tree.getRoot()) != Tree.IS_CLEAN)
                 calcLogP();
-        }
-        catch (ArithmeticException e) {
+        } catch (ArithmeticException e) {
             return Double.NEGATIVE_INFINITY;
         }
         m_nScale++;
@@ -735,7 +767,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
 //            calcLogP();
 //            return logP;
             //TODO deleted possibility to turn off scaling
-        } else if (logP == Double.NEGATIVE_INFINITY && m_fScale < 10 ) { // && !m_likelihoodCore.getUseScaling()) {
+        } else if (logP == Double.NEGATIVE_INFINITY && m_fScale < 10) { // && !m_likelihoodCore.getUseScaling()) {
             m_nScale = 0;
             m_fScale *= 1.01;
             Log.warning.println("Turning on scaling to prevent numeric instability " + m_fScale);
@@ -751,20 +783,57 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
 
     void calcLogP() {
         logP = 0.0;
-        if (useAscertainedSitePatterns) {
-            final double ascertainmentCorrection = dataInput.get().getAscertainmentCorrection(patternLogLikelihoods);
-            for (int i = 0; i < dataInput.get().getPatternCount(); i++) {
-                logP += (patternLogLikelihoods[i] - ascertainmentCorrection) * dataInput.get().getPatternWeight(i);
-            }
-        } else {
-            for (int i = 0; i < dataInput.get().getPatternCount(); i++) {
-                logP += patternLogLikelihoods[i] * dataInput.get().getPatternWeight(i);
-            }
+        //if (useAscertainedSitePatterns) {
+        //    final double ascertainmentCorrection = dataInput.get().getAscertainmentCorrection(patternLogLikelihoods);
+        //   for (int i = 0; i < dataInput.get().getPatternCount(); i++) {
+        //       logP += (patternLogLikelihoods[i] - ascertainmentCorrection) * dataInput.get().getPatternWeight(i);
+        //  }
+        //} else {
+        for (int i = 0; i < dataInput.get().getPatternCount(); i++) {
+            logP += patternLogLikelihoods[i] * dataInput.get().getPatternWeight(i);
         }
     }
 
+    @Override
+    public void store() {
+        storedLogP = logP;
+        if (likelihoodCore != null) {
+            likelihoodCore.store();
+        }
+        super.store();
+        System.arraycopy(m_branchLengths, 0, storedBranchLengths, 0, m_branchLengths.length);
+    }
 
 
+    @Override
+    public void restore() {
+        logP = storedLogP;
+        if (likelihoodCore != null) {
+            likelihoodCore.restore();
+        }
+        super.restore();
+        double[] tmp = m_branchLengths;
+        m_branchLengths = storedBranchLengths;
+        storedBranchLengths = tmp;
+    }
 
 
+    @Override
+    protected boolean requiresRecalculation() {
+        hasDirt = Tree.IS_CLEAN;
+
+        if (dataInput.get().isDirtyCalculation()) {
+            hasDirt = Tree.IS_FILTHY;
+            return true;
+        }
+        if (m_siteModel.isDirtyCalculation()) {
+            hasDirt = Tree.IS_DIRTY;
+            return true;
+        }
+        if (branchRateModel != null && branchRateModel.isDirtyCalculation()) {
+            //m_nHasDirt = Tree.IS_DIRTY;
+            return true;
+        }
+        return treeInput.get().somethingIsDirty();
+    }
 }
