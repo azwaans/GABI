@@ -242,7 +242,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
                     nodePartials = calculatePartialsForCrossBranches(nodePartials, node, child1, child2, parentBeforeChildrenAfterScarringHeight, parentBeforeChildrenAfterScarringStop);
 
                     //set partials at node
-                    likelihoodCore.setNodePartials(nodeIndex, nodePartials);
+                    likelihoodCore.setCurrentNodePartials(nodeIndex, nodePartials);
                     if(useScaling){
                         likelihoodCore.scalePartials(nodeIndex);
                     }
@@ -265,8 +265,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
                             m_fRootPartials[i] += proportionInvariant;
                         }
                     }*/
-                m_fRootPartials = nodePartials;
-                //likelihoodCore.getNodePartials(nodeIndex, m_fRootPartials);
+                likelihoodCore.getNodePartials(nodeIndex, m_fRootPartials);
 
                 double[] rootFrequencies = substitutionModel.getFrequencies();
                 if (rootFrequenciesInput.get() != null) {
@@ -794,7 +793,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
         }
     }
 
-    @Override
+    /*@Override
     public void store() {
         storedLogP = logP;
         if (likelihoodCore != null) {
@@ -835,5 +834,5 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
             return true;
         }
         return treeInput.get().somethingIsDirty();
-    }
+    }*/
 }
