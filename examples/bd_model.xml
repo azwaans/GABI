@@ -3,9 +3,14 @@
 <!-- dataType has to be set to integer and the value must contain a ',' s.t. the class recognizes it as a comma separated string of integers-->
     <data  id="h3n2_2deme" spec="Alignment" name="alignment" dataType="integer">
 
-        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTCAACC" spec="Sequence" taxon="1" totalcount="4" value="3,3,3,2,3,3,3,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,"/>
-        <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCAACGGT" spec="Sequence" taxon="2" totalcount="1" value="3,3,3,2,3,3,3,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,"/>
-
+        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC" spec="Sequence" taxon="0" totalcount="4" value="0,"/>
+        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC1" spec="Sequence" taxon="1" totalcount="4" value="0,"/>
+       <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCAAC2GGT" spec="Sequence" taxon="2" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCACGG3T" spec="Sequence" taxon="3" totalcount="1" value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCACGGT5" spec="Sequence" taxon="4" totalcount="1" value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCACGGT6" spec="Sequence" taxon="5" totalcount="1" value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC7" spec="Sequence" taxon="6" totalcount="4" value="3,"/>
+        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC8" spec="Sequence" taxon="7" totalcount="4" value="3,"/>
     </data>
 
 <map name="Uniform" >beast.math.distributions.Uniform</map>
@@ -22,7 +27,7 @@
     <!--specify tip dates -->
     <traitSet id="dateTrait.t:h3n2_2deme"
               spec="beast.evolution.tree.TraitSet"
-              taxa="@TaxonSet.0" traitname="date-forward" value="1=32,2=32" />
+              taxa="@TaxonSet.0" traitname="date-forward" value="1=32,0=32,2=32" />
 
     <taxa id="TaxonSet.0" spec="TaxonSet">
         <alignment idref="h3n2_2deme"/>
@@ -31,16 +36,17 @@
 <run id="mcmc" spec="MCMC" chainLength="10000000">
     <state id="state" spec="State" storeEvery="5000">
         <!-- define state node -->
-        <stateNode id="Tree.t:h3n2_2deme"  spec="lineageTree.tree.startingTree" rootHeight="32.0" taxa="@h3n2_2deme" scarringHeight="25" nClusters="2">
+        <stateNode id="Tree.t:h3n2_2deme"  spec="lineageTree.tree.startingTree" rootHeight="32.0"
+                   taxa="@h3n2_2deme" scarringHeight="25" nClusters="4">
             <trait idref="dateTrait.t:h3n2_2deme"/>
             <taxonset idref="TaxonSet.0"/>
         </stateNode>
 
-        <parameter id="scarringRate" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity"> 2.0</parameter>
-        <parameter id="lossRate" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="Infinity"> 2.0</parameter>
+        <parameter id="scarringRate" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity"> 0.2</parameter>
+        <parameter id="lossRate" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="Infinity"> 0.02</parameter>
 
 
-        <parameter id="birthRate" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity">2.0</parameter>
+        <parameter id="birthRate" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="Infinity">2.0</parameter>
         <parameter id="deathRate" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="Infinity">0.01</parameter>
         <parameter id="samplingRate" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="1.0">0.0</parameter>
         <parameter id="origin_BDSKY_Contemp.t:input_alignment" spec="parameter.RealParameter" lower="32.5" name="stateNode" upper="33.0">32.5</parameter>
@@ -61,7 +67,6 @@
             <distribution id="birthDeathMigration.t:h3n2_2deme" spec="beast.evolution.speciation.BirthDeathSkylineModel"
                           birthRate="@birthRate" deathRate="@deathRate" samplingRate="@samplingRate"
                           contemp="true" origin="@origin_BDSKY_Contemp.t:input_alignment" rho="@rho_BDSKY_Contemp.t:input_alignment"
-                          birthRateChangeTimes="0 16"
                            tree="@Tree.t:h3n2_2deme">
             </distribution>
 
@@ -109,13 +114,12 @@
     </distribution>
 
    <!-- tree operators -->
-    <operator id="treeWB" spec="WilsonBalding"
+   <operator id="treeWB" spec="WilsonBalding"
               tree="@Tree.t:h3n2_2deme" weight="3.0"/>
 
     <operator id="Unif" spec="Uniform" tree="@Tree.t:h3n2_2deme" weight="3.0"/>
 
-    <operator id="SubtreeSlideOperator" spec="SubtreeSlide" tree="@Tree.t:h3n2_2deme" weight="3.0"/>
-
+    <!--operator id="SubtreeSlideOperator" spec="SubtreeSlide" tree="@Tree.t:h3n2_2deme" weight="3.0"/-->
     <operator id="BDSKY_ContempWide.t:input_alignment" spec="Exchange" isNarrow="false" tree="@Tree.t:h3n2_2deme" weight="3.0"/>
 
     <!-- phylogenetic operators -->
