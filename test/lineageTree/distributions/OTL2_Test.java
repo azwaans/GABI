@@ -20,6 +20,7 @@ public class OTL2_Test {
 
     organoidTreeLikelihood2 likelihood1, likelihood2, likelihood3;
     Tree tree1, tree2, tree3;
+    private organoidTreeLikelihood2 likelihood4;
 
     @Before
     public void setUp(){
@@ -74,9 +75,17 @@ public class OTL2_Test {
                 "scarringHeight", 2.0,
                 "scarringDuration", 2.0, "frequencies", frequencies);
 
+        GeneralScarringLoss scarringModel4 = new GeneralScarringLoss();
+        scarringModel4.initByName("scarringRates", new RealParameter("0.01 0.01"),
+                "lossRate", new RealParameter("0.01"),
+                "scarringHeight", 100.0,
+                "scarringDuration", 100.0, "frequencies", frequencies);
+
         // init site model
         SiteModel siteM = new SiteModel();
         siteM.initByName( "gammaCategoryCount", 0, "substModel", scarringModel);
+        SiteModel siteM4 = new SiteModel();
+        siteM4.initByName("gammaCategoryCount", 0, "substModel", scarringModel4);
 
         // init branch rate model
         StrictClockModel clockModel = new StrictClockModel();
@@ -92,6 +101,10 @@ public class OTL2_Test {
         likelihood3 = new organoidTreeLikelihood2();
         likelihood3.initByName("data", alignment3, "tree", tree3,
                 "siteModel", siteM, "branchRateModel", clockModel);
+
+        likelihood4 = new organoidTreeLikelihood2();
+        likelihood4.initByName("data", alignment2, "tree", tree2,
+                "siteModel", siteM4, "branchRateModel", clockModel);
     }
 
     @Test
@@ -159,6 +172,22 @@ public class OTL2_Test {
 
         double logP = likelihood3.calculateLogP();
         assertEquals(Math.log(1.225782753675767e-04), logP, 1e-13);
+
+    }
+
+    @Test
+    public void testLikelihood4(){
+        //test likelihood calculation, when scarring window extends over the entire tree height
+        // -> calculation does not require a changing rate matrix nor helper nodes
+
+        // parent above scarring window, children within scarring window
+        Node parent = tree3.getRoot();
+        Node child1 = parent.getChild(0);
+        Node child2 = parent.getChild(1);
+
+
+        double logP = likelihood4.calculateLogP();
+        assertEquals(Math.log(0.072374640511506), logP, 1e-14);
 
     }
 }
