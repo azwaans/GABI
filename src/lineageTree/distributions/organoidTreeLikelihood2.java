@@ -8,6 +8,7 @@ import beast.evolution.branchratemodel.StrictClockModel;
 import beast.evolution.likelihood.BeerLikelihoodCore;
 import beast.evolution.likelihood.GenericTreeLikelihood;
 import beast.evolution.likelihood.LikelihoodCore;
+import beast.evolution.likelihood.TreeLikelihood;
 import beast.evolution.sitemodel.SiteModel;
 import beast.evolution.substitutionmodel.Frequencies;
 import beast.evolution.tree.Node;
@@ -21,6 +22,10 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
 
     final public Input<Frequencies> rootFrequenciesInput =
             new Input<>("rootFrequencies", "prior state frequencies at root, optional", Input.Validate.OPTIONAL);
+    public static enum Scaling {none, always, _default};
+    final public Input<TreeLikelihood.Scaling> scaling = new Input<>("scaling",
+            "type of scaling to use, one of " + Arrays.toString(TreeLikelihood.Scaling.values()) + ". If not specified, the -beagle_scaling flag is used.",
+            TreeLikelihood.Scaling.none, TreeLikelihood.Scaling.values());
 
     /**
      * calculation engine *
@@ -769,12 +774,12 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
         } else if (logP == Double.NEGATIVE_INFINITY && m_fScale < 10) { // && !m_likelihoodCore.getUseScaling()) {
             m_nScale = 0;
             m_fScale *= 1.01;
-            Log.warning.println("Turning on scaling to prevent numeric instability " + m_fScale);
+            /*Log.warning.println("Turning on scaling to prevent numeric instability " + m_fScale);
             likelihoodCore.setUseScaling(m_fScale);
             likelihoodCore.unstore();
             hasDirt = Tree.IS_FILTHY;
             traverse(tree.getRoot());
-            calcLogP();
+            calcLogP();*/
             return logP;
         }
         return logP;

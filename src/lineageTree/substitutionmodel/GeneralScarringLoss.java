@@ -3,6 +3,7 @@ package lineageTree.substitutionmodel;
 import beast.core.Input;
 import beast.core.parameter.RealParameter;
 import beast.evolution.datatype.DataType;
+import beast.evolution.datatype.IntegerData;
 import beast.evolution.substitutionmodel.EigenDecomposition;
 import beast.evolution.substitutionmodel.SubstitutionModel;
 import beast.evolution.tree.Node;
@@ -15,9 +16,9 @@ public class GeneralScarringLoss extends SubstitutionModel.Base {
 
         final public Input<List<RealParameter>> scarringRatesInput = new Input<>("scarringRates",
                 "Rates, at which scars types are introduced into the scarring region",
-                new ArrayList<>(), Input.Validate.REQUIRED);
+                new ArrayList<>());
         final public Input<RealParameter> lossRateInput = new Input<>("lossRate",
-                "Rate, at which scarring regions are lost");
+                "Rate, at which scarring regions are lost", Input.Validate.REQUIRED);
         public Input<Double> scarringHeightInput = new Input<>("scarringHeight",
                 "Duration between the onset of scarring and sampling of the cells");
         public Input<Double> scarringDurationInput = new Input<>("scarringDuration",
@@ -25,29 +26,15 @@ public class GeneralScarringLoss extends SubstitutionModel.Base {
 
 
         /**
-         * Eigenvalue decomposition of rate matrix + its stored version *
-         */
-        private EigenDecomposition getEigenDecompositionScarring = null;
-        private EigenDecomposition storedEigenDecompositionScarring = null;
-        private EigenDecomposition getEigenDecompositionLoss = null;
-        private EigenDecomposition storedEigenDecompositionLoss = null;
-        /**
-         * flag to indicate eigen decomposition is up to date *
-         */
-        private boolean updateEigenScar = true;
-        private boolean updateEigenLoss = true;
-
-        /**
          * flag to indicate matrix is up to date *
          */
-        protected boolean updateMatrixScar = true;
-        protected boolean updateMatrixLoss = true;
+        protected boolean updateMatrixScar = false;
+        protected boolean updateMatrixLoss = false;
 
 
         double scarringHeight;
         double scarringDuration;
         double[] frequencies;
-        //TODO potentially delete or add loss rates
         double[][] rateMatrix;
         Double[] scarRates;
         Double lossRate;
@@ -138,14 +125,11 @@ public class GeneralScarringLoss extends SubstitutionModel.Base {
     }
 
     @Override
-    public EigenDecomposition getEigenDecomposition(Node node) {
-
-        return null;
-    }
+    public EigenDecomposition getEigenDecomposition(Node node) {return null;}
 
     @Override
     public boolean canHandleDataType(DataType dataType) {
-        return false;
+        return dataType instanceof IntegerData;
     }
 
     @Override
