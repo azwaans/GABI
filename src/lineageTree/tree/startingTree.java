@@ -193,6 +193,7 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         if (iSeq > nTaxa){
             //throw new RuntimeException("iSeq reached " + iSeq + " but it should never exceed the number of sequences: " + nTaxa + "!");
         }
+        subtreeLeft.setHeight(rootHeight);
         return subtreeLeft;
     }
 }
