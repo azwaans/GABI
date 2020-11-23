@@ -19,39 +19,35 @@ import static org.junit.Assert.assertEquals;
 public class OTL2_Test {
 
     organoidTreeLikelihood2 likelihood1, likelihood2, likelihood3;
-    Tree tree1, tree2, tree3;
-    private organoidTreeLikelihood2 likelihood4;
+    Tree tree1, tree2, tree3, treeImpossible;
+    private organoidTreeLikelihood2 likelihood4, likelihoodNegInf;
 
     @Before
     public void setUp(){
 
+
+
+        // init site model
+        //SiteModel siteM = new SiteModel();
+       // siteM.initByName( "gammaCategoryCount", 0, "substModel", scarringModel);
+        // init branch rate model
+
+
+
+    }
+
+    @Test
+    public void testLikelihood1() {
+
         // init alignment
         Sequence a = new Sequence("0", "0,");
         Sequence b = new Sequence("1", "0,");
-        Sequence b2 = new Sequence("1", "1,");
-        Sequence b3 = new Sequence("1", "3,");
-
         Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a, "sequence", b, "dataType", "integer", "stateCount", 3);
-        Alignment alignment2 = new Alignment();
-        alignment2.initByName("sequence", a, "sequence", b2, "dataType", "integer", "stateCount", 3);
-        Alignment alignment3 = new Alignment();
-        alignment3.initByName("sequence", a, "sequence", b3, "dataType", "integer", "stateCount", 3);
-
-
-        //init trees
+        alignment.initByName("sequence", a, "sequence", b, "dataType", "integer", "stateCount", 4);
+        //init tree
         tree1 = new TreeParser();
         tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
                 "(0[&cluster=0]:28.5,1[&cluster=1]:28.5)2[&cluster=0]:0.0",
-                "adjustTipHeights", false, "offset", 0);
-
-        tree2 = new TreeParser();
-        tree2.initByName("IsLabelledNewick", true, "taxa", alignment2, "newick",
-                "(0[&cluster=0]:25,1[&cluster=1]:25)2[&cluster=0]:0.0",
-                "adjustTipHeights", false, "offset", 0);
-        tree3 = new TreeParser();
-        tree3.initByName("IsLabelledNewick", true, "taxa", alignment3, "newick",
-                "(0[&cluster=0]:25,1[&cluster=1]:25)2[&cluster=0]:0.0",
                 "adjustTipHeights", false, "offset", 0);
 
         //init scarring model
@@ -69,23 +65,9 @@ public class OTL2_Test {
                 "scarringHeight", 25.0,
                 "scarringDuration", 2.0, "frequencies", frequencies);
 
-        GeneralScarringLoss scarringModel3 = new GeneralScarringLoss();
-        scarringModel3.initByName("scarringRates", scarRates,
-                "lossRate", lossRate,
-                "scarringHeight", 2.0,
-                "scarringDuration", 2.0, "frequencies", frequencies);
-
-        GeneralScarringLoss scarringModel4 = new GeneralScarringLoss();
-        scarringModel4.initByName("scarringRates", new RealParameter("0.01 0.01"),
-                "lossRate", new RealParameter("0.01"),
-                "scarringHeight", 100.0,
-                "scarringDuration", 100.0, "frequencies", frequencies);
-
         // init site model
         SiteModel siteM = new SiteModel();
         siteM.initByName( "gammaCategoryCount", 0, "substModel", scarringModel);
-        SiteModel siteM4 = new SiteModel();
-        siteM4.initByName("gammaCategoryCount", 0, "substModel", scarringModel4);
 
         // init branch rate model
         StrictClockModel clockModel = new StrictClockModel();
@@ -94,23 +76,8 @@ public class OTL2_Test {
         likelihood1.initByName("data", alignment, "tree", tree1,
                 "siteModel", siteM, "branchRateModel", clockModel);
 
-        likelihood2 = new organoidTreeLikelihood2();
-        likelihood2.initByName("data", alignment2, "tree", tree2,
-                "siteModel", siteM, "branchRateModel", clockModel);
 
-        likelihood3 = new organoidTreeLikelihood2();
-        likelihood3.initByName("data", alignment3, "tree", tree3,
-                "siteModel", siteM, "branchRateModel", clockModel);
-
-        likelihood4 = new organoidTreeLikelihood2();
-        likelihood4.initByName("data", alignment2, "tree", tree2,
-                "siteModel", siteM4, "branchRateModel", clockModel);
-    }
-
-    @Test
-    public void testLikelihood1() {
         // parent above scarring window, children below scarring window
-
         Node parent = tree1.getRoot();
         Node child1 = parent.getChild(0);
         Node child2 = parent.getChild(1);
@@ -135,6 +102,44 @@ public class OTL2_Test {
     @Test
     public void testLikelihood2(){
         // parent within scarring window, children below scarring window
+
+        // init alignment
+        Sequence a = new Sequence("0", "0,");
+        Sequence b2 = new Sequence("1", "1,");
+
+        Alignment alignment2 = new Alignment();
+        alignment2.initByName("sequence", a, "sequence", b2, "dataType", "integer", "stateCount", 3);
+
+        tree2 = new TreeParser();
+        tree2.initByName("IsLabelledNewick", true, "taxa", alignment2, "newick",
+                "(0[&cluster=0]:25,1[&cluster=1]:25)2[&cluster=0]:0.0",
+                "adjustTipHeights", false, "offset", 0);
+
+        //init scarring model
+        RealParameter lossRate = new RealParameter("0.2");
+        RealParameter scarRates = new RealParameter("1.0 1.0");
+        RealParameter freqs = new RealParameter("1.0 0 0");
+        Frequencies frequencies = new Frequencies();
+        frequencies.initByName("frequencies", freqs,
+                "estimate", false);
+
+        GeneralScarringLoss scarringModel = new GeneralScarringLoss();
+        scarringModel.initByName("scarringRates", scarRates,
+                "lossRate", lossRate,
+                "scarringHeight", 25.0,
+                "scarringDuration", 2.0, "frequencies", frequencies);
+
+        // init site model
+        SiteModel siteM = new SiteModel();
+        siteM.initByName( "gammaCategoryCount", 0, "substModel", scarringModel);
+        // init branch rate model
+        StrictClockModel clockModel = new StrictClockModel();
+
+
+        likelihood2 = new organoidTreeLikelihood2();
+        likelihood2.initByName("data", alignment2, "tree", tree2,
+                "siteModel", siteM, "branchRateModel", clockModel);
+
         Node parent = tree2.getRoot();
         Node child1 = parent.getChild(0);
         Node child2 = parent.getChild(1);
@@ -156,6 +161,45 @@ public class OTL2_Test {
     @Test
     public void testLikelihood3(){
         // parent above scarring window, children within scarring window
+
+        // init alignment
+        Sequence a = new Sequence("0", "0,");
+        Sequence b3 = new Sequence("1", "3,");
+
+        Alignment alignment3 = new Alignment();
+        alignment3.initByName("sequence", a, "sequence", b3, "dataType", "integer", "stateCount", 3);
+
+        //init tree
+        tree3 = new TreeParser();
+        tree3.initByName("IsLabelledNewick", true, "taxa", alignment3, "newick",
+                "(0[&cluster=0]:25,1[&cluster=1]:25)2[&cluster=0]:0.0",
+                "adjustTipHeights", false, "offset", 0);
+
+        //init scarring model
+        RealParameter lossRate = new RealParameter("0.2");
+        RealParameter scarRates = new RealParameter("1.0 1.0");
+
+        RealParameter freqs = new RealParameter("1.0 0 0");
+        Frequencies frequencies = new Frequencies();
+        frequencies.initByName("frequencies", freqs,
+                "estimate", false);
+
+        GeneralScarringLoss scarringModel3 = new GeneralScarringLoss();
+        scarringModel3.initByName("scarringRates", scarRates,
+                "lossRate", lossRate,
+                "scarringHeight", 2.0,
+                "scarringDuration", 2.0, "frequencies", frequencies);
+
+        // init site model
+        SiteModel siteM3 = new SiteModel();
+        siteM3.initByName( "gammaCategoryCount", 0, "substModel", scarringModel3);
+        StrictClockModel clockModel = new StrictClockModel();
+
+        likelihood3 = new organoidTreeLikelihood2();
+        likelihood3.initByName("data", alignment3, "tree", tree3,
+                "siteModel", siteM3, "branchRateModel", clockModel);
+
+
         Node parent = tree3.getRoot();
         Node child1 = parent.getChild(0);
         Node child2 = parent.getChild(1);
@@ -163,16 +207,20 @@ public class OTL2_Test {
         double[] partials = likelihood3.calculatePartialsBeforeParent(parent, child2, 1, 1,
                 new double[]{0, 2.0, Double.NEGATIVE_INFINITY}, 1.0, 1);
         assertArrayEquals("Assert correct likelihood at helper node before parent", partials,
-                new double[]{0.329679953964361, 0.329679953964361, 0.329679953964361, 1.0}, 1e-12);
+                new double[]{0.329679953964361, 0.329679953964361, 0.329679953964361, 1.0}, 1e-15);
+
+        partials = likelihood3.calculatePartialsBeforeParent(parent, child1, 0, 0,
+                new double[]{0, 2.0, Double.NEGATIVE_INFINITY}, 1.0, 1);
+        assertArrayEquals("Assert correct likelihood at helper node before parent", partials,
+                new double[]{0.012277339903068, 0, 0, 0}, 1e-15);
 
         partials= likelihood3.calculatePartialsForCrossBranches(partials, parent, child1, child2,
-                false, true);
+                true, false);
         assertArrayEquals("Assert correct likelihood at parent", partials,
                 new double[]{1.225782753675767e-04, 0, 0, 0}, 1e-15);
 
         double logP = likelihood3.calculateLogP();
-        assertEquals(Math.log(1.225782753675767e-04), logP, 1e-13);
-
+        assertEquals(Math.log(1.225782753675767e-04), logP, 1e-14);
     }
 
     @Test
@@ -180,14 +228,153 @@ public class OTL2_Test {
         //test likelihood calculation, when scarring window extends over the entire tree height
         // -> calculation does not require a changing rate matrix nor helper nodes
 
-        // parent above scarring window, children within scarring window
-        Node parent = tree3.getRoot();
-        Node child1 = parent.getChild(0);
-        Node child2 = parent.getChild(1);
+        // init alignment
+        Sequence a = new Sequence("0", "0,");
+        Sequence b2 = new Sequence("1", "1,");
+
+        Alignment alignment2 = new Alignment();
+        alignment2.initByName("sequence", a, "sequence", b2, "dataType", "integer", "stateCount", 3);
+
+        //init tree
+        tree2 = new TreeParser();
+        tree2.initByName("IsLabelledNewick", true, "taxa", alignment2, "newick",
+                "(0[&cluster=0]:25,1[&cluster=1]:25)2[&cluster=0]:0.0",
+                "adjustTipHeights", false, "offset", 0);
+
+
+        // init scarring model
+        RealParameter freqs = new RealParameter("1.0 0 0");
+        Frequencies frequencies = new Frequencies();
+        frequencies.initByName("frequencies", freqs,
+                "estimate", false);
+
+        GeneralScarringLoss scarringModel4 = new GeneralScarringLoss();
+        scarringModel4.initByName("scarringRates", new RealParameter("0.01 0.01"),
+                "lossRate", new RealParameter("0.01"),
+                "scarringHeight", 100.0,
+                "scarringDuration", 100.0, "frequencies", frequencies);
+
+        SiteModel siteM4 = new SiteModel();
+        siteM4.initByName("gammaCategoryCount", 0, "substModel", scarringModel4);
+        StrictClockModel clockModel = new StrictClockModel();
+
+        //init likelihood
+        likelihood4 = new organoidTreeLikelihood2();
+        likelihood4.initByName("data", alignment2, "tree", tree2,
+                "siteModel", siteM4, "branchRateModel", clockModel);
 
 
         double logP = likelihood4.calculateLogP();
         assertEquals(Math.log(0.072374640511506), logP, 1e-14);
 
+    }
+
+    @Test
+    public void testLikelihood5(){
+        //test that impossible trees under the scarring model get a neg inf likelihood
+
+        // init alignment
+        Sequence a = new Sequence("0", "0,");
+        Sequence b2 = new Sequence("1", "1,");
+        Sequence c = new Sequence("2", "2,");
+
+        Alignment alignment4 = new Alignment();
+        alignment4.initByName("sequence", a, "sequence", b2, "sequence", c, "dataType", "integer", "stateCount", 3);
+
+
+        //init trees
+        treeImpossible = new TreeParser();
+        treeImpossible.initByName("IsLabelledNewick", true, "taxa", alignment4, "newick",
+                "((2[&cluster=0]:10,1[&cluster=1]:10)3[&cluster=0]:15.0,0[&cluster=2]:25)4[&cluster=0]:0.0",
+                "adjustTipHeights", false, "offset", 0);
+
+        //init scarring model
+        RealParameter lossRate = new RealParameter("0.2");
+        RealParameter scarRates = new RealParameter("1.0 1.0");
+
+        RealParameter freqs = new RealParameter("1.0 0 0");
+        Frequencies frequencies = new Frequencies();
+        frequencies.initByName("frequencies", freqs,
+                "estimate", false);
+
+        GeneralScarringLoss scarringModel = new GeneralScarringLoss();
+        scarringModel.initByName("scarringRates", scarRates,
+                "lossRate", lossRate,
+                "scarringHeight", 25.0,
+                "scarringDuration", 2.0, "frequencies", frequencies);
+
+        // init site model
+        SiteModel siteM = new SiteModel();
+        siteM.initByName( "gammaCategoryCount", 0, "substModel", scarringModel);
+
+        // init branch rate model
+        StrictClockModel clockModel = new StrictClockModel();
+
+        likelihoodNegInf = new organoidTreeLikelihood2();
+        likelihoodNegInf.initByName("data", alignment4, "tree", treeImpossible,
+                "siteModel", siteM, "branchRateModel", clockModel);
+
+        Node parent = treeImpossible.getRoot();
+        Node child1 = parent.getChild(0);
+        Node child2 = parent.getChild(1);
+
+        double logP = likelihoodNegInf.calculateLogP();
+
+        assertEquals(Double.NEGATIVE_INFINITY, logP, 1e-14);
+    }
+
+    @Test
+    public void testLikelihood6(){
+        //test tree that was found in tree posterior but should have been rejected
+
+        // init alignment
+        Sequence a = new Sequence("0", "1,");
+        Sequence b = new Sequence("1", "1,");
+        Sequence c = new Sequence("2", "2,");
+        Sequence d = new Sequence("3", "2,");
+
+        Alignment alignment = new Alignment();
+        alignment.initByName("sequence", a, "sequence", b, "sequence", c, "sequence", d, "dataType", "integer", "stateCount", 4);
+
+        String wrongAcceptedTree = "((0[&cluster=0]:18.987792267733195,2[&cluster=1]:18.987792267733195)5[&cluster=1]:13.012207732266805,(1[&cluster=0]:30.196436618358874,3[&cluster=1]:30.196436618358874)4[&cluster=0]:1.8035633816411263)6[&cluster=0]:0.0;";
+        //init trees
+        treeImpossible = new TreeParser();
+        treeImpossible.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
+                wrongAcceptedTree,
+                "adjustTipHeights", false, "offset", 0);
+
+        //init scarring model
+        RealParameter lossRate = new RealParameter("0.02");
+        RealParameter scarRates = new RealParameter("1 1");
+
+        RealParameter freqs = new RealParameter("1.0 0 0 0");
+        Frequencies frequencies = new Frequencies();
+        frequencies.initByName("frequencies", freqs,
+                "estimate", false);
+
+        GeneralScarringLoss scarringModel = new GeneralScarringLoss();
+        scarringModel.initByName("scarringRates", scarRates,
+                "lossRate", lossRate,
+                "scarringHeight", 25.0,
+                "scarringDuration", 2.0, "frequencies", frequencies);
+
+        // init site model
+        SiteModel siteM = new SiteModel();
+        siteM.initByName( "gammaCategoryCount", 0, "substModel", scarringModel);
+
+        // init branch rate model
+        StrictClockModel clockModel = new StrictClockModel();
+
+        likelihoodNegInf = new organoidTreeLikelihood2();
+        likelihoodNegInf.initByName("data", alignment, "tree", treeImpossible,
+                "siteModel", siteM, "branchRateModel", clockModel);
+
+        Node parent = treeImpossible.getRoot();
+        Node child1 = parent.getChild(0);
+        Node child2 = parent.getChild(1);
+
+        double logP = likelihoodNegInf.calculateLogP();
+
+        assertEquals(Double.NEGATIVE_INFINITY, logP, 1e-14);
     }
 }

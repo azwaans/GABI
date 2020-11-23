@@ -127,7 +127,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
         m_branchLengths = new double[nodeCount];
         storedBranchLengths = new double[nodeCount];
 
-        nrOfStates = dataInput.get().getMaxStateCount();
+        nrOfStates = substitutionModel.getStateCount(); //dataInput.get().getMaxStateCount();
         nrOfPatterns = dataInput.get().getPatternCount();
         nrOfMatrices = m_siteModel.getCategoryCount();
 
@@ -299,8 +299,8 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
         double[] heightsBeforeParent = new double[2];
         boolean[] needsIntermediates = new boolean[2];
 
-        double[] probs0 = new double[(nrOfStates + 1) * (nrOfStates + 1)];
-        double[] probs1 = new double[(nrOfStates + 1) * (nrOfStates + 1)];
+        double[] probs0 = new double[(nrOfStates) * (nrOfStates)];
+        double[] probs1 = new double[(nrOfStates) * (nrOfStates)];
 
         // determine the number of helper nodes to calculate the partials over
         int nIntermediateNodes;
@@ -371,6 +371,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
                 } else {
                     double[] partials = new double[nrOfStates * nrOfPatterns];
                     likelihoodCore.getNodePartials(childIndices[1], partials);
+                    calculatePartialsPartialsPruning(partials, probs1, helperNodePartials[1], probs0, nodePartials);
                 }
             }
         } else {
@@ -761,7 +762,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
             return Double.NEGATIVE_INFINITY;
         }
         m_nScale++;
-        if (logP > 0 || (likelihoodCore.getUseScaling() && m_nScale > X)) {
+        /*if (logP > 0 || (likelihoodCore.getUseScaling() && m_nScale > X)) {
 //            System.err.println("Switch off scaling");
 //            m_likelihoodCore.setUseScaling(1.0);
 //            m_likelihoodCore.unstore();
@@ -774,14 +775,14 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
         } else if (logP == Double.NEGATIVE_INFINITY && m_fScale < 10) { // && !m_likelihoodCore.getUseScaling()) {
             m_nScale = 0;
             m_fScale *= 1.01;
-            /*Log.warning.println("Turning on scaling to prevent numeric instability " + m_fScale);
+            *//*Log.warning.println("Turning on scaling to prevent numeric instability " + m_fScale);
             likelihoodCore.setUseScaling(m_fScale);
             likelihoodCore.unstore();
             hasDirt = Tree.IS_FILTHY;
             traverse(tree.getRoot());
-            calcLogP();*/
+            calcLogP();*//*
             return logP;
-        }
+        }*/
         return logP;
     }
 
