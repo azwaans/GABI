@@ -381,6 +381,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
             if (needsIntermediates[1]) {
                 substitutionModel.getTransitionProbabilities(null, parent.getHeight(), heightsBeforeParent[1],
                         jointBranchRate1, probs1);
+
                 if (child1.isLeaf()){
                     int[] states1 = new int[nrOfPatterns];
                     likelihoodCore.getNodeStates(childIndices[0], states1);
@@ -402,6 +403,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
                         int[] states2 = new int[nrOfPatterns];
                         likelihoodCore.getNodeStates(childIndices[1], states2);
                         calculateStatesStatesPruning(states1, probs0, states2, probs1, nodePartials);
+
                     }else{
                         double[] partials2 = new double[nrOfPatterns*nrOfStates];
                         likelihoodCore.getNodePartials(childIndices[1], partials2);
@@ -415,6 +417,7 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
                         int[] states2 = new int[nrOfPatterns];
                         likelihoodCore.getNodeStates(childIndices[1], states2);
                         calculateStatesPartialsPruning(states2, probs1, partials1, probs0, nodePartials);
+
                     }else{
                         double[] partials2 = new double[nrOfPatterns*nrOfStates];
                         likelihoodCore.getNodePartials(childIndices[1], partials2);
