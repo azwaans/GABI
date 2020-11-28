@@ -38,6 +38,7 @@ public class OTL2_Test {
 
     @Test
     public void testLikelihood1() {
+        // parent above scarring window, children below scarring window
 
         // init alignment
         Sequence a = new Sequence("0", "0,");
@@ -76,8 +77,6 @@ public class OTL2_Test {
         likelihood1.initByName("data", alignment, "tree", tree1,
                 "siteModel", siteM, "branchRateModel", clockModel);
 
-
-        // parent above scarring window, children below scarring window
         Node parent = tree1.getRoot();
         Node child1 = parent.getChild(0);
         Node child2 = parent.getChild(1);
@@ -159,7 +158,7 @@ public class OTL2_Test {
     }
 
     @Test
-    public void testLikelihood3(){
+     public void testLikelihood3(){
         // parent above scarring window, children within scarring window
 
         // init alignment
@@ -224,6 +223,67 @@ public class OTL2_Test {
     }
 
     @Test
+    public void testLikelihood3b(){
+        // parent above scarring window, children within scarring window, 2 sites!
+
+        // init alignment
+        Sequence a = new Sequence("0", "0,0");
+        Sequence b3 = new Sequence("1", "3,3");
+
+        Alignment alignment3 = new Alignment();
+        alignment3.initByName("sequence", a, "sequence", b3, "dataType", "integer", "stateCount", 3);
+
+        //init tree
+        tree3 = new TreeParser();
+        tree3.initByName("IsLabelledNewick", true, "taxa", alignment3, "newick",
+                "(0[&cluster=0]:25,1[&cluster=1]:25)2[&cluster=0]:0.0",
+                "adjustTipHeights", false, "offset", 0);
+
+        //init scarring model
+        RealParameter lossRate = new RealParameter("0.2");
+        RealParameter scarRates = new RealParameter("1.0 1.0");
+
+        RealParameter freqs = new RealParameter("1.0 0 0");
+        Frequencies frequencies = new Frequencies();
+        frequencies.initByName("frequencies", freqs,
+                "estimate", false);
+
+        GeneralScarringLoss scarringModel3 = new GeneralScarringLoss();
+        scarringModel3.initByName("scarringRates", scarRates,
+                "lossRate", lossRate,
+                "scarringHeight", 2.0,
+                "scarringDuration", 2.0, "frequencies", frequencies);
+
+        // init site model
+        SiteModel siteM3 = new SiteModel();
+        siteM3.initByName( "gammaCategoryCount", 0, "substModel", scarringModel3);
+        StrictClockModel clockModel = new StrictClockModel();
+
+        likelihood3 = new organoidTreeLikelihood2();
+        likelihood3.initByName("data", alignment3, "tree", tree3,
+                "siteModel", siteM3, "branchRateModel", clockModel);
+
+
+        /*double[] partials = likelihood3.calculatePartialsBeforeParent(parent, child2, 1, 1,
+                new double[]{0, 2.0, Double.NEGATIVE_INFINITY}, 1.0, 1);
+        assertArrayEquals("Assert correct likelihood at helper node before parent", partials,
+                new double[]{0.329679953964361, 0.329679953964361, 0.329679953964361, 1.0}, 1e-15);
+
+        partials = likelihood3.calculatePartialsBeforeParent(parent, child1, 0, 0,
+                new double[]{0, 2.0, Double.NEGATIVE_INFINITY}, 1.0, 1);
+        assertArrayEquals("Assert correct likelihood at helper node before parent", partials,
+                new double[]{0.012277339903068, 0, 0, 0}, 1e-15);
+
+        partials= likelihood3.calculatePartialsForCrossBranches(partials, parent, child1, child2,
+                true, false);
+        assertArrayEquals("Assert correct likelihood at parent", partials,
+                new double[]{1.225782753675767e-04, 0, 0, 0}, 1e-15);
+*/
+        double logP = likelihood3.calculateLogP();
+        assertEquals(Math.log(Math.pow(1.225782753675767e-04,2)), logP, 1e-13);
+    }
+
+    @Test
     public void testLikelihood4(){
         //test likelihood calculation, when scarring window extends over the entire tree height
         // -> calculation does not require a changing rate matrix nor helper nodes
@@ -269,6 +329,75 @@ public class OTL2_Test {
 
     }
 
+
+
+    @Test
+    public void testLikelihood4b(){
+        //test likelihood calculation, when scarring window is of size 0
+        // -> any tree should have 0 likelihood if it had scars
+
+        // init alignment
+        Sequence a = new Sequence("0", "1,");
+        Sequence b2 = new Sequence("1", "2,");
+
+        Alignment alignment2 = new Alignment();
+        alignment2.initByName("sequence", a, "sequence", b2, "dataType", "integer", "stateCount", 3);
+
+        //init tree
+        tree2 = new TreeParser();
+        tree2.initByName("IsLabelledNewick", true, "taxa", alignment2, "newick",
+                "(0[&cluster=0]:25,1[&cluster=1]:25)2[&cluster=0]:0.0",
+                "adjustTipHeights", false, "offset", 0);
+
+
+        // init scarring model
+        RealParameter freqs = new RealParameter("1.0 0 0");
+        Frequencies frequencies = new Frequencies();
+        frequencies.initByName("frequencies", freqs,
+                "estimate", false);
+
+        GeneralScarringLoss scarringModel4 = new GeneralScarringLoss();
+        scarringModel4.initByName("scarringRates", new RealParameter("0.01 0.01"),
+                "lossRate", new RealParameter("0.01"),
+                "scarringHeight", 25.0,
+                "scarringDuration", 0.0, "frequencies", frequencies);
+
+        SiteModel siteM4 = new SiteModel();
+        siteM4.initByName("gammaCategoryCount", 0, "substModel", scarringModel4);
+        StrictClockModel clockModel = new StrictClockModel();
+
+        //init likelihood
+        likelihood4 = new organoidTreeLikelihood2();
+        likelihood4.initByName("data", alignment2, "tree", tree2,
+                "siteModel", siteM4, "branchRateModel", clockModel);
+
+
+        double logP = likelihood4.calculateLogP();
+        assertEquals("Test 0 likelihood for tree with scars and scarring model without scarring window",
+                Double.NEGATIVE_INFINITY, logP, 1e-14);
+
+        //-------------------------------------------------------------------------------------------------------//
+
+        GeneralScarringLoss scarringModel4b = new GeneralScarringLoss();
+        scarringModel4b.initByName("scarringRates", new RealParameter("0.01 0.01"),
+                "lossRate", new RealParameter("0.01"),
+                "scarringHeight", 30.0,
+                "scarringDuration", 2.0, "frequencies", frequencies);
+
+        siteM4.initByName("gammaCategoryCount", 0, "substModel", scarringModel4b);
+
+        //init likelihood
+        likelihood4.initByName("data", alignment2, "tree", tree2,
+                "siteModel", siteM4, "branchRateModel", clockModel);
+
+
+        logP = likelihood4.calculateLogP();
+        assertEquals("Test 0 likelihood if scars segregate at parent and scarring window was before parent",
+                Double.NEGATIVE_INFINITY, logP, 1e-14);
+
+    }
+
+
     @Test
     public void testLikelihood5(){
         //test that impossible trees under the scarring model get a neg inf likelihood
@@ -313,10 +442,6 @@ public class OTL2_Test {
         likelihoodNegInf = new organoidTreeLikelihood2();
         likelihoodNegInf.initByName("data", alignment4, "tree", treeImpossible,
                 "siteModel", siteM, "branchRateModel", clockModel);
-
-        Node parent = treeImpossible.getRoot();
-        Node child1 = parent.getChild(0);
-        Node child2 = parent.getChild(1);
 
         double logP = likelihoodNegInf.calculateLogP();
 
@@ -369,12 +494,87 @@ public class OTL2_Test {
         likelihoodNegInf.initByName("data", alignment, "tree", treeImpossible,
                 "siteModel", siteM, "branchRateModel", clockModel);
 
-        Node parent = treeImpossible.getRoot();
-        Node child1 = parent.getChild(0);
-        Node child2 = parent.getChild(1);
-
         double logP = likelihoodNegInf.calculateLogP();
 
         assertEquals(Double.NEGATIVE_INFINITY, logP, 1e-14);
+    }
+
+    @Test
+    public void testLikelihood7(){
+        //test tree that contains all "branch classes"
+
+        // init alignment
+        // note: the second site is just reversing 1 and 2. Since the scar types have the same
+        // scarring rate here, their partials will be the same - just the position in the partial
+        // array will be swapped (1<->2). This also means that the tree likelihood is the tree
+        // likelihood of one site x 2. To compare to the matlab script, just use the first site.
+        Sequence a = new Sequence("0", "0,0");
+        Sequence b = new Sequence("1", "1,2");
+        Sequence c = new Sequence("2", "1,2");
+        Sequence d = new Sequence("3", "2,1");
+        Sequence e = new Sequence("4", "3,3");
+
+        Alignment alignment = new Alignment();
+        alignment.initByName("sequence", a, "sequence", b, "sequence", c, "sequence", d, "sequence", e, "dataType", "integer", "stateCount", 4);
+
+        String newickTree = "((0[&cluster=0]:26.0,(1[&cluster=1]:13.0,2[&cluster=1]:13.0)5[&cluster=1]:13.0)7[&cluster=0]:6.0,(3[&cluster=2]:24.0,4[&cluster=3]:24.0)6[&cluster=1]:8.0)8:0.0;";
+        //init trees
+        Tree tree = new TreeParser();
+        tree.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
+                newickTree,
+                "adjustTipHeights", false, "offset", 0);
+
+        //init scarring model
+        RealParameter lossRate = new RealParameter("0.02");
+        RealParameter scarRates = new RealParameter("1 1");
+
+        RealParameter freqs = new RealParameter("1.0 0 0 0");
+        Frequencies frequencies = new Frequencies();
+        frequencies.initByName("frequencies", freqs,
+                "estimate", false);
+
+        GeneralScarringLoss scarringModel = new GeneralScarringLoss();
+        scarringModel.initByName("scarringRates", scarRates,
+                "lossRate", lossRate,
+                "scarringHeight", 25.0,
+                "scarringDuration", 2.0, "frequencies", frequencies);
+
+        // init site model
+        SiteModel siteM = new SiteModel();
+        siteM.initByName( "gammaCategoryCount", 0, "substModel", scarringModel);
+
+        // init branch rate model
+        StrictClockModel clockModel = new StrictClockModel();
+
+        likelihoodNegInf = new organoidTreeLikelihood2();
+        likelihoodNegInf.initByName("data", alignment, "tree", tree,
+                "siteModel", siteM, "branchRateModel", clockModel);
+
+        Node parent = tree.getRoot();
+        Node node_7 = parent.getChild(0);
+        Node node_6 = parent.getChild(1);
+        Node node_5 = node_7.getChild(1);
+
+        //test partials at node 5
+        likelihoodNegInf.traverse(tree.getRoot());
+        double [] partials = new double[8];
+        likelihoodNegInf.getLikelihoodCore().getNodePartials(node_5.getNr(), partials);
+       assertArrayEquals("Assert correct likelihood at internal node 5:", partials,
+                new double[]{0, 0.594520547970194, 0, 0, 0,0, 0.594520547970194,0}, 1e-15);
+
+       //test partials at node 6
+        likelihoodNegInf.getLikelihoodCore().getNodePartials(node_6.getNr(), partials);
+        assertArrayEquals("Assert correct likelihood at internal node 5:", partials,
+                new double[]{0.101983098705779, 0, 0.235890505831029, 0, 0.101983098705779, 0.235890505831029 ,0,0}, 1e-15);
+
+        //test partials at node 7
+        likelihoodNegInf.getLikelihoodCore().getNodePartials(node_7.getNr(), partials);
+        assertArrayEquals("Assert correct likelihood at internal node 5:", partials,
+                new double[]{0.002450084837716, 0, 0, 0, 0.002450084837716, 0, 0, 0}, 1e-15);
+
+
+        double logP = likelihoodNegInf.calculateLogP();
+
+        assertEquals(-8.447652794733264*2, logP, 1e-14);
     }
 }
