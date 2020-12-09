@@ -16,6 +16,7 @@ public class startingTree extends Tree implements StateNodeInitialiser {
     final public Input<Alignment> taxaInput = new Input<>("taxa", "set of taxa to initialise tree specified by alignment");
 
     final public Input<Double> rootHeightInput = new Input<>("rootHeight", "Time from beginning of the experiment until sequencing");
+    final public Input<Double> scarringDurationInput = new Input<>("scarringDuration", "Time duration from scarring start to scarring stop");
     final public Input<Double> scarringHeightInput = new Input<>("scarringHeight", "Time from the onset of scarring until sequencing");
     final public Input<Integer> nClustersInput = new Input<>("nClusters", "Number of clusters, where each cluster consists of identical sequences");
 
@@ -23,6 +24,7 @@ public class startingTree extends Tree implements StateNodeInitialiser {
     int[][] matchMatrix;
     int nClusters;
     double scarringHeight;
+    double scarringDuration;
     double rootHeight;
     int nTaxa;
     Alignment taxa;
@@ -39,6 +41,7 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         cSeq = nTaxa-1;
 
         rootHeight = rootHeightInput.get();
+        scarringDuration = scarringDurationInput.get();
         scarringHeight = scarringHeightInput.get();
 
         if (scarringHeight >= rootHeight){
@@ -105,12 +108,17 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         return matchMatrix;
     }
 
-    public Node get_cluster_tree(int iSeq, double scarringHeight, Alignment taxa, int iCluster){
+    public Node get_cluster_tree(int iSeq, double scarringStop, Alignment taxa, int iCluster){
         //build subtree for identical sequences with equally spaced divergence
         // times between the internal nodes up until the scarring event
 
         int nMatches = IntStream.of(matchMatrix[iSeq]).sum();
-        double divTimes =  scarringHeight / nMatches;
+        double divTimes;
+        if(nMatches != 0){
+            divTimes =  scarringStop / nMatches;
+        }else{
+            divTimes = scarringStop;
+        }
         List<String> taxaNames = taxa.getTaxaNames();
 
         // generate left node
@@ -159,8 +167,9 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         // time between the internal nodes connecting the cluster trees
         double divTime = (rootHeight - scarringHeight) / nClusters;
 
+        double scarringStop = scarringHeight - scarringDuration;
         // get left subtree
-        Node subtreeLeft = get_cluster_tree(iSeq, scarringHeight, taxa, 0);
+        Node subtreeLeft = get_cluster_tree(iSeq, scarringStop, taxa, 0);
 
         // update iSeq to next cluster start
         nMatches = IntStream.of(matchMatrix[iSeq]).sum();
@@ -170,7 +179,7 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         for (int iCluster=1; iCluster < nClusters; iCluster++){
 
             // get right subtree
-            Node subtreeRight = get_cluster_tree(iSeq, scarringHeight, taxa, iCluster);
+            Node subtreeRight = get_cluster_tree(iSeq, scarringStop, taxa, iCluster);
             nMatches = IntStream.of(matchMatrix[iSeq]).sum();
             iSeq += (nMatches+1);
 
