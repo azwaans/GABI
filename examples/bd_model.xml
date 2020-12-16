@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><beast beautitemplate='MultiTypeBirthDeath' beautistatus='' namespace="lineageTree.substitutionmodel.ScarringLoss:beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood" required="" version="2.6">
 
 <!-- dataType has to be set to integer and the value must contain a ',' s.t. the class recognizes it as a comma separated string of integers-->
-    <data  id="h3n2_2deme" spec="Alignment" name="alignment" dataType="integer">
+    <data  id="h3n2_2deme" spec="Alignment" name="alignment" >
+        <userDataType spec="beast.evolution.datatype.ScarData" nrOfStates="5" />
 
-        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC" spec="Sequence" taxon="0" totalcount="4" value="0,"/>
-        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC1" spec="Sequence" taxon="1" totalcount="4" value="0,"/>
-       <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCAAC2GGT" spec="Sequence" taxon="2" totalcount="1" value="1,"/>
-        <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCACGG3T" spec="Sequence" taxon="3" totalcount="1" value="1,"/>
-        <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCACGGT5" spec="Sequence" taxon="4" totalcount="1" value="2,"/>
-        <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCACGGT6" spec="Sequence" taxon="5" totalcount="1" value="2,"/>
-        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC7" spec="Sequence" taxon="6" totalcount="4" value="3,"/>
-        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC8" spec="Sequence" taxon="7" totalcount="4" value="3,"/>
+        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC" spec="Sequence" taxon="0"  value="0,"/>
+        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC1" spec="Sequence" taxon="1" value="0,"/>
+       <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCAAC2GGT" spec="Sequence" taxon="2"  value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCACGG3T" spec="Sequence" taxon="3"  value="1,"/>
+        <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCACGGT5" spec="Sequence" taxon="4" value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCACGGT6" spec="Sequence" taxon="5"  value="2,"/>
+        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC7" spec="Sequence" taxon="6" value="3,"/>
+        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC8" spec="Sequence" taxon="7" value="4,"/>
     </data>
 
 <map name="Uniform" >beast.math.distributions.Uniform</map>
@@ -27,7 +28,7 @@
     <!--specify tip dates -->
     <traitSet id="dateTrait.t:h3n2_2deme"
               spec="beast.evolution.tree.TraitSet"
-              taxa="@TaxonSet.0" traitname="date-forward" value="1=32,0=32,2=32" />
+              taxa="@TaxonSet.0" traitname="date-forward" value="1=32,0=32,2=32,3=32,4=32,5=32,6=32,7=32" />
 
     <taxa id="TaxonSet.0" spec="TaxonSet">
         <alignment idref="h3n2_2deme"/>
@@ -37,12 +38,12 @@
     <state id="state" spec="State" storeEvery="5000">
         <!-- define state node -->
         <stateNode id="Tree.t:h3n2_2deme"  spec="lineageTree.tree.startingTree" rootHeight="32.0"
-                   taxa="@h3n2_2deme" scarringHeight="25" nClusters="4">
+                   taxa="@h3n2_2deme" scarringHeight="25" nClusters="5" scarringDuration="2">
             <trait idref="dateTrait.t:h3n2_2deme"/>
             <taxonset idref="TaxonSet.0"/>
         </stateNode>
 
-        <parameter id="scarringRate" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity"> 0.2</parameter>
+        <parameter id="scarringRate" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity"> 0.2 0.2 0.2</parameter>
         <parameter id="lossRate" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="Infinity"> 0.02</parameter>
 
 

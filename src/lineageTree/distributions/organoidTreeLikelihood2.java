@@ -114,7 +114,6 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
         }
         m_siteModel = (SiteModel.Base) siteModelInput.get();
         m_siteModel.setDataType(dataInput.get().getDataType());
-        //TODO check type conversion
         substitutionModel = (GeneralScarringLoss) m_siteModel.substModelInput.get();
         scarringStart = substitutionModel.getScarringHeight();
         scarringStop = scarringStart - substitutionModel.getScarringDuration();
@@ -128,6 +127,12 @@ public class organoidTreeLikelihood2 extends GenericTreeLikelihood {
         storedBranchLengths = new double[nodeCount];
 
         nrOfStates = substitutionModel.getStateCount(); //dataInput.get().getMaxStateCount();
+        if (nrOfStates != dataInput.get().getMaxStateCount()){
+            throw new IllegalArgumentException("The number of sequence states provided in userDataType \n" +
+                    " and the number of scarring rates +2 have to be equal! \n" +
+                    "Number of sequence states: " + dataInput.get().getMaxStateCount() + "\n"+
+                    "Number of scarring rates +2: " + nrOfStates);
+        }
         nrOfPatterns = dataInput.get().getPatternCount();
         nrOfMatrices = m_siteModel.getCategoryCount();
 
