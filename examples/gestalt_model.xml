@@ -1,17 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><beast beautitemplate='MultiTypeBirthDeath' beautistatus='' namespace="lineageTree.substitutionmodel.ScarringLoss:beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood" required="" version="2.6">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><beast beautitemplate='MultiTypeBirthDeath' beautistatus='' namespace="lineageTree.substitutionmodel.GeneralGestalt:beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood" required="" version="2.6">
 
 <!-- dataType has to be set to integer and the value must contain a ',' s.t. the class recognizes it as a comma separated string of integers-->
-    <data  id="h3n2_2deme" spec="Alignment" name="alignment" >
-        <userDataType spec="beast.evolution.datatype.ScarData" nrOfStates="5" />
+    <data  id="gestaltTest" spec="Alignment" name="alignment" >
+        <userDataType spec="beast.evolution.datatype.GstaltData" nrOfTargets="10" />
 
-        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC" spec="Sequence" taxon="0"  value="0,"/>
-        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC1" spec="Sequence" taxon="1" value="0,"/>
-       <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCAAC2GGT" spec="Sequence" taxon="2"  value="1,"/>
-        <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCACGG3T" spec="Sequence" taxon="3"  value="1,"/>
-        <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCACGGT5" spec="Sequence" taxon="4" value="2,"/>
-        <sequence id="LTv2_NEd32_iNE32_AAAGTAGAGCACGGT6" spec="Sequence" taxon="5"  value="2,"/>
-        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC7" spec="Sequence" taxon="6" value="3,"/>
-        <sequence id="LTv2_NEd32_iNE32_AAACGGGTCCTC1AACC8" spec="Sequence" taxon="7" value="4,"/>
+        <sequence id="CHILD1" spec="Sequence" taxon="CHILD1"  value="20_6_0_0_,40_5_1_1_,110_10_3_3_,"/>
+        <sequence id="CHILD2" spec="Sequence" taxon="CHILD2" value="40_5_1_1_,None,None,"/>
     </data>
 
 <map name="Uniform" >beast.math.distributions.Uniform</map>
@@ -26,25 +20,30 @@
 <map name="OneOnX" >beast.math.distributions.OneOnX</map>
 
     <!--specify tip dates -->
-    <traitSet id="dateTrait.t:h3n2_2deme"
+    <traitSet id="dateTrait.t:gestaltTest"
               spec="beast.evolution.tree.TraitSet"
-              taxa="@TaxonSet.0" traitname="date-forward" value="1=32,0=32,2=32,3=32,4=32,5=32,6=32,7=32" />
+              taxa="@TaxonSet.0" traitname="date-forward" value="1=32,0=32,2=32,3=32" />
 
     <taxa id="TaxonSet.0" spec="TaxonSet">
-        <alignment idref="h3n2_2deme"/>
+        <alignment idref="gestaltTest"/>
     </taxa>
 
 <run id="mcmc" spec="MCMC" chainLength="10000000">
     <state id="state" spec="State" storeEvery="5000">
         <!-- define state node -->
-        <stateNode id="Tree.t:h3n2_2deme"  spec="lineageTree.tree.startingTree" rootHeight="32.0"
-                   taxa="@h3n2_2deme" scarringHeight="25" nClusters="5" scarringDuration="2">
-            <trait idref="dateTrait.t:h3n2_2deme"/>
-            <taxonset idref="TaxonSet.0"/>
-        </stateNode>
+        <stateNode spec='beast.util.TreeParser' id='Tree.t:gestaltTest' IsLabelledNewick='true' adjustTipHeights='false'
+                   taxa='@gestaltTest'
+                   newick="((CHILD1:1,CHILD2:1)INTERNAL:1):0.0;"/>
 
-        <parameter id="scarringRate" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity"> 0.2 0.2 0.2</parameter>
-        <parameter id="lossRate" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="Infinity"> 0.02</parameter>
+        <!--<stateNode id="Tree.t:gestaltTest"  spec="lineageTree.tree.startingTree" rootHeight="32.0"
+                   taxa="@gestaltTest" scarringHeight="25" nClusters="5" scarringDuration="2">
+            <trait idref="dateTrait.t:gestaltTest"/>
+            <taxonset idref="TaxonSet.0"/>
+        </stateNode>-->
+
+        <parameter id="cutRates" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity"> 0.2 0.2 0.2</parameter>
+        <parameter id="longTrimScaling" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity"> 0.2 0.2 0.2</parameter>
+        <parameter id="doubleCutWeight" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="Infinity"> 0.02</parameter>
 
 
         <parameter id="birthRate" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="Infinity">2.0</parameter>
@@ -52,23 +51,23 @@
         <parameter id="samplingRate" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="1.0">0.0</parameter>
         <parameter id="origin_BDSKY_Contemp.t:input_alignment" spec="parameter.RealParameter" lower="32.5" name="stateNode" upper="33.0">32.5</parameter>
         <parameter id="rho_BDSKY_Contemp.t:input_alignment" spec="parameter.RealParameter" lower="0.0" name="stateNode" upper="1.0">0.01</parameter>
-        <parameter id="clockRate.c:h3n2_2deme" spec="parameter.RealParameter" name="stateNode">1.0</parameter>
-        <parameter id="freqParameter.s:h3n2_2deme" spec="parameter.RealParameter" dimension="4" lower="0.0" name="stateNode" upper="1.0">0.25</parameter>
+        <parameter id="clockRate.c:gestaltTest" spec="parameter.RealParameter" name="stateNode">1.0</parameter>
+        <parameter id="freqParameter.s:gestaltTest" spec="parameter.RealParameter" dimension="4" lower="0.0" name="stateNode" upper="1.0">0.25</parameter>
     </state>
 
 
-    <!--init id="RandomTree.t:h3n2" spec="lineageTree.tree.startingTree" initial="@Tree.t:h3n2_2deme"
-          rootHeight="32.0" taxa="@h3n2_2deme" scarringHeight="25" nClusters="109">
+    <!--init id="RandomTree.t:h3n2" spec="lineageTree.tree.startingTree" initial="@Tree.t:gestaltTest"
+          rootHeight="32.0" taxa="@gestaltTest" scarringHeight="25" nClusters="109">
     </init-->
 
 
     <distribution id="posterior" spec="util.CompoundDistribution">
         <!-- tree prior -->
         <distribution id="prior" spec="util.CompoundDistribution">
-            <distribution id="birthDeathMigration.t:h3n2_2deme" spec="beast.evolution.speciation.BirthDeathSkylineModel"
+            <distribution id="birthDeathMigration.t:gestaltTest" spec="beast.evolution.speciation.BirthDeathSkylineModel"
                           birthRate="@birthRate" deathRate="@deathRate" samplingRate="@samplingRate"
                           contemp="true" origin="@origin_BDSKY_Contemp.t:input_alignment" rho="@rho_BDSKY_Contemp.t:input_alignment"
-                           tree="@Tree.t:h3n2_2deme">
+                           tree="@Tree.t:gestaltTest">
             </distribution>
 
             <!-- prior distributions on parameters -->
@@ -84,7 +83,7 @@
                     <parameter id="RealParameter.12" spec="parameter.RealParameter" estimate="false" name="beta">100.0</parameter>
                 </Beta>
             </prior>
-            <prior id="ClockPrior.c:h3n2_2deme" name="distribution" x="@clockRate.c:h3n2_2deme">
+            <prior id="ClockPrior.c:gestaltTest" name="distribution" x="@clockRate.c:gestaltTest">
                 <Uniform id="Uniform.0" name="distr" upper="Infinity"/>
             </prior>
             <prior id="originPrior_BDSKY_Contemp.t:input_alignment" name="distribution" x="@origin_BDSKY_Contemp.t:input_alignment">
@@ -99,33 +98,33 @@
         </distribution>
         <!-- Tree likelihood -->
         <distribution id="likelihood" spec="util.CompoundDistribution">
-            <distribution id="treeLikelihood.h3n2_2deme" spec="lineageTree.distributions.organoidTreeLikelihood2" data="@h3n2_2deme" tree="@Tree.t:h3n2_2deme">
-                <siteModel id="SiteModel.s:h3n2_2deme" spec="SiteModel">
-                    <parameter id="mutationRate.s:h3n2_2deme" spec="parameter.RealParameter" estimate="false" name="mutationRate">1.0</parameter>
+            <distribution id="treeLikelihood.gestaltTest" spec="lineageTree.distributions.gestaltTreeLikelihood" data="@gestaltTest" tree="@Tree.t:gestaltTest">
+                <siteModel id="SiteModel.s:gestaltTest" spec="SiteModel">
+                    <parameter id="mutationRate.s:gestaltTest" spec="parameter.RealParameter" estimate="false" name="mutationRate">1.0</parameter>
 
-                    <parameter id="proportionInvariant.s:h3n2_2deme" spec="parameter.RealParameter" estimate="false" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
-                    <substModel id="JC69.s:h3n2_2deme" spec="lineageTree.substitutionmodel.GeneralScarringLoss" scarringRates="@scarringRate" lossRate="@lossRate"
-                    scarringHeight="25" scarringDuration="2">
+                    <parameter id="proportionInvariant.s:gestaltTest" spec="parameter.RealParameter" estimate="false" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
+                    <substModel id="JC69.s:gestaltTest" spec="lineageTree.substitutionmodel.GeneralGestalt" cutRates="@cutRates" longTrimScaling="@longTrimScaling" doubleCutWeight="@doubleCutWeight"
+                    editingHeight="0" editingDuration="2">
                         <frequencies id="freq" spec="beast.evolution.substitutionmodel.Frequencies" frequencies="1.0 0" estimate="false"/>
                             </substModel>
                 </siteModel>
-                <branchRateModel id="StrictClock.c:h3n2_2deme" spec="beast.evolution.branchratemodel.StrictClockModel" clock.rate="@clockRate.c:h3n2_2deme"/>
+                <branchRateModel id="StrictClock.c:gestaltTest" spec="beast.evolution.branchratemodel.StrictClockModel" clock.rate="@clockRate.c:gestaltTest"/>
             </distribution>
         </distribution>
     </distribution>
 
    <!-- tree operators -->
    <operator id="treeWB" spec="WilsonBalding"
-              tree="@Tree.t:h3n2_2deme" weight="3.0"/>
+              tree="@Tree.t:gestaltTest" weight="0"/>
 
-    <operator id="Unif" spec="Uniform" tree="@Tree.t:h3n2_2deme" weight="3.0"/>
+    <operator id="Unif" spec="Uniform" tree="@Tree.t:gestaltTest" weight="0"/>
 
-    <!--operator id="SubtreeSlideOperator" spec="SubtreeSlide" tree="@Tree.t:h3n2_2deme" weight="3.0"/-->
-    <operator id="BDSKY_ContempWide.t:input_alignment" spec="Exchange" isNarrow="false" tree="@Tree.t:h3n2_2deme" weight="3.0"/>
+    <!--operator id="SubtreeSlideOperator" spec="SubtreeSlide" tree="@Tree.t:gestaltTest" weight="3.0"/-->
+    <operator id="BDSKY_ContempWide.t:input_alignment" spec="Exchange" isNarrow="false" tree="@Tree.t:gestaltTest" weight="3.0"/>
 
     <!-- phylogenetic operators -->
-    <operator id="scarRateScaler" spec="ScaleOperator" parameter="@scarringRate" scaleFactor="0.8" weight="3.0"/>
-    <operator id="lossRateScaler" spec="ScaleOperator" parameter="@lossRate" scaleFactor="0.8" weight="3.0"/>
+    <!--<operator id="scarRateScaler" spec="ScaleOperator" parameter="@cutRates" scaleFactor="0.8" weight="3.0"/>
+    <operator id="lossRateScaler" spec="ScaleOperator" parameter="@lossRate" scaleFactor="0.8" weight="3.0"/>-->
 
     <!-- phylodynamic operators -->
     <operator id="birthRateScaler" spec="ScaleOperator" parameter="@birthRate" scaleFactor="0.8" weight="3.0"/>
@@ -135,17 +134,17 @@
     <operator id="samplingScaler" spec="ScaleOperator" parameter="@rho_BDSKY_Contemp.t:input_alignment" scaleFactor="0.9" weight="3.0"/>
 
 
-    <operator id="updownBD.t:h3n2_2deme" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
+    <operator id="updownBD.t:gestaltTest" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
         <up idref="birthRate"/>
         <down idref="rho_BDSKY_Contemp.t:input_alignment"/>
     </operator>
 
-    <operator id="updownBM.t:h3n2_2deme" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
+    <operator id="updownBM.t:gestaltTest" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
         <up idref="birthRate"/>
         <down idref="deathRate"/>
     </operator>
 
-    <operator id="updownDS.t:h3n2_2deme" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
+    <operator id="updownDS.t:gestaltTest" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
         <up idref="rho_BDSKY_Contemp.t:input_alignment"/>
         <down idref="deathRate"/>
     </operator>
@@ -156,13 +155,13 @@
         <log idref="posterior"/>
         <log idref="likelihood"/>
         <log idref="prior"/>
-        <log idref="treeLikelihood.h3n2_2deme"/>
-        <log id="treeHeight.t:h3n2_2deme" spec="beast.evolution.tree.TreeHeightLogger" tree="@Tree.t:h3n2_2deme"/>
-        <log id="treeLength.t:h3n2_2deme" spec="multitypetree.util.TreeLengthLogger" tree="@Tree.t:h3n2_2deme"/>
+        <log idref="treeLikelihood.gestaltTest"/>
+        <log id="treeHeight.t:gestaltTest" spec="beast.evolution.tree.TreeHeightLogger" tree="@Tree.t:gestaltTest"/>
+        <log id="treeLength.t:gestaltTest" spec="multitypetree.util.TreeLengthLogger" tree="@Tree.t:gestaltTest"/>
         <log idref="birthRate"/>
         <log idref="rho_BDSKY_Contemp.t:input_alignment"/>
         <log idref="deathRate"/>
-        <log idref="clockRate.c:h3n2_2deme"/>
+        <log idref="clockRate.c:gestaltTest"/>
     </logger>
 
     <logger id="screenlog" spec="Logger" logEvery="1000">
@@ -172,8 +171,8 @@
         <log idref="prior"/>
     </logger>
 
-    <logger id="treelog.t:h3n2_2deme" spec="Logger" fileName="$(filebase).$(tree).$(seed).trees" logEvery="10000" mode="tree">
-        <log idref="Tree.t:h3n2_2deme" printMetaData="true"/>
+    <logger id="treelog.t:gestaltTest" spec="Logger" fileName="$(filebase).$(tree).$(seed).trees" logEvery="10000" mode="tree">
+        <log idref="Tree.t:gestaltTest" printMetaData="true"/>
     </logger>
 
 
