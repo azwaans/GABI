@@ -1,6 +1,5 @@
 package lineageTree.distributions;
 
-import beast.core.util.Log;
 import beast.evolution.alignment.AncStates;
 import beast.evolution.alignment.IndelSet;
 import org.junit.Test;

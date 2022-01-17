@@ -3,18 +3,12 @@ package lineageTree.distributions;
 import beast.core.parameter.RealParameter;
 import beast.core.util.Log;
 import beast.evolution.alignment.*;
-import beast.evolution.sitemodel.SiteModel;
 import beast.evolution.substitutionmodel.Frequencies;
 import lineageTree.substitutionmodel.GeneralGestalt;
-import beast.evolution.tree.Tree;
-import beast.util.TreeParser;
 import org.jblas.DoubleMatrix;
 import org.junit.Test;
-import junit.framework.TestCase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.List;
 
 import static org.jblas.MatrixFunctions.powi;

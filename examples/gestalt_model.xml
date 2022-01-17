@@ -1,181 +1,187 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><beast beautitemplate='MultiTypeBirthDeath' beautistatus='' namespace="lineageTree.substitutionmodel.GeneralGestalt:beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood" required="" version="2.6">
 
-<!-- dataType has to be set to integer and the value must contain a ',' s.t. the class recognizes it as a comma separated string of integers-->
+    <!-- dataType has to be set to integer and the value must contain a ',' s.t. the class recognizes it as a comma separated string of integers-->
     <data  id="gestaltTest" spec="Alignment" name="alignment" >
-        <userDataType spec="beast.evolution.datatype.GstaltData" nrOfTargets="10" />
-
-        <sequence id="CHILD1" spec="Sequence" taxon="CHILD1"  value="20_6_0_0_,40_5_1_1_,110_10_3_3_,"/>
-        <sequence id="CHILD2" spec="Sequence" taxon="CHILD2" value="40_5_1_1_,None,None,"/>
+        <userDataType spec="beast.evolution.datatype.GstaltData"/>
+        <sequence id="1" spec="Sequence" taxon="1"  value="66_130_1_5_,"/>
+        <sequence id="3" spec="Sequence" taxon="3"  value="38_38_0_1_,"/>
+        <sequence id="4" spec="Sequence" taxon="4"  value="38_1_0_0_,"/>
     </data>
 
-<map name="Uniform" >beast.math.distributions.Uniform</map>
-<map name="Exponential" >beast.math.distributions.Exponential</map>
-<map name="LogNormal" >beast.math.distributions.LogNormalDistributionModel</map>
-<map name="Normal" >beast.math.distributions.Normal</map>
-<map name="Beta" >beast.math.distributions.Beta</map>
-<map name="Gamma" >beast.math.distributions.Gamma</map>
-<map name="LaplaceDistribution" >beast.math.distributions.LaplaceDistribution</map>
-<map name="prior" >beast.math.distributions.Prior</map>
-<map name="InverseGamma" >beast.math.distributions.InverseGamma</map>
-<map name="OneOnX" >beast.math.distributions.OneOnX</map>
+    <map name="Uniform" >beast.math.distributions.Uniform</map>
+    <map name="Exponential" >beast.math.distributions.Exponential</map>
+    <map name="LogNormal" >beast.math.distributions.LogNormalDistributionModel</map>
+    <map name="Normal" >beast.math.distributions.Normal</map>
+    <map name="Beta" >beast.math.distributions.Beta</map>
+    <map name="Gamma" >beast.math.distributions.Gamma</map>
+    <map name="LaplaceDistribution" >beast.math.distributions.LaplaceDistribution</map>
+    <map name="prior" >beast.math.distributions.Prior</map>
+    <map name="InverseGamma" >beast.math.distributions.InverseGamma</map>
+    <map name="OneOnX" >beast.math.distributions.OneOnX</map>
 
     <!--specify tip dates -->
     <traitSet id="dateTrait.t:gestaltTest"
               spec="beast.evolution.tree.TraitSet"
-              taxa="@TaxonSet.0" traitname="date-forward" value="1=32,0=32,2=32,3=32" />
+              taxa="@TaxonSet.0" traitname="date-forward" value="1=8" />
 
     <taxa id="TaxonSet.0" spec="TaxonSet">
         <alignment idref="gestaltTest"/>
     </taxa>
 
-<run id="mcmc" spec="MCMC" chainLength="10000000">
-    <state id="state" spec="State" storeEvery="5000">
-        <!-- define state node -->
-        <stateNode spec='beast.util.TreeParser' id='Tree.t:gestaltTest' IsLabelledNewick='true' adjustTipHeights='false'
-                   taxa='@gestaltTest'
-                   newick="((CHILD1:1,CHILD2:1)INTERNAL:1):0.0;"/>
+    <run id="mcmc" spec="MCMC" chainLength="1">
+        <state id="state" spec="State" storeEvery="1">
 
-        <!--<stateNode id="Tree.t:gestaltTest"  spec="lineageTree.tree.startingTree" rootHeight="32.0"
-                   taxa="@gestaltTest" scarringHeight="25" nClusters="5" scarringDuration="2">
-            <trait idref="dateTrait.t:gestaltTest"/>
-            <taxonset idref="TaxonSet.0"/>
-        </stateNode>-->
-
-        <parameter id="cutRates" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity"> 0.2 0.2 0.2</parameter>
-        <parameter id="longTrimScaling" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity"> 0.2 0.2 0.2</parameter>
-        <parameter id="doubleCutWeight" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="Infinity"> 0.02</parameter>
+            <stateNode spec='beast.util.TreeParser' id='Tree.t:gestaltTest' IsLabelledNewick='true' adjustTipHeights='false'
+                             taxa='@gestaltTest'
+                             newick="(1:3,(3:4,4:4)1:1);"/>
 
 
-        <parameter id="birthRate" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="Infinity">2.0</parameter>
-        <parameter id="deathRate" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="Infinity">0.01</parameter>
-        <parameter id="samplingRate" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="1.0">0.0</parameter>
-        <parameter id="origin_BDSKY_Contemp.t:input_alignment" spec="parameter.RealParameter" lower="32.5" name="stateNode" upper="33.0">32.5</parameter>
-        <parameter id="rho_BDSKY_Contemp.t:input_alignment" spec="parameter.RealParameter" lower="0.0" name="stateNode" upper="1.0">0.01</parameter>
-        <parameter id="clockRate.c:gestaltTest" spec="parameter.RealParameter" name="stateNode">1.0</parameter>
-        <parameter id="freqParameter.s:gestaltTest" spec="parameter.RealParameter" dimension="4" lower="0.0" name="stateNode" upper="1.0">0.25</parameter>
-    </state>
+            <!-- <stateNode id='Tree.t:gestaltTest'  spec="lineageTree.tree.startingTree" rootHeight="4.33"
+                        taxa='@gestaltTest' scarringHeight="0"
+                        scarringDuration="0" sequencesAreClustered="false">
+                 <trait idref="dateTrait.t:gestaltTest"/>
+                 <taxonset idref="TaxonSet.0"/>
+             </stateNode>-->
+
+             <parameter id="NumTargets" spec="parameter.IntegerParameter" dimension="1" lower="1" name="stateNode" > 3</parameter>
+             <parameter id="doubleCutWeight" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="Infinity"> 0.3 </parameter>
+             <parameter id="cutRates" spec="parameter.RealParameter" dimension="3" lower="0.0" name="stateNode" upper="Infinity"> 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452</parameter>
+
+            <parameter id="longTrimScaling" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity"> 0.05 0.05 </parameter>
 
 
-    <!--init id="RandomTree.t:h3n2" spec="lineageTree.tree.startingTree" initial="@Tree.t:gestaltTest"
-          rootHeight="32.0" taxa="@gestaltTest" scarringHeight="25" nClusters="109">
-    </init-->
+             <parameter id="clockRate.c:gestaltTest" spec="parameter.RealParameter" name="stateNode">1.0</parameter>
+             <parameter id="freqParameter.s:gestaltTest" spec="parameter.RealParameter" dimension="4" lower="0.0" name="stateNode" upper="1.0">0.25</parameter>
+             <parameter id="popsize" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="100000000">4000</parameter>
+             <parameter id="growthRate" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="10">1.9</parameter>
+         </state>
 
 
-    <distribution id="posterior" spec="util.CompoundDistribution">
-        <!-- tree prior -->
-        <distribution id="prior" spec="util.CompoundDistribution">
-            <distribution id="birthDeathMigration.t:gestaltTest" spec="beast.evolution.speciation.BirthDeathSkylineModel"
-                          birthRate="@birthRate" deathRate="@deathRate" samplingRate="@samplingRate"
-                          contemp="true" origin="@origin_BDSKY_Contemp.t:input_alignment" rho="@rho_BDSKY_Contemp.t:input_alignment"
-                           tree="@Tree.t:gestaltTest">
+
+
+
+         <distribution id="posterior" spec="util.CompoundDistribution">
+
+             <!-- tree priors -->
+            <distribution id="prior" spec="util.CompoundDistribution">
+
+                <distribution id="expCoal" spec="beast.evolution.tree.coalescent.Coalescent">
+                    <populationModel spec="beast.evolution.tree.coalescent.ExponentialGrowth" growthRate="@growthRate" popSize="@popsize" />
+                    <treeIntervals spec="beast.evolution.tree.coalescent.TreeIntervals" tree="@Tree.t:gestaltTest"/>
+                </distribution>
+
+
+
+                <!-- prior distributions on parameters -->
+                <prior id="doubleCutWeightPrior" name="distribution" x="@doubleCutWeight">
+                    <LogNormal id="LogNormalDistributionModel.1" name="distr">
+                        <parameter id="RealParameter.13" spec="parameter.RealParameter" estimate="false" name="M">-2.65</parameter>
+                        <parameter id="RealParameter.14" spec="parameter.RealParameter" estimate="false" name="S">1.25</parameter>
+                    </LogNormal>
+                </prior>
+
+                <prior id="cutRatePrior" name="distribution" x="@cutRates">
+                    <LogNormal id="LogNormalDistributionModel.2" name="distr">
+                        <parameter id="RealParameter.17" spec="parameter.RealParameter" estimate="false" name="M">0.0</parameter>
+                        <parameter id="RealParameter.18" spec="parameter.RealParameter" estimate="false" name="S">1.25</parameter>
+                    </LogNormal>
+                </prior>
+
+                <prior id="popSizePrior" name="distribution" x="@popsize">
+                    <LogNormal id="LogNormalDistributionModel.3" name="distr">
+                        <parameter id="RealParameter.15" spec="parameter.RealParameter" estimate="false" name="M">8.29</parameter>
+                        <parameter id="RealParameter.16" spec="parameter.RealParameter" estimate="false" lower="0.0" name="S" upper="20.0">1.0</parameter>
+                    </LogNormal>
+                </prior>
+
+
+                <prior id="growthRatePrior" name="distribution" x="@growthRate">
+                    <LogNormal id="Beta.3" name="distr">
+                        <parameter id="RealParameter.11" spec="parameter.RealParameter" estimate="false" name="M">0.64</parameter>
+                        <parameter id="RealParameter.12" spec="parameter.RealParameter" estimate="false" name="S">1.25</parameter>
+                    </LogNormal>
+                </prior>
+
+                <prior id="ClockPrior.c:gestaltTest" name="distribution" x="@clockRate.c:gestaltTest">
+                    <Uniform id="Uniform.0" name="distr" upper="Infinity"/>
+                </prior>
+
             </distribution>
 
-            <!-- prior distributions on parameters -->
-            <prior id="birthRatePrior" name="distribution" x="@birthRate">
-                <LogNormal id="LogNormalDistributionModel.2" name="distr">
-                    <parameter id="RealParameter.15" spec="parameter.RealParameter" estimate="false" name="M">0.0</parameter>
-                    <parameter id="RealParameter.16" spec="parameter.RealParameter" estimate="false" lower="0.0" name="S" upper="20.0">1.4</parameter>
-                </LogNormal>
-            </prior>
-            <prior id="deathRatePrior" name="distribution" x="@deathRate">
-                <Beta id="Beta.3" name="distr">
-                    <parameter id="RealParameter.11" spec="parameter.RealParameter" estimate="false" name="alpha">1.5</parameter>
-                    <parameter id="RealParameter.12" spec="parameter.RealParameter" estimate="false" name="beta">100.0</parameter>
-                </Beta>
-            </prior>
-            <prior id="ClockPrior.c:gestaltTest" name="distribution" x="@clockRate.c:gestaltTest">
-                <Uniform id="Uniform.0" name="distr" upper="Infinity"/>
-            </prior>
-            <prior id="originPrior_BDSKY_Contemp.t:input_alignment" name="distribution" x="@origin_BDSKY_Contemp.t:input_alignment">
-                <Uniform id="Uniform.5" name="distr" upper="Infinity"/>
-            </prior>
-            <prior id="rhoPrior_BDSKY_Contemp.t:input_alignment" name="distribution" x="@rho_BDSKY_Contemp.t:input_alignment">
-                <Beta id="Beta.1" name="distr">
-                    <parameter id="RealParameter.3" spec="parameter.RealParameter" estimate="false" name="alpha">2.5</parameter>
-                    <parameter id="RealParameter.4" spec="parameter.RealParameter" estimate="false" name="beta">50.0</parameter>
-                </Beta>
-            </prior>
-        </distribution>
-        <!-- Tree likelihood -->
-        <distribution id="likelihood" spec="util.CompoundDistribution">
-            <distribution id="treeLikelihood.gestaltTest" spec="lineageTree.distributions.gestaltTreeLikelihood" data="@gestaltTest" tree="@Tree.t:gestaltTest">
-                <siteModel id="SiteModel.s:gestaltTest" spec="SiteModel">
-                    <parameter id="mutationRate.s:gestaltTest" spec="parameter.RealParameter" estimate="false" name="mutationRate">1.0</parameter>
 
-                    <parameter id="proportionInvariant.s:gestaltTest" spec="parameter.RealParameter" estimate="false" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
-                    <substModel id="JC69.s:gestaltTest" spec="lineageTree.substitutionmodel.GeneralGestalt" cutRates="@cutRates" longTrimScaling="@longTrimScaling" doubleCutWeight="@doubleCutWeight"
-                    editingHeight="0" editingDuration="2">
-                        <frequencies id="freq" spec="beast.evolution.substitutionmodel.Frequencies" frequencies="1.0 0" estimate="false"/>
-                            </substModel>
-                </siteModel>
-                <branchRateModel id="StrictClock.c:gestaltTest" spec="beast.evolution.branchratemodel.StrictClockModel" clock.rate="@clockRate.c:gestaltTest"/>
+
+            <!-- Tree likelihood -->
+            <distribution id="likelihood" spec="util.CompoundDistribution">
+                <distribution id="treeLikelihood.gestaltTest" spec="lineageTree.distributions.gestaltTreeLikelihood" data="@gestaltTest" tree="@Tree.t:gestaltTest">
+                    <siteModel id="SiteModel.s:gestaltTest" spec="SiteModel">
+                        <parameter id="mutationRate.s:gestaltTest" spec="parameter.RealParameter" estimate="false" name="mutationRate">1.0</parameter>
+
+                        <parameter id="proportionInvariant.s:gestaltTest" spec="parameter.RealParameter" estimate="false" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
+                        <substModel id="JC69.s:gestaltTest" spec="lineageTree.substitutionmodel.GeneralGestalt" barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA" cutSite="6" crucialPos="6 6" maxSumSteps= "3000" maxExtraSteps="0" cutRates="@cutRates" longTrimScaling="@longTrimScaling" doubleCutWeight="@doubleCutWeight">
+                            <frequencies id="freq" spec="beast.evolution.substitutionmodel.Frequencies" frequencies="1.0 0" estimate="false"/>
+                        </substModel>
+                    </siteModel>
+                    <branchRateModel id="StrictClock.c:gestaltTest" spec="beast.evolution.branchratemodel.StrictClockModel" clock.rate="@clockRate.c:gestaltTest"/>
+                </distribution>
             </distribution>
         </distribution>
-    </distribution>
 
-   <!-- tree operators -->
-   <operator id="treeWB" spec="WilsonBalding"
-              tree="@Tree.t:gestaltTest" weight="0"/>
+        <!-- tree operators -->
 
-    <operator id="Unif" spec="Uniform" tree="@Tree.t:gestaltTest" weight="0"/>
+      <!--  <operator spec="WilsonBalding" tree="@Tree.t:gestaltTest" weight="30.0"/>
+         <operator spec="Uniform" tree="@Tree.t:gestaltTest"
+                   weight="30.0"/>
 
-    <!--operator id="SubtreeSlideOperator" spec="SubtreeSlide" tree="@Tree.t:gestaltTest" weight="3.0"/-->
-    <operator id="BDSKY_ContempWide.t:input_alignment" spec="Exchange" isNarrow="false" tree="@Tree.t:gestaltTest" weight="3.0"/>
+        <operator spec="Exchange"
+                  isNarrow="true" tree="@Tree.t:gestaltTest"
+                  weight="30.0"/>-->
 
-    <!-- phylogenetic operators -->
-    <!--<operator id="scarRateScaler" spec="ScaleOperator" parameter="@cutRates" scaleFactor="0.8" weight="3.0"/>
-    <operator id="lossRateScaler" spec="ScaleOperator" parameter="@lossRate" scaleFactor="0.8" weight="3.0"/>-->
+       <!-- <operator id="ContempUniformOperator" spec="Uniform" tree="@Tree.t:gestaltTest" weight="30.0"/>
 
-    <!-- phylodynamic operators -->
-    <operator id="birthRateScaler" spec="ScaleOperator" parameter="@birthRate" scaleFactor="0.8" weight="3.0"/>
+        <operator id="ContempSubtreeSlide" spec="SubtreeSlide" tree="@Tree.t:gestaltTest" weight="15.0"/>
 
-    <operator id="deathRateScaler" spec="ScaleOperator" optimise="false" parameter="@deathRate" scaleAll="true" scaleFactor="0.9" weight="3.0"/>
+        <operator id="ContempNarrow" spec="Exchange" tree="@Tree.t:gestaltTest" weight="15.0"/>
 
-    <operator id="samplingScaler" spec="ScaleOperator" parameter="@rho_BDSKY_Contemp.t:input_alignment" scaleFactor="0.9" weight="3.0"/>
+        <operator id="ContempWide" spec="Exchange" isNarrow="false" tree="@Tree.t:gestaltTest" weight="3.0"/>-->
 
-
-    <operator id="updownBD.t:gestaltTest" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
-        <up idref="birthRate"/>
-        <down idref="rho_BDSKY_Contemp.t:input_alignment"/>
-    </operator>
-
-    <operator id="updownBM.t:gestaltTest" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
-        <up idref="birthRate"/>
-        <down idref="deathRate"/>
-    </operator>
-
-    <operator id="updownDS.t:gestaltTest" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
-        <up idref="rho_BDSKY_Contemp.t:input_alignment"/>
-        <down idref="deathRate"/>
-    </operator>
+        <!-- phylogenetic operators -->
+       <!-- <operator id="cutRatesScaler" spec="ScaleOperator" parameter="@cutRates" scaleFactor="0.8" weight="3.0"/>
+        <operator id="doubleCutScaler" spec="ScaleOperator" parameter="@doubleCutWeight" scaleFactor="0.8" weight="3.0"/>
+        <operator id="longTrimScalingScaler" spec="ScaleOperator" parameter="@longTrimScaling" scaleFactor="0.8" weight="3.0"/>-->
 
 
+        <!-- phylodynamic operators -->
+      <!--  <operator id="popSizeScaler" spec="ScaleOperator" parameter="@popsize" scaleFactor="0.8" weight="3.0"/>
 
-    <logger id="tracelog" spec="Logger" fileName="$(filebase).$(seed).log" logEvery="1000">
-        <log idref="posterior"/>
-        <log idref="likelihood"/>
-        <log idref="prior"/>
-        <log idref="treeLikelihood.gestaltTest"/>
-        <log id="treeHeight.t:gestaltTest" spec="beast.evolution.tree.TreeHeightLogger" tree="@Tree.t:gestaltTest"/>
-        <log id="treeLength.t:gestaltTest" spec="multitypetree.util.TreeLengthLogger" tree="@Tree.t:gestaltTest"/>
-        <log idref="birthRate"/>
-        <log idref="rho_BDSKY_Contemp.t:input_alignment"/>
-        <log idref="deathRate"/>
-        <log idref="clockRate.c:gestaltTest"/>
-    </logger>
+        <operator id="growthRateScaler" spec="ScaleOperator" optimise="false" parameter="@growthRate" scaleAll="true" scaleFactor="0.9" weight="3.0"/>-->
 
-    <logger id="screenlog" spec="Logger" logEvery="1000">
-        <log idref="posterior"/>
-        <log id="ESS.0" spec="util.ESS" arg="@posterior"/>
-        <log idref="likelihood"/>
-        <log idref="prior"/>
-    </logger>
+        <logger id="tracelog" spec="Logger" fileName="$(filebase).$(seed).log" logEvery="1">
+            <log idref="posterior"/>
+            <log idref="likelihood"/>
+            <log idref="prior"/>
+            <log idref="treeLikelihood.gestaltTest"/>
+            <log id="treeHeight.t:gestaltTest" spec="beast.evolution.tree.TreeHeightLogger" tree="@Tree.t:gestaltTest"/>
+            <log id="treeLength.t:gestaltTest" spec="multitypetree.util.TreeLengthLogger" tree="@Tree.t:gestaltTest"/>
+            <log idref="popsize"/>
+            <log idref="growthRate"/>
+            <log idref="clockRate.c:gestaltTest"/>
+            <log idref="cutRates"/>
+            <log idref="doubleCutWeight"/>
+        </logger>
 
-    <logger id="treelog.t:gestaltTest" spec="Logger" fileName="$(filebase).$(tree).$(seed).trees" logEvery="10000" mode="tree">
-        <log idref="Tree.t:gestaltTest" printMetaData="true"/>
-    </logger>
+        <logger id="screenlog" spec="Logger" logEvery="1">
+            <log idref="posterior"/>
+            <log id="ESS.0" spec="util.ESS" arg="@posterior"/>
+            <log idref="likelihood"/>
+            <log idref="prior"/>
+        </logger>
+
+        <logger id="treelog.t:gestaltTest" spec="Logger" fileName="$(filebase).$(tree).$(seed).trees" logEvery="1" mode="tree">
+            <log idref="Tree.t:gestaltTest" printMetaData="true"/>
+        </logger>
 
 
-</run>
+    </run>
 
 </beast>
+
