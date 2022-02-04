@@ -15,6 +15,9 @@ import cern.jet.random.NegativeBinomial;
 import cern.jet.random.Poisson;
 import cern.jet.random.engine.RandomEngine;
 import org.jblas.DoubleMatrix;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -70,14 +73,18 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         Integer numTargets;
         public Double[] cutRates = {1.09459452, 1.03371947, 1.02624685};
 
-        public Double[] longTrimFactors = {0.1,0.1};
+        public Double[] longTrimFactors = {0.04,0.04};
 
         public Double[] trimZeroProbs = {0.5,0.5,0.5,0.5};
-        public Double[] trim_short_params = {1.0,1.0};
-        public Double[] trim_long_params = {1.0,1.0};
+        public Double[] trim_short_params = {3.0,3.0};
+        public Double[] trim_long_params = {3.0,3.0};
         Double insertZeroProb = 0.5;
-        Double[] insertParams = {2.0};
-        public Double doubleCutWeight = 3.0;
+         Double[] insertParams = {2.0};
+        //toy example clt_calc: Double[] insertParams = {2.0};
+        //tune_topology: Double[] insertParams = {1.0};
+        public Double doubleCutWeight = 0.03;
+        //toy example clt_calc: public Double doubleCutWeight = 0.3;
+        //tune_topology: public Double doubleCutWeight = 0.1;
         public Double cutRatesPenalty = 0.0;
         public Double branchLensPenalty = 0.0;
         boolean usePoisson= true;
@@ -218,6 +225,7 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         Hashtable<Integer, Double> logScalingTerms = new Hashtable<>();
         for (Node node:tree.listNodesPostOrder(null,null)) {
             if(node.isLeaf()) {
+                Log.info.println("NODE IS LEAF");
 
                 TransitionWrap nodeWrap = transitionWrappers.get(node.getNr());
                 DoubleMatrix probArray = DoubleMatrix.zeros(nodeWrap.numStatuses+1,1);
@@ -226,22 +234,30 @@ public class GeneralGestalt extends SubstitutionModel.Base {
                 LProb.put(node.getNr(),probArray);
             }
             else {
+                Log.info.println("NODE IS NOT LEAF");
+
                 TransitionWrap nodeWrap = transitionWrappers.get(node.getNr());
                 DoubleMatrix logLprobNode = initializeLowerLogProb(nodeWrap,node);
+                Log.info.println("initial logLprobNode"+ logLprobNode);
+
                 DoubleMatrix hasPosProb = DoubleMatrix.ones(1);
                 for (Node child: node.getChildren()) {
+
+                    Log.info.println("CHILD NODE");
 
                     TransitionWrap childNodeWrap = transitionWrappers.get(child.getNr());
                     //TODO check the trim probs init
                     //trans_mats[child.node_id], trim_probs[child.node_id] = self._create_transition_matrix(
                     //                        child_wrapper)
                     DoubleMatrix childMat = createRateMatrix(childNodeWrap);
+                    Log.info.println("childMat " + childMat);
 
                     transMats.put(child.getNr(),childMat);
                    /* DoubleMatrix expInput = new DoubleMatrix((childMat.toArray2()));*/
                     childMat.muli(node.getHeight() - child.getHeight());
 
                     DoubleMatrix ptMat = expm(childMat);
+                    Log.info.println("ptMat " + ptMat);
                     //TODO check AFTER THIS
 
                     ptMats.put(child.getNr(),ptMat);
@@ -258,11 +274,13 @@ public class GeneralGestalt extends SubstitutionModel.Base {
                     }
                     //ROOT BLOCK!!!!
                     else {
+                        Log.info.println("ROOT block !");
                         Integer chId = childNodeWrap.statusMap.get(new TargetStatus());
                         double downProb = chOrderedDownProbs.get(chId);
                         downProb = max(downProb,0.0);
                         downProbs = new DoubleMatrix(1,1,downProb);
                         down_probs_dict.put(chId,downProbs);
+                        Log.info.println("en of ROOT block !");
                         //CORRECT UNTIL NOW!!!!
                     }
 
@@ -275,8 +293,25 @@ public class GeneralGestalt extends SubstitutionModel.Base {
                     //TODO LOSS OF DOWN PROBS DIMENSION!!!!
 
                     //ISSUE WITH THE ADDI ??
+                    Log.info.println("logLprobNode before" + logLprobNode );
+                    Log.info.println("downProbs before" + downProbs );
+                    Log.info.println("hasPosProb" + hasPosProb );
+                    Double dummy = downProbs.add((hasPosProb.neg()).add(1).mul( 1e-30 )).get(0);
+                    NumberFormat formatter = new DecimalFormat();
+
+                    Log.info.println("downProbs.addi((hasPosProb.neg()).add(1).mul( 1e-30 )) non zero!" + (formatter.format(dummy)));
+                    Log.info.println("is it  > 0 ?" + (dummy > 0) );
+                    Log.info.println("is it  = 0 ?" + (dummy == 0) );
+                    Log.info.println("log of that" + log(dummy) );
+                    Log.info.println("log of that" + log(dummy) );
+                    //proctection against states with zero probability.
+
                     logLprobNode = logLprobNode.addi(logi(downProbs.addi((hasPosProb.neg()).add(1).mul( 1e-30 ))))  ;
+                    Log.info.println("logLprobNode after" + logLprobNode);
+                    Log.info.println("END CHILD NODE ITER");
+
                 }
+                Log.info.println("logLprobNode" + logLprobNode);
                 Double logScalingTerm = logLprobNode.max();
                 LProb.put(node.getNr(),expi((logLprobNode.subi(logScalingTerm)).muli(hasPosProb)));
                 logScalingTerms.put(node.getNr(), logScalingTerm);
@@ -285,13 +320,18 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
 
         }
+        Log.info.println("LProb" + LProb.get(0).get(1) *1000000000);
         Collection<Double> logScalingTermsAll = logScalingTerms.values();
+        Log.info.println("logScalingTermsAll" + logScalingTermsAll);
+
         List<Double> terms = new ArrayList<>(logScalingTermsAll);
         Double fullScaling = 0.0;
         for(int i = 0; i < terms.size();++i) {
             fullScaling = fullScaling + terms.get(i);
         }
         DoubleMatrix logLikAlleles = log(LProb.get(rootNodeID)).addi(fullScaling);
+        Log.info.println("logLikAlleles" + logLikAlleles);
+        Log.info.println("fullScaling" + fullScaling);
         /*Lprob = Lprob;
         down_probs_dict = down_probs_dict;
         pt_matrix = pt_matrix;
@@ -492,6 +532,7 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         Integer matrxLen = wrapper.numStatuses + 1;
         DoubleMatrix targTractLeft = createMarginalTransitionMatrixLeft(wrapper);
         DoubleMatrix trimProbsLeft = createTrimInstantProbMatrixLeft(wrapper);
+
         //TODO CHECK IF TENSORS ARE FINITE
 
 
@@ -501,6 +542,7 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         qMatrix = concatHorizontally(qMatrix,lastColumn);
 
         return qMatrix;
+
     }
 
 
@@ -597,6 +639,7 @@ public class GeneralGestalt extends SubstitutionModel.Base {
             qAllTtMatrix.put(indices.getFirst(), indices.getSecond(), sparseValues.get(i));
         }
         DoubleMatrix qmatrixLeft = qAllTtMatrix;
+
         qmatrixLeft.addi(qSingleTtMatrix);
         return qmatrixLeft;
 
@@ -656,6 +699,10 @@ public class GeneralGestalt extends SubstitutionModel.Base {
                         IndelSet.Singleton sg = (IndelSet.Singleton) singletonSet.toArray()[0];
                         Double trimProbVal = singletonCondProb.get(singletonIndexDict.get(sg));
                         sparseVals.add(trimProbVal -1 );
+                        Log.info.println(" trimProbVal" + trimProbVal);
+                        Log.info.println(" trimProbVal -1" + (trimProbVal -1));
+                        //CHECK THAT
+
                     }
                     else if (singletonSet.size()>1) {
                         sparseIndices.add(new Pair(startKey,endKey));
@@ -675,7 +722,10 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         DoubleMatrix zeroes = DoubleMatrix.zeros(outputShape[0],outputShape[1]);
         DoubleMatrix tobeReturned = DoubleMatrix.ones(outputShape[0],outputShape[1]);
         for(int i=0;i<sparseIndices.size();i++) {
+            Log.info.println(" tobereturned sparsevals" + (sparseVals.get(i)));
+            Log.info.println("filling tobereturned" + (1.0 + sparseVals.get(i)));
             tobeReturned.put(sparseIndices.get(i).getFirst(),sparseIndices.get(i).getSecond(),1.0 + sparseVals.get(i));
+
         }
         tobeReturned.max(zeroes);
         return tobeReturned;
@@ -785,7 +835,9 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         }
         createTrimInsertDistributions(singletons.size());
         singletonLogCondProb = createLogIndelProbs(singletons);
+        Log.info.println("singletonLogCondProb" + singletonLogCondProb);
         singletonCondProb = expi(singletonLogCondProb);
+        Log.info.println("singletonCondProb" + singletonCondProb);
 
 
     }
@@ -833,11 +885,17 @@ public class GeneralGestalt extends SubstitutionModel.Base {
             DoubleMatrix leftDelProb = createLeftDelProbs(singletons);
             DoubleMatrix rightDelProb = createRightDelProbs(singletons);
             DoubleMatrix insertProb = createInsertProbs(singletons);
+            Log.info.println("insertProb" + insertProb);
+            Log.info.println("rightDelProb" + rightDelProb);
+            Log.info.println("leftDelProb" + leftDelProb);
             //combine everything
             DoubleMatrix allLogProbs = (logi(leftDelProb)).addi(logi(rightDelProb)).addi(logi(insertProb));
 
+            Log.info.println("allLogProbs" + allLogProbs);
+
             //SOMETHING TO INITIALIZE
             Double logShortFocalNormalization = log(1-(trimZeroProbsDict.get(0,0)*trimZeroProbsDict.get(1,0)*insertZeroProb));
+            Log.info.println("logShortFocalNormalization" + logShortFocalNormalization);
 
             boolean[] isLongIndel = new boolean[singletons.size()];
             for (int i=0; i<singletons.size();i++) {
@@ -882,6 +940,7 @@ public class GeneralGestalt extends SubstitutionModel.Base {
             }
             else { Return.put(i,(1-insertZeroProb)*insertLenProb.get(i));}
         }
+
         return Return;
     }
 

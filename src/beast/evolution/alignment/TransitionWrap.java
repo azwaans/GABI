@@ -42,6 +42,7 @@ public class TransitionWrap extends BEASTObject {
             }
 
         }
+        Log.info.println("transStatuses size:"+ transStatuses.size());
         transStatuses.addAll(noDuplicates);
         statusMap = new Hashtable<>();
         //LATEST CHANGE
