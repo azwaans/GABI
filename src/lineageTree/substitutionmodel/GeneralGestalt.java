@@ -34,60 +34,77 @@ import static org.jblas.MatrixFunctions.*;
 
 public class GeneralGestalt extends SubstitutionModel.Base {
 
+        //metadata inputs
+         public Input<String> uneditedBarcodeInput = new Input<>("barcodeSequence",
+                "The exact sequence of the unedited barcode, split in targets and spacers.");
+         public Input<Integer> cutSiteInput = new Input<>("cutSite",
+            "How far from the end of the target in bp the cut site is.");
+         public Input<IntegerParameter> crucialPosInput = new Input<>("crucialPos",
+            "Position range left and right of the cut that can deactivate the target.");
+         public Input<Integer> maxSumStepsInput = new Input<>("maxSumSteps",
+            "Position range left and right of the cut that can deactivate the target.");
+         public Input<Integer> maxExtraStepsInput = new Input<>("maxExtraSteps",
+            "Position range left and right of the cut that can deactivate the target.");
+
+        //target cut parameters input
         final public Input<List<RealParameter>> cutRatesInput = new Input<>("cutRates",
                 "Rates at which each target is cut in the barcode",
                 new ArrayList<>());
-        final public Input<List<RealParameter>> longTrimScalingInput = new Input<>("longTrimScaling",
-                "Scaling factor for long deletions left and right of the cut sites", new ArrayList<>());
         final public Input<RealParameter> doubleCutWeightInput = new Input<>("doubleCutWeight",
             "Rate, at which editing regions are lost", Input.Validate.REQUIRED);
 
-       public Input<Double> branchPenParamInput = new Input<>("branchPenParam",
+        //indel parameters input
+        final public Input<List<RealParameter>> longTrimFactorsInput = new Input<>("longTrimScalingParam",
+                "Scaling factor for long deletions left and right of the cut sites", new ArrayList<>());
+        final public Input<List<RealParameter>> trimZeroProbsInput = new Input<>("trimZeroProbsParam",
+                "Penalty parameter for target cut rates",new ArrayList<>());
+        final public Input<List<RealParameter>> trim_short_paramsInput = new Input<>("trim_short_Param",
+                "Penalty parameter for target cut rates",new ArrayList<>());
+        final public Input<List<RealParameter>> trim_long_paramsInput = new Input<>("trim_long_Param",
+                "Penalty parameter for target cut rates",new ArrayList<>());
+        final public Input<List<RealParameter>> insertParamsInput = new Input<>("insertParam",
+                "Penalty parameter for target cut rates",new ArrayList<>());
+        final public Input<RealParameter> insertZeroProbInput = new Input<>("insertZeroProbParam",
+            "Rate, at which editing regions are lost", Input.Validate.REQUIRED);
+
+        //penalization parameters input
+        public Input<Double> branchPenParamInput = new Input<>("branchPenParam",
                "Penalty parameter for branch lengths",0.01);
-       public Input<Double> targetLamPenParamInput = new Input<>("cutRatePenParam",
+        public Input<Double> targetLamPenParamInput = new Input<>("cutRatePenParam",
             "Penalty parameter for target cut rates",0.01);
 
-        public Input<String> uneditedBarcodeInput = new Input<>("barcodeSequence",
-                "The exact sequence of the unedited barcode, split in targets and spacers.");
-        public Input<Integer> cutSiteInput = new Input<>("cutSite",
-                "How far from the end of the target in bp the cut site is.");
-        public Input<IntegerParameter> crucialPosInput = new Input<>("crucialPos",
-                "Position range left and right of the cut that can deactivate the tarfet.");
-        public Input<Integer> maxSumStepsInput = new Input<>("maxSumSteps",
-            "Position range left and right of the cut that can deactivate the tarfet.");
-        public Input<Integer> maxExtraStepsInput = new Input<>("maxExtraSteps",
-            "Position range left and right of the cut that can deactivate the tarfet.");
 
-
+        //TODO remove this
         /**
          * flag to indicate matrix is up to date *
          */
-        protected boolean updateMatrix = false;
+        //protected boolean updateMatrix = false;
 
-      /*  double editingHeight;
-        double editingDuration;*/
-        double[] frequencies;
-        double[][] rateMatrix;
-
-        //Model parameters
+        //processed metadata
         Integer numTargets;
+        public BarcodeMeta metaData;
+
+        //target cut parameters
         public Double[] cutRates = {1.09459452, 1.03371947, 1.02624685};
+        public Double doubleCutWeight = 0.03;
+        //toy example clt_calc: public Double doubleCutWeight = 0.3;
+        //tune_topology: public Double doubleCutWeight = 0.1;
 
+        //indel parameters
         public Double[] longTrimFactors = {0.04,0.04};
-
         public Double[] trimZeroProbs = {0.5,0.5,0.5,0.5};
         public Double[] trim_short_params = {3.0,3.0};
         public Double[] trim_long_params = {3.0,3.0};
         Double insertZeroProb = 0.5;
-         Double[] insertParams = {2.0};
+        Double[] insertParams = {2.0};
         //toy example clt_calc: Double[] insertParams = {2.0};
         //tune_topology: Double[] insertParams = {1.0};
-        public Double doubleCutWeight = 0.03;
-        //toy example clt_calc: public Double doubleCutWeight = 0.3;
-        //tune_topology: public Double doubleCutWeight = 0.1;
+        boolean usePoisson= true;
+
+        //penalty parameters
         public Double cutRatesPenalty = 0.0;
         public Double branchLensPenalty = 0.0;
-        boolean usePoisson= true;
+
 
         //Computed/rearranged model parameters
         DoubleMatrix trim_short_params_reshaped;
@@ -107,33 +124,41 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
 
 
-        public BarcodeMeta metaData;
+
 
 
     @Override
     public void initAndValidate() {
-        //TO DO: remove loss and scarRates to test the rest!
+
+        //metadata
         String[] barcodeSplit = uneditedBarcodeInput.get().split(" ");
         int[] crucial = new int[2];
         crucial[0] = crucialPosInput.get().getValue(0);
         crucial[1] = crucialPosInput.get().getValue(1);
         metaData = new BarcodeMeta(Arrays.asList(barcodeSplit),cutSiteInput.get(),crucial,maxSumStepsInput.get(),maxExtraStepsInput.get());
-
         numTargets = metaData.nTargets;
-        //nr of states changes
-        nrOfStates = cutRatesInput.get().get(0).getDimension() + 2;
-        rateMatrix = new double[nrOfStates][nrOfStates];
+
+        //target cut parameters
         cutRates = cutRatesInput.get().get(0).getValues();
-        //longTrimFactors = longTrimScalingInput.get().get(0).getValues();
         doubleCutWeight = doubleCutWeightInput.get().getValue();
+
+        //indel parameters
+        longTrimFactors = longTrimFactorsInput.get().get(0).getValues();
+        insertZeroProb = insertZeroProbInput.get().getValue();
+        trimZeroProbs = trimZeroProbsInput.get().get(0).getValues();
+        trim_short_params = trim_short_paramsInput.get().get(0).getValues();
+        trim_long_params = trim_long_paramsInput.get().get(0).getValues();
+        insertParams = insertParamsInput.get().get(0).getValues();
+
+
+        //penalization parameters
         branchLensPenalty = branchPenParamInput.get();
         cutRatesPenalty =  targetLamPenParamInput.get();
 
+        //to remove
+        nrOfStates = cutRatesInput.get().get(0).getDimension() + 2;
 
-        // assert positive rates
-        double sumScarringRates = 0;
 
-        // check cut rates
         for (int i=0; i<cutRates.length; i++){
 
             if (cutRates[i] <= 0) {
@@ -160,25 +185,12 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         }
 
 
-
-
-        // center root frequency on unedited state
-        frequencies = new double[nrOfStates];
-        frequencies[0] = 1;
-
-      /*  editingHeight = editingHeightInput.get();
-        editingDuration = editingDurationInput.get();
-*/
-
-        //TODO check that the indices match
-
         trimZeroProbsDict.put(0,0,trimZeroProbs[0]);
         trimZeroProbsDict.put(0,1,trimZeroProbs[1]);
         trimZeroProbsDict.put(1,0,trimZeroProbs[2]);
         trimZeroProbsDict.put(1,1,trimZeroProbs[3]);
 
 
-        //CREATING THE targStatTransitionsDict is empty!!! have to redo that
         targStatTransitionsDict = TargetStatus.getAllTransitions(numTargets);
         Pair<DoubleMatrix,Hashtable<IndelSet.TargetTract,Integer>> doubleMatrixHashtablePair = createAllTargetTractHazards();
 
@@ -193,7 +205,6 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
         hazardAwayDict = createHazardAwayDict();
 
-
         trim_long_params_reshaped = new DoubleMatrix(2,1);
         trim_long_params_reshaped.put(0,trim_long_params[0]);
         trim_long_params_reshaped.put(1,trim_long_params[1]);
@@ -201,16 +212,6 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         trim_short_params_reshaped = new DoubleMatrix(2,1);
         trim_short_params_reshaped.put(0,trim_short_params[0]);
         trim_short_params_reshaped.put(1,trim_short_params[1]);
-
-
-
-
-
-
-
-
-
-
 
     }
 
@@ -516,16 +517,7 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         return dataType instanceof IntegerData;
     }
 
-    @Override
-    public double[] getFrequencies() {
-        return frequencies;
-    }
 
-    /*public double getEditingHeight(){return editingHeight;}
-
-    public double getEditingDuration(){return editingDuration;}*/
-
-    public double[][] getRateMatrix(){return rateMatrix;}
 
     public DoubleMatrix createRateMatrix(TransitionWrap wrapper) {
 

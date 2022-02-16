@@ -4,6 +4,8 @@ import beast.core.parameter.RealParameter;
 import beast.core.util.Log;
 import beast.evolution.alignment.*;
 import beast.evolution.substitutionmodel.Frequencies;
+import beast.evolution.tree.Tree;
+import beast.util.TreeParser;
 import lineageTree.substitutionmodel.GeneralGestalt;
 import org.jblas.DoubleMatrix;
 import org.junit.Test;
@@ -27,11 +29,13 @@ public class GeneralGestaltTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="1";
         RealParameter cutRates = new RealParameter("0.1 1.1 2.1 3.1 4.1 5.1 6.1 7.1 8.1 9.1");
-        String longTrimScaling="0.05 0.05";
+        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+        RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
+        RealParameter trim_short_params = new RealParameter("1.0 1.0");
+        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        String insertZeroProb = "0.5";
+        RealParameter insertParam = new RealParameter("2.0");
         String doubleCutWeight="0.3";
-
-        Double[] trim_short_params = {1.0,1.0};
-        Double[] trim_long_params = {1.0,1.0};
 
 
         GeneralGestalt gestaltModel = new GeneralGestalt();
@@ -42,7 +46,7 @@ public class GeneralGestaltTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScaling",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
 
         gestaltModel.initAndValidate();
         //gestaltModel.trim_long_params = trim_long_params;
@@ -74,7 +78,12 @@ public class GeneralGestaltTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        String longTrimScaling="0.05 0.05";
+        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+        RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
+        RealParameter trim_short_params = new RealParameter("1.0 1.0");
+        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        String insertZeroProb = "0.5";
+        RealParameter insertParam = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
 
@@ -86,7 +95,7 @@ public class GeneralGestaltTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScaling",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
 
         gestaltModel.initAndValidate();
 
@@ -114,7 +123,12 @@ public class GeneralGestaltTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        String longTrimScaling="0.05 0.05";
+        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+        RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
+        RealParameter trim_short_params = new RealParameter("1.0 1.0");
+        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        String insertZeroProb = "0.5";
+        RealParameter insertParam = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
 
@@ -126,7 +140,7 @@ public class GeneralGestaltTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScaling",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
 
         gestaltModel.initAndValidate();
 
@@ -155,7 +169,12 @@ public class GeneralGestaltTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        String longTrimScaling="0.05 0.05";
+        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+        RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
+        RealParameter trim_short_params = new RealParameter("1.0 1.0");
+        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        String insertZeroProb = "0.5";
+        RealParameter insertParam = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
 
@@ -167,7 +186,7 @@ public class GeneralGestaltTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScaling",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
 
         gestaltModel.initAndValidate();
 
@@ -198,7 +217,12 @@ public class GeneralGestaltTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        String longTrimScaling="0.05 0.05";
+        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+        RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
+        RealParameter trim_short_params = new RealParameter("1.0 1.0");
+        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        String insertZeroProb = "0.5";
+        RealParameter insertParam = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
 
@@ -210,7 +234,7 @@ public class GeneralGestaltTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScaling",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
 
         gestaltModel.initAndValidate();
 
@@ -243,7 +267,12 @@ public class GeneralGestaltTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        String longTrimScaling="0.05 0.05";
+        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+        RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
+        RealParameter trim_short_params = new RealParameter("1.0 1.0");
+        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        String insertZeroProb = "0.5";
+        RealParameter insertParam = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
 
@@ -255,7 +284,7 @@ public class GeneralGestaltTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScaling",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
 
         gestaltModel.initAndValidate();
 
@@ -289,7 +318,12 @@ public class GeneralGestaltTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        String longTrimScaling="0.05 0.05";
+        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+        RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
+        RealParameter trim_short_params = new RealParameter("1.0 1.0");
+        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        String insertZeroProb = "0.5";
+        RealParameter insertParam = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
 
@@ -301,7 +335,7 @@ public class GeneralGestaltTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScaling",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
 
         gestaltModel.initAndValidate();
 
@@ -331,7 +365,12 @@ public class GeneralGestaltTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        String longTrimScaling="0.05 0.05";
+        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+        RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
+        RealParameter trim_short_params = new RealParameter("1.0 1.0");
+        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        String insertZeroProb = "0.5";
+        RealParameter insertParam = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
 
@@ -343,7 +382,7 @@ public class GeneralGestaltTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScaling",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
 
         gestaltModel.initAndValidate();
         //////////////////test_get_hazard_away 1
