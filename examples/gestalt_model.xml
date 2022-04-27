@@ -12,7 +12,7 @@
         <sequence id="4" spec="Sequence" taxon="4"  value="34_12_0_0_,55_46_1_2_,108_98_3_6_,253_5_8_8_,None,None,"/>
         <sequence id="5" spec="Sequence" taxon="5"  value="34_12_0_0_,55_46_1_2_,108_98_3_6_,229_27_8_8_,280_2_9_9_a,None,"/>
         <sequence id="8" spec="Sequence" taxon="8"  value="38_38_0_1_,82_47_2_3_,174_27_5_6_,250_5_8_8_,None,None,"/>
-        <sequence id="9" spec="Sequence" taxon="9"  value="34_5_0_0_,61_5_1_1_aaaaa,120_7_3_3_,132_33_4_4_,173_80_5_7_a,None,"/>y
+        <sequence id="9" spec="Sequence" taxon="9"  value="34_5_0_0_,61_5_1_1_aaaaa,120_7_3_3_,132_33_4_4_,173_80_5_7_a,None,"/>
     </data>
 
     <map name="Uniform" >beast.math.distributions.Uniform</map>

@@ -42,9 +42,9 @@ public class GeneralGestalt extends SubstitutionModel.Base {
          public Input<IntegerParameter> crucialPosInput = new Input<>("crucialPos",
             "Position range left and right of the cut that can deactivate the target.");
          public Input<Integer> maxSumStepsInput = new Input<>("maxSumSteps",
-            "Position range left and right of the cut that can deactivate the target.");
+            "Max total number of steps from the parsimony states on each branch allowed to be taken");
          public Input<Integer> maxExtraStepsInput = new Input<>("maxExtraSteps",
-            "Position range left and right of the cut that can deactivate the target.");
+            "Max steps past parsimony state taken");
 
         //target cut parameters input
         final public Input<List<RealParameter>> cutRatesInput = new Input<>("cutRates",
@@ -54,18 +54,18 @@ public class GeneralGestalt extends SubstitutionModel.Base {
             "Rate, at which editing regions are lost", Input.Validate.REQUIRED);
 
         //indel parameters input
-        final public Input<List<RealParameter>> longTrimFactorsInput = new Input<>("longTrimScalingParam",
+        final public Input<List<RealParameter>> longTrimFactorsInput = new Input<>("longTrimScalingFactors",
                 "Scaling factor for long deletions left and right of the cut sites", new ArrayList<>());
-        final public Input<List<RealParameter>> trimZeroProbsInput = new Input<>("trimZeroProbsParam",
-                "Penalty parameter for target cut rates",new ArrayList<>());
-        final public Input<List<RealParameter>> trim_short_paramsInput = new Input<>("trim_short_Param",
-                "Penalty parameter for target cut rates",new ArrayList<>());
-        final public Input<List<RealParameter>> trim_long_paramsInput = new Input<>("trim_long_Param",
-                "Penalty parameter for target cut rates",new ArrayList<>());
-        final public Input<List<RealParameter>> insertParamsInput = new Input<>("insertParam",
-                "Penalty parameter for target cut rates",new ArrayList<>());
-        final public Input<RealParameter> insertZeroProbInput = new Input<>("insertZeroProbParam",
-            "Rate, at which editing regions are lost", Input.Validate.REQUIRED);
+        final public Input<List<RealParameter>> trimZeroProbsInput = new Input<>("trimZeroProbs",
+                "Probablilties of a length zero deletion for indel types: focal-left, intertarget-left, focal right, intertarget-right",new ArrayList<>());
+        final public Input<List<RealParameter>> trimShortParamsInput = new Input<>("trimShortParams",
+                "Means for the short deletion length distribution, left and right of the cut (poisson)",new ArrayList<>());
+        final public Input<List<RealParameter>> trimLongParamsInput = new Input<>("trimLongParams",
+                "Means for the long deletion length distribution, left and right of the cut (poisson)",new ArrayList<>());
+        final public Input<List<RealParameter>> insertParamsInput = new Input<>("insertParams",
+                "Mean for the insert length distribution (poisson)",new ArrayList<>());
+        final public Input<RealParameter> insertZeroProbInput = new Input<>("insertZeroProb",
+            "Length zero insertion probability", Input.Validate.REQUIRED);
 
         //penalization parameters input
         public Input<Double> branchPenParamInput = new Input<>("branchPenParam",
@@ -93,8 +93,8 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         //indel parameters
         public Double[] longTrimFactors = {0.04,0.04};
         public Double[] trimZeroProbs = {0.5,0.5,0.5,0.5};
-        public Double[] trim_short_params = {3.0,3.0};
-        public Double[] trim_long_params = {3.0,3.0};
+        public Double[] trimShortParams = {3.0,3.0};
+        public Double[] trimLongParams = {3.0,3.0};
         Double insertZeroProb = 0.5;
         Double[] insertParams = {2.0};
         //toy example clt_calc: Double[] insertParams = {2.0};
@@ -107,8 +107,8 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
 
         //Computed/rearranged model parameters
-        DoubleMatrix trim_short_params_reshaped;
-        DoubleMatrix trim_long_params_reshaped;
+        DoubleMatrix trimShortParams_reshaped;
+        DoubleMatrix trimLongParams_reshaped;
         public Hashtable<TargetStatus, Double> hazardAwayDict;
         Hashtable<IndelSet.Singleton,Integer> singletonIndexDict = new Hashtable<>();
         DoubleMatrix singletonLogCondProb;
@@ -146,8 +146,8 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         longTrimFactors = longTrimFactorsInput.get().get(0).getValues();
         insertZeroProb = insertZeroProbInput.get().getValue();
         trimZeroProbs = trimZeroProbsInput.get().get(0).getValues();
-        trim_short_params = trim_short_paramsInput.get().get(0).getValues();
-        trim_long_params = trim_long_paramsInput.get().get(0).getValues();
+        trimShortParams = trimShortParamsInput.get().get(0).getValues();
+        trimLongParams = trimLongParamsInput.get().get(0).getValues();
         insertParams = insertParamsInput.get().get(0).getValues();
 
 
@@ -205,13 +205,13 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
         hazardAwayDict = createHazardAwayDict();
 
-        trim_long_params_reshaped = new DoubleMatrix(2,1);
-        trim_long_params_reshaped.put(0,trim_long_params[0]);
-        trim_long_params_reshaped.put(1,trim_long_params[1]);
+        trimLongParams_reshaped = new DoubleMatrix(2,1);
+        trimLongParams_reshaped.put(0,trimLongParams[0]);
+        trimLongParams_reshaped.put(1,trimLongParams[1]);
 
-        trim_short_params_reshaped = new DoubleMatrix(2,1);
-        trim_short_params_reshaped.put(0,trim_short_params[0]);
-        trim_short_params_reshaped.put(1,trim_short_params[1]);
+        trimShortParams_reshaped = new DoubleMatrix(2,1);
+        trimShortParams_reshaped.put(0,trimShortParams[0]);
+        trimShortParams_reshaped.put(1,trimShortParams[1]);
 
     }
 
@@ -226,39 +226,47 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         Hashtable<Integer, Double> logScalingTerms = new Hashtable<>();
         for (Node node:tree.listNodesPostOrder(null,null)) {
             if(node.isLeaf()) {
-                Log.info.println("NODE IS LEAF");
+                //Log.info.println("NODE IS LEAF");
 
                 TransitionWrap nodeWrap = transitionWrappers.get(node.getNr());
                 DoubleMatrix probArray = DoubleMatrix.zeros(nodeWrap.numStatuses+1,1);
+                TargetStatus LEAF = nodeWrap.leafState;
+                //Log.info.println(Arrays.asList(LEAF.getBinaryStatus(10)));
                 Integer observedKey = nodeWrap.statusMap.get(nodeWrap.leafState);
+                //Log.info.println("size of the status map"+nodeWrap.statusMap.size());
+                //Log.info.println("printing the observed key :"+observedKey);
+                //Log.info.println("printing the node number :"+node.getNr());
+                //Log.info.println("printing the node ID :"+node.getID());
+                //Log.info.println("IS the node a leaf"+node.isLeaf());
+
                 probArray.put(observedKey,1.0);
                 LProb.put(node.getNr(),probArray);
             }
             else {
-                Log.info.println("NODE IS NOT LEAF");
+                //Log.info.println("NODE IS NOT LEAF");
 
                 TransitionWrap nodeWrap = transitionWrappers.get(node.getNr());
                 DoubleMatrix logLprobNode = initializeLowerLogProb(nodeWrap,node);
-                Log.info.println("initial logLprobNode"+ logLprobNode);
+                //Log.info.println("initial logLprobNode"+ logLprobNode);
 
                 DoubleMatrix hasPosProb = DoubleMatrix.ones(1);
                 for (Node child: node.getChildren()) {
 
-                    Log.info.println("CHILD NODE");
+                    //Log.info.println("CHILD NODE");
 
                     TransitionWrap childNodeWrap = transitionWrappers.get(child.getNr());
                     //TODO check the trim probs init
                     //trans_mats[child.node_id], trim_probs[child.node_id] = self._create_transition_matrix(
                     //                        child_wrapper)
                     DoubleMatrix childMat = createRateMatrix(childNodeWrap);
-                    Log.info.println("childMat " + childMat);
+                    //Log.info.println("childMat " + childMat);
 
                     transMats.put(child.getNr(),childMat);
                    /* DoubleMatrix expInput = new DoubleMatrix((childMat.toArray2()));*/
                     childMat.muli(node.getHeight() - child.getHeight());
 
                     DoubleMatrix ptMat = expm(childMat);
-                    Log.info.println("ptMat " + ptMat);
+                    //Log.info.println("ptMat " + ptMat);
                     //TODO check AFTER THIS
 
                     ptMats.put(child.getNr(),ptMat);
@@ -275,13 +283,13 @@ public class GeneralGestalt extends SubstitutionModel.Base {
                     }
                     //ROOT BLOCK!!!!
                     else {
-                        Log.info.println("ROOT block !");
+                        //Log.info.println("ROOT block !");
                         Integer chId = childNodeWrap.statusMap.get(new TargetStatus());
                         double downProb = chOrderedDownProbs.get(chId);
                         downProb = max(downProb,0.0);
                         downProbs = new DoubleMatrix(1,1,downProb);
                         down_probs_dict.put(chId,downProbs);
-                        Log.info.println("en of ROOT block !");
+                        //Log.info.println("en of ROOT block !");
                         //CORRECT UNTIL NOW!!!!
                     }
 
@@ -294,25 +302,25 @@ public class GeneralGestalt extends SubstitutionModel.Base {
                     //TODO LOSS OF DOWN PROBS DIMENSION!!!!
 
                     //ISSUE WITH THE ADDI ??
-                    Log.info.println("logLprobNode before" + logLprobNode );
-                    Log.info.println("downProbs before" + downProbs );
-                    Log.info.println("hasPosProb" + hasPosProb );
+                    //Log.info.println("logLprobNode before" + logLprobNode );
+                   // Log.info.println("downProbs before" + downProbs );
+                   // Log.info.println("hasPosProb" + hasPosProb );
                     Double dummy = downProbs.add((hasPosProb.neg()).add(1).mul( 1e-30 )).get(0);
                     NumberFormat formatter = new DecimalFormat();
 
-                    Log.info.println("downProbs.addi((hasPosProb.neg()).add(1).mul( 1e-30 )) non zero!" + (formatter.format(dummy)));
-                    Log.info.println("is it  > 0 ?" + (dummy > 0) );
-                    Log.info.println("is it  = 0 ?" + (dummy == 0) );
-                    Log.info.println("log of that" + log(dummy) );
-                    Log.info.println("log of that" + log(dummy) );
+                    //Log.info.println("downProbs.addi((hasPosProb.neg()).add(1).mul( 1e-30 )) non zero!" + (formatter.format(dummy)));
+                    //Log.info.println("is it  > 0 ?" + (dummy > 0) );
+                    //Log.info.println("is it  = 0 ?" + (dummy == 0) );
+                    //Log.info.println("log of that" + log(dummy) );
+                    //Log.info.println("log of that" + log(dummy) );
                     //proctection against states with zero probability.
 
                     logLprobNode = logLprobNode.addi(logi(downProbs.addi((hasPosProb.neg()).add(1).mul( 1e-30 ))))  ;
-                    Log.info.println("logLprobNode after" + logLprobNode);
-                    Log.info.println("END CHILD NODE ITER");
+                    //Log.info.println("logLprobNode after" + logLprobNode);
+                    //Log.info.println("END CHILD NODE ITER");
 
                 }
-                Log.info.println("logLprobNode" + logLprobNode);
+               //Log.info.println("logLprobNode" + logLprobNode);
                 Double logScalingTerm = logLprobNode.max();
                 LProb.put(node.getNr(),expi((logLprobNode.subi(logScalingTerm)).muli(hasPosProb)));
                 logScalingTerms.put(node.getNr(), logScalingTerm);
@@ -321,9 +329,9 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
 
         }
-        Log.info.println("LProb" + LProb.get(0).get(1) *1000000000);
+       // Log.info.println("LProb" + LProb.get(0).get(1) *1000000000);
         Collection<Double> logScalingTermsAll = logScalingTerms.values();
-        Log.info.println("logScalingTermsAll" + logScalingTermsAll);
+        //Log.info.println("logScalingTermsAll" + logScalingTermsAll);
 
         List<Double> terms = new ArrayList<>(logScalingTermsAll);
         Double fullScaling = 0.0;
@@ -331,15 +339,20 @@ public class GeneralGestalt extends SubstitutionModel.Base {
             fullScaling = fullScaling + terms.get(i);
         }
         DoubleMatrix logLikAlleles = log(LProb.get(rootNodeID)).addi(fullScaling);
-        Log.info.println("logLikAlleles" + logLikAlleles);
-        Log.info.println("fullScaling" + fullScaling);
+        //Log.info.println("logLikAlleles" + logLikAlleles);
+        //Log.info.println("fullScaling" + fullScaling);
         /*Lprob = Lprob;
         down_probs_dict = down_probs_dict;
         pt_matrix = pt_matrix;
        trans_mats = trans_mats;
         trim_probs = trim_probs;*/
-        return logLikAlleles.get(0);
-
+//        if(Double.isNaN(logLikAlleles.get(0))) {
+//            Log.info.println("is NAN");
+//            return Double.NEGATIVE_INFINITY;
+//        }
+//        else {
+            return logLikAlleles.get(0);
+//        }
     }
 
 
@@ -650,8 +663,7 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         //                note: this is used to generate the matrix for a specific branch in the tree
         //                If the transition is not possible, we fill in with trim prob 1.0 since it doesnt matter
 
-            List<IndelSet.Singleton> childSingletons = childWrap.ancStates.getSingletons();
-
+        List<IndelSet.Singleton> childSingletons = childWrap.ancStates.getSingletons();
 
         List<IndelSet.Singleton> targetToSingleton = new ArrayList<>();
         for(int i = 0;i<numTargets;i++) {
@@ -660,8 +672,6 @@ public class GeneralGestalt extends SubstitutionModel.Base {
             for (IndelSet.Singleton sg: childSingletons) {
                 targetToSingleton.set(sg.getminTarg(),sg);
                 targetToSingleton.set(sg.getmaxTarg(),sg);
-
-
             }
 
             Set<TargetStatus> possibleStates = new HashSet<>();
@@ -690,15 +700,22 @@ public class GeneralGestalt extends SubstitutionModel.Base {
                         sparseIndices.add(new Pair(startKey,endKey));
                         IndelSet.Singleton sg = (IndelSet.Singleton) singletonSet.toArray()[0];
                         Double trimProbVal = singletonCondProb.get(singletonIndexDict.get(sg));
-                        sparseVals.add(trimProbVal -1 );
-                        Log.info.println(" trimProbVal" + trimProbVal);
-                        Log.info.println(" trimProbVal -1" + (trimProbVal -1));
-                        //CHECK THAT
+                        //sparseVals.add(trimProbVal -1 );
+                        sparseVals.add(trimProbVal);
+                        //Log.info.println(" trimProbVal" + trimProbVal);
+                        //Log.info.println(" 1 + trimProbVal -1" + (1+ trimProbVal -1));
+                        //Log.info.println(" trimProbVal -1" + (trimProbVal -1));
+                        //Log.info.println(" trimProbVal -1" + (trimProbVal -1));
+                        //Log.info.println(" equals -1.0 or not" + ((trimProbVal -1) == -1.0));
+
+
 
                     }
                     else if (singletonSet.size()>1) {
                         sparseIndices.add(new Pair(startKey,endKey));
-                        sparseVals.add(-1.0);
+                        //Log.info.println("LENGTH superior to 1");
+                        //sparseVals.add(-1.0);
+                        sparseVals.add(0.0);
                     }
 
                 }
@@ -711,16 +728,19 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         int outputLength = childWrap.numStatuses+1;
         int[] outputShape = new int[] {outputLength,outputLength -1};
         if(sparseVals.size() !=0) {
-        DoubleMatrix zeroes = DoubleMatrix.zeros(outputShape[0],outputShape[1]);
-        DoubleMatrix tobeReturned = DoubleMatrix.ones(outputShape[0],outputShape[1]);
+            //DoubleMatrix zeroes = DoubleMatrix.zeros(outputShape[0],outputShape[1]);
+        DoubleMatrix qMatrixLeft = DoubleMatrix.ones(outputShape[0],outputShape[1]);
         for(int i=0;i<sparseIndices.size();i++) {
-            Log.info.println(" tobereturned sparsevals" + (sparseVals.get(i)));
-            Log.info.println("filling tobereturned" + (1.0 + sparseVals.get(i)));
-            tobeReturned.put(sparseIndices.get(i).getFirst(),sparseIndices.get(i).getSecond(),1.0 + sparseVals.get(i));
+           // Log.info.println(" tobereturned sparsevals" + (sparseVals.get(i)));
+            //Log.info.println("filling tobereturned" + (1.0 + sparseVals.get(i)));
+            //qMatrixLeft.put(sparseIndices.get(i).getFirst(),sparseIndices.get(i).getSecond(),1.0 + sparseVals.get(i));
+            qMatrixLeft.put(sparseIndices.get(i).getFirst(),sparseIndices.get(i).getSecond(), sparseVals.get(i));
+
+
 
         }
-        tobeReturned.max(zeroes);
-        return tobeReturned;
+            //qMatrixLeft.max(zeroes);
+        return qMatrixLeft;
         }
         else{
             return DoubleMatrix.ones(outputShape[0],outputShape[1]);
@@ -827,17 +847,17 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         }
         createTrimInsertDistributions(singletons.size());
         singletonLogCondProb = createLogIndelProbs(singletons);
-        Log.info.println("singletonLogCondProb" + singletonLogCondProb);
+        //Log.info.println("singletonLogCondProb" + singletonLogCondProb);
         singletonCondProb = expi(singletonLogCondProb);
-        Log.info.println("singletonCondProb" + singletonCondProb);
+        //Log.info.println("singletonCondProb" + singletonCondProb);
 
 
     }
 
     public void createTrimInsertDistributions(int numSingletons) {
 
-        delShortDist = makeDelDist(trim_short_params_reshaped, 2, usePoisson);
-        delLongDist = makeDelDist(trim_long_params_reshaped, 2, true);
+        delShortDist = makeDelDist(trimShortParams_reshaped, 2, usePoisson);
+        delLongDist = makeDelDist(trimLongParams_reshaped, 2, true);
         if (usePoisson) {
 
              insertDist = new Poisson(exp(insertParams[0]),RandomEngine.makeDefault());
@@ -877,17 +897,17 @@ public class GeneralGestalt extends SubstitutionModel.Base {
             DoubleMatrix leftDelProb = createLeftDelProbs(singletons);
             DoubleMatrix rightDelProb = createRightDelProbs(singletons);
             DoubleMatrix insertProb = createInsertProbs(singletons);
-            Log.info.println("insertProb" + insertProb);
-            Log.info.println("rightDelProb" + rightDelProb);
-            Log.info.println("leftDelProb" + leftDelProb);
+            //Log.info.println("insertProb" + insertProb);
+            //Log.info.println("rightDelProb" + rightDelProb);
+            //Log.info.println("leftDelProb" + leftDelProb);
             //combine everything
             DoubleMatrix allLogProbs = (logi(leftDelProb)).addi(logi(rightDelProb)).addi(logi(insertProb));
 
-            Log.info.println("allLogProbs" + allLogProbs);
+            //Log.info.println("allLogProbs" + allLogProbs);
 
             //SOMETHING TO INITIALIZE
             Double logShortFocalNormalization = log(1-(trimZeroProbsDict.get(0,0)*trimZeroProbsDict.get(1,0)*insertZeroProb));
-            Log.info.println("logShortFocalNormalization" + logShortFocalNormalization);
+            //Log.info.println("logShortFocalNormalization" + logShortFocalNormalization);
 
             boolean[] isLongIndel = new boolean[singletons.size()];
             for (int i=0; i<singletons.size();i++) {

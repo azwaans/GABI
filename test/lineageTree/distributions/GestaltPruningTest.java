@@ -41,12 +41,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -62,7 +62,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
 
@@ -106,12 +106,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="10";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -127,7 +127,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
@@ -172,12 +172,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="0";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -193,7 +193,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
@@ -237,12 +237,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="10";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -258,7 +258,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
@@ -310,12 +310,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="0";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -331,7 +331,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
@@ -383,12 +383,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="0";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -404,7 +404,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
 
@@ -451,12 +451,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="0";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -472,7 +472,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
@@ -516,12 +516,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -537,7 +537,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
@@ -582,12 +582,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="10";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -603,7 +603,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
@@ -649,12 +649,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="0";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -670,7 +670,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
@@ -715,12 +715,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -736,7 +736,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
@@ -782,12 +782,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="2";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -803,7 +803,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
 
@@ -847,12 +847,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="0";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -868,7 +868,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
@@ -919,12 +919,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="10";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -940,7 +940,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
@@ -1006,12 +1006,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="10";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -1027,7 +1027,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
 
@@ -1090,12 +1090,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="0";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -1111,7 +1111,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
@@ -1175,12 +1175,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="0";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -1196,7 +1196,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
 
@@ -1251,12 +1251,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="0";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -1272,7 +1272,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
 
@@ -1324,12 +1324,12 @@ public class GestaltPruningTest {
         String maxSumSteps= "3000";
         String maxExtraSteps="1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
-        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+              RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
-        RealParameter trim_short_params = new RealParameter("1.0 1.0");
-        RealParameter trim_long_params = new RealParameter("1.0 1.0");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
-        RealParameter insertParam = new RealParameter("2.0");
+        RealParameter insertParams = new RealParameter("2.0");
         String doubleCutWeight="0.3";
 
         Tree tree1 = new TreeParser();
@@ -1345,7 +1345,7 @@ public class GestaltPruningTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingParam",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProbParam",insertZeroProb, "trimZeroProbsParam",trimZeroProbs,"trim_short_Param",trim_short_params,"trim_long_Param",trim_long_params,"insertParam",insertParam);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         SiteModel siteM = new SiteModel();
         siteM.initByName( "gammaCategoryCount", 0, "substModel", gestaltModel);

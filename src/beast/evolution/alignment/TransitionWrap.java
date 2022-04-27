@@ -42,11 +42,14 @@ public class TransitionWrap extends BEASTObject {
             }
 
         }
-        Log.info.println("transStatuses size:"+ transStatuses.size());
+        //Log.info.println("transStatuses size:"+ transStatuses.size());
         transStatuses.addAll(noDuplicates);
         statusMap = new Hashtable<>();
         //LATEST CHANGE
         for(int i=0;i<transStatuses.size();++i) {
+            //Log.info.println("STATUS MAP FILLING with: "+ Arrays.asList(transStatuses.get(i).getBinaryStatus(10)));
+            //Log.info.println("STATUS MAP FILLING index: "+ i );
+
             statusMap.put(transStatuses.get(i),i);
         }
 
@@ -178,11 +181,16 @@ public class TransitionWrap extends BEASTObject {
                 //for now, only 1 site without insertions
                 //TO DO: find out why alignment is not containing the sequences properly
                 String leafSeq = alinmt.sequences.get(node.getNr()).getData();
+               //Log.info.println("initialising the states dict, sequences" + leafSeq);
+                //Log.info.println("initialising the states dict, node number" + node.getNr());
+                //Log.info.println("initialising the states dict, ID" + node.getID());
 
                 //
                 //leafSeq = leafSeq.substring(7, leafSeq.length() - 1);
 
                 AncStates leafState = AncStates.createObservedAlleleSet(leafSeq, posSites,nTargets);
+                TargetStatus Status = leafState.getMaxTargetStatus();
+                //Log.info.println("initialising the states dict, State" + Arrays.asList(Status.getBinaryStatus(10)));
 
 
                 statesDict.put(node.getNr(), leafState);
@@ -211,7 +219,7 @@ public class TransitionWrap extends BEASTObject {
     }
 
     public static Hashtable<Integer, TransitionWrap> createTransitionWrappers(beast.evolution.tree.TreeInterface tree, Alignment alinmt, BarcodeMeta metaData) {
-
+        Log.info.println("creating createTransitionWrappers" + "\n");
         // annotate tree possible ancestral states HERE, by creating a dictionary with node indices.
         Hashtable<Integer, AncStates> statesDict = createStatesDict(tree,alinmt,metaData.posSites, metaData.nTargets);
         // annotate tree possible ancestral states HERE, by creating a dictionary with node indices.
@@ -225,6 +233,8 @@ public class TransitionWrap extends BEASTObject {
             List<IndelSet.TargetTract> innerinitNull = new ArrayList<>();
             initNull.add(innerinitNull);
             TransitionWrap temp = new TransitionWrap(initNull, statesDict.get(node.getNr()), node.isLeaf());
+            //Log.info.println("in create transition wrapper NODE NUMBER "+node.getNr());
+            //Log.info.println("in create transition wrapper NODE ID "+node.getID());
             wrapDict.put(node.getNr(), temp);
         }
         //create a parsimony state dictionary

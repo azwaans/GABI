@@ -18,6 +18,7 @@ import beast.evolution.branchratemodel.StrictClockModel;
 import beast.evolution.sitemodel.SiteModel;
 import beast.evolution.sitemodel.SiteModelInterface;
 import beast.evolution.tree.Node;
+import beast.evolution.tree.Tree;
 import beast.evolution.tree.TreeInterface;
 import lineageTree.substitutionmodel.GeneralGestalt;
 import org.jblas.DoubleMatrix;
@@ -53,6 +54,8 @@ public class gestaltTreeLikelihood extends Distribution {
 
     protected double[] m_branchLengths;
     protected double[] storedBranchLengths;
+
+    protected Hashtable<Integer, TransitionWrap> transitionWrappers;
 
 
     @Override
@@ -96,35 +99,65 @@ public class gestaltTreeLikelihood extends Distribution {
 
     }
 
+    protected boolean wrapperRequiresRecalculation() {
+        if ( treeInput.get().getRoot().isDirty() == Tree.IS_FILTHY) {
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }
+
     @Override
     public double calculateLogP() {
-        /////test_branch_likelihood:
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(treeInput.get(),dataInput.get(),substitutionModel.metaData);
-        Log.info.println("TOTAL SIZE OF THE TRANSITION WRAPPER, whole tree"+ transitionWrappers.size());
-        //THAT?S CORRECT: 1 for the root and one for the leaf?
-        //check that the only possible state at the root is empty:
-        TransitionWrap rootWrap = transitionWrappers.get(treeInput.get().getRoot().getNr());
-        Log.info.println("root wrap size"+ rootWrap.numStatuses );
-        Log.info.println("root wrap ID"+ treeInput.get().getRoot().getNr() );
-        for(TargetStatus stat:rootWrap.transStatuses) {
-            Log.info.println("status in root wrap" + Arrays.toString(stat.getBinaryStatus(substitutionModel.metaData.nTargets)));
+//        ///test_branch_likelihood:
+//        for (Node node : treeInput.get().listNodesPostOrder(null, null)) {
+//            Log.info.println("node.isDirty() : "+ node.isDirty() + "\n");
+//        }
+       // int isROOTDIRTY = treeInput.get().getRoot().isDirty();
+        // Log.info.println("ROOT.isDirty() : "+ isROOTDIRTY);
+
+        //Log.info.println("wrapperrequiresRecalculation() : "+wrapperRequiresRecalculation() + "\n");
+        //Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(treeInput.get(),dataInput.get(),substitutionModel.metaData);
+        if (wrapperRequiresRecalculation() == true) {
+            transitionWrappers = TransitionWrap.createTransitionWrappers(treeInput.get(),dataInput.get(),substitutionModel.metaData);
         }
-        for(int i=0;i<2;i++) {
-            Log.info.println("non root wrap ID, is LEAF? T/F:"+ treeInput.get().getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
-            Log.info.println("non root wrap size" + leafWrap.numStatuses);
-            for (TargetStatus stat : leafWrap.transStatuses) {
-                Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
-            }
-        }
+        //debugging for 222 seed
+        ///  TransitionWrap eigth = transitionWrappers.get(8);
+//        Log.info.println("node 8 node ID" + treeInput.get().getNode(8).getID());
+//        Log.info.println("node 8 node number" + treeInput.get().getNode(8).getNr());
+//        Log.info.println("node 8 is leaf? " + treeInput.get().getNode(8).isLeaf());
+//        Log.info.println("node 8 status map size " + eigth.statusMap.size());
+
+//        for (TargetStatus status : eigth.statusMap.keySet()) {
+//            Log.info.println("in the eigth node status map" +Arrays.asList(status.getBinaryStatus(10)));
+//        }
+//        Log.info.println("TOTAL SIZE OF THE TRANSITION WRAPPER, whole tree"+ transitionWrappers.size());
+//        //THAT?S CORRECT: 1 for the root and one for the leaf?
+//        //check that the only possible state at the root is empty:
+//        TransitionWrap rootWrap = transitionWrappers.get(treeInput.get().getRoot().getNr());
+//        Log.info.println("root wrap size"+ rootWrap.numStatuses );
+//        Log.info.println("root wrap ID"+ treeInput.get().getRoot().getNr() );
+//        for(TargetStatus stat:rootWrap.transStatuses) {
+//            Log.info.println("status in root wrap" + Arrays.toString(stat.getBinaryStatus(substitutionModel.metaData.nTargets)));
+//        }
+//        for(int i=0;i<2;i++) {
+//            Log.info.println("non root wrap ID, is LEAF? T/F:"+ treeInput.get().getNode(i).isLeaf());
+//            TransitionWrap leafWrap = transitionWrappers.get(i);
+//            Log.info.println("non root wrap size" + leafWrap.numStatuses);
+//            for (TargetStatus stat : leafWrap.transStatuses) {
+//                Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
+//            }
+//        }
         //THE WRAPPERS ARE CORRECT
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(treeInput.get(),dataInput.get(),substitutionModel.metaData.posSites,substitutionModel.metaData.nTargets);
         List<IndelSet.Singleton> list = substitutionModel.getAllSingletons(treeInput.get(),statesDict);
-        Log.info.println("GET ALL SINGLETONS SIZE" + list.size());
+        //Log.info.println("GET ALL SINGLETONS SIZE" + list.size());
         substitutionModel.initSingletonProbs(list);
         Double likelihood = substitutionModel.createTopologyLogLikelihood(treeInput.get(),transitionWrappers);
-        Log.info.println("likelihood TREE LIKELIHOOD" + likelihood);
+        Log.info.println("likelihood TREE LIKELIHOOD" + likelihood + "\n");
         logP = (double) likelihood;
 
         //double pen_test = penalization();
@@ -146,7 +179,7 @@ public class gestaltTreeLikelihood extends Distribution {
 
         }
 
-        Log.info.println("branch lengths"+ Arrays.toString(m_branchLengths));
+        //Log.info.println("branch lengths"+ Arrays.toString(m_branchLengths));
         DoubleMatrix branchLengths = new DoubleMatrix(m_branchLengths);
         DoubleMatrix cutRates = new DoubleMatrix(Arrays.asList(substitutionModel.cutRates));
         DoubleMatrix logbranchLenghts = logi(branchLengths);
