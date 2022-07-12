@@ -9,18 +9,26 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class TargetStatus extends BEASTObject implements Comparable < TargetStatus > {
+    /**
+     *     Class that represent barcode activation status.
+     *     The barcode target status consists of a collection of deactivation tracts. They result from applying
+     *     a Target Tract indel to the barcode. The corresponding feature resulting from applying Target Tracts to a barcode
+     *     are Target Deactivation Tracts. A Target Status can be converted into a binary format, as represented in J.Feng's paper.
+     */
 
+
+    /**
+     *  The list of Target Deactivation Tracts applied to the barcode
+     */
     protected List<TargetDeactTract> targetDeacList;
-    /*Target Status. The barcode target status consists of a collection of deactivation tracts. They result from applying
-    a Target Tract indel to the barcode. The corresponding feature resulting from applying Target Tracts to a barcode
-    are Target Deactivation Tracts. A Target Status can be converted into a binary format, as represented in J.Feng's paper.*/
 
+    //no argument constructor
     public TargetStatus() {
         targetDeacList = null;
         initAndValidate();
     }
 
-
+   //constructor
     public TargetStatus(List<TargetDeactTract> list) {
         targetDeacList = list;
         initAndValidate();
@@ -51,9 +59,10 @@ public class TargetStatus extends BEASTObject implements Comparable < TargetStat
         return code;
     }
 
-
+    /**
+     *  Adding a target tract to an existing target status.
+     */
     public void addTarget(IndelSet.TargetTract targTrac) {
-        //adding a target tract to an existing target status.
         //if the target status is empty, initialize it with the tract
 
 
@@ -80,6 +89,10 @@ public class TargetStatus extends BEASTObject implements Comparable < TargetStat
         }
     }
 
+
+    /**
+     *  Get a list of deactivated target indices
+     */
     public List<Integer> getDeactTargets() {
         List<Integer> deactTargs = new ArrayList<>();
         if(targetDeacList != null) {
@@ -93,9 +106,12 @@ public class TargetStatus extends BEASTObject implements Comparable < TargetStat
         return deactTargs;
     }
 
+    /**
+     * converting a binary target status into a TargetStatus with TargetTractDeac attribute. We iterate through th
+     *  binary representation. !The targets are indexed starting from 0!
+     */
     public static TargetStatus convertBinaryToTarget(Integer[] binaryStat) {
-    /*converting a binary target status into a TargetStatus with TargetTractDeac attribute. We iterate through th
-    binary representation. !The targets are indexed starting from 0! */
+
         int targetIndex = 0;
         Integer currentTrgtStart = null;
         List<TargetDeactTract> Deactracts = new ArrayList<>();
@@ -124,9 +140,13 @@ public class TargetStatus extends BEASTObject implements Comparable < TargetStat
         return new TargetStatus(Deactracts);
     }
 
+    /**
+     * this creates a binary representation of the status of all targets <= n_targets. 0 if active, 1 if deactivated.
+     *         should this be a boolean[]/a list?
+     */
+
     public Integer[] getBinaryStatus(int nTargets) {
-        /*this creates a binary representation of the status of all targets <= n_targets. 0 if active, 1 if deactivated.
-        should this be a boolean[]/a list?*/
+
         Integer[] binaryStatus = new Integer[nTargets];
         java.util.Arrays.fill(binaryStatus, 0);
         if (targetDeacList != null) {
@@ -139,7 +159,9 @@ public class TargetStatus extends BEASTObject implements Comparable < TargetStat
             return binaryStatus;
         }
     }
-
+    /**
+     * construct a target tract list for an existing, untouched TargetStatus
+     */
     public void fillWithTargetTracts(List<IndelSet.TargetTract> targetTractList) {
         if (targetTractList != null) {
             for (IndelSet.TargetTract tt : targetTractList) {
@@ -148,8 +170,10 @@ public class TargetStatus extends BEASTObject implements Comparable < TargetStat
         }
     }
 
+    /**
+     * Merging 2 target statuses:
+     */
     public TargetStatus merge(TargetStatus otherTarget) {
-        //merging 2 target statuses:
         if (this.targetDeacList.size() == 0) {
             return otherTarget;
         }
@@ -178,9 +202,13 @@ public class TargetStatus extends BEASTObject implements Comparable < TargetStat
         return (this.targetDeacList.size()) - ((other.targetDeacList.size()));
     }
 
+
+    /**
+     * returns edited target positions in the barcode.
+     */
     public List<Integer> getInactiveTargets(int nTargets) {
-        //returns edited target positions in the barcode.
-        //TO DO: ADJUST TARGET NUMBER !!!!!!!!!!!!!!!!!!!!!!
+
+        //TO DO: ADJUST TARGET NUMBER !
         Integer[] binary = this.getBinaryStatus(nTargets);
         List<Integer> binaryStatus = Arrays.asList(binary);
         List<Integer> indices = new ArrayList<>();
@@ -198,9 +226,11 @@ public class TargetStatus extends BEASTObject implements Comparable < TargetStat
         }
     }
 
+    /**
+     * returns unedited target positions in the barcode.
+     */
     public List<Integer> getActiveTargets(int nTargets) {
-        //returns unedited target positions in the barcode.
-        //TO DO: ADJUST TARGET NUMBER !!!!!!!!!!!!!!!!!!!!!!
+        //TO DO: ADJUST TARGET NUMBER !
         Integer[] binary = this.getBinaryStatus(nTargets);
         List<Integer> binaryStatus = Arrays.asList(binary);
         List<Integer> indices = new ArrayList<>();
@@ -213,12 +243,14 @@ public class TargetStatus extends BEASTObject implements Comparable < TargetStat
         return indices;
     }
 
-
+    /**
+     * given a specific target tract, returns all possible target tracts that could have generated it.
+     * Do this by enumerating the start position and end positioon of the tt tract,
+     * there are 2 edit types on each side of the deletion: short or long trim
+     * the "basic" entry is a short trim
+     */
     public List<IndelSet.TargetTract> getPossibleTargetTracts(List<Integer> activeAny, int nTargets) {
-        //given a specific target tract, returns all possible target tracts that could have generated it.
-        //DO this by enumerating the start position and end positioon of the tt tract,
-        //there are 2 edit types on each side of the deletion: short or long trim
-        //the "basic" entry is a short trim
+
 
         if (activeAny.size() == 0) {
             activeAny = this.getActiveTargets(nTargets);
@@ -292,6 +324,9 @@ public class TargetStatus extends BEASTObject implements Comparable < TargetStat
 
     }
 
+    /**
+     * subtract a status to another
+     */
     public Set<Integer> minus(TargetStatus originalTargetStatus) {
         Set<Integer> origTargs = new HashSet<>(originalTargetStatus.getDeactTargets());
         Set<Integer> selfTargs = new HashSet<>(this.getDeactTargets());
@@ -304,6 +339,12 @@ public class TargetStatus extends BEASTObject implements Comparable < TargetStat
 
 
     }
+    /**
+     *  rReturns a tuple of two Dicts:
+     *  1. that can be introduced to the start TargetStatus to create the end TargetStatus]
+     *  2. maps each end target status to all the possible start target statuses (within one step)
+     *
+     */
 
     public static Hashtable<TargetStatus, Hashtable<TargetStatus, List<IndelSet.TargetTract>>> getAllTransitions(int nTargets) {
         Hashtable<TargetStatus, Hashtable<TargetStatus, List<IndelSet.TargetTract>>> targetStatusTransitionDict = new Hashtable<>();

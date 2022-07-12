@@ -24,7 +24,7 @@ public class GestaltLikelihoodTest {
     public void testLikelihoodSingleBranchNothing() {
 
         // Test for a single branch with no indels
-        String newick = "(CHILD1:0.1):0.0;";
+        String newick = "(CHILD1:0.1);";
 
         Sequence a = new Sequence("CHILD1", "None,");
         Alignment alignment = new Alignment();
@@ -200,7 +200,7 @@ public class GestaltLikelihoodTest {
     public void testLikelihoodDoubleBranchIntertarget() {
 
         // Test for a single branch
-        String newick = "(CHILD2:5):10.0;";
+        String newick = "(CHILD2:5);";
 
         Sequence a = new Sequence("CHILD2", "6_28_0_2_ATC,");
         Alignment alignment = new Alignment();
@@ -259,7 +259,7 @@ public class GestaltLikelihoodTest {
     public void testLikelihoodTreeThreeLeaves() {
 
         // Test for a single branch
-        String newick = "(((CHILD1:1,CHILD3:1)INTERNAL:1,CHILD2:2):2)0.0;";
+        String newick = "(((CHILD1:1,CHILD3:1)INTERNAL:1,CHILD2:2):2.0):0.0;";
 
         Sequence a = new Sequence("CHILD1", "None,");
         Sequence b = new Sequence("CHILD3", "6_10_0_0_,");

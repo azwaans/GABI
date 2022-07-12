@@ -8,9 +8,22 @@ import java.util.*;
 
 public abstract class IndelSet extends BEASTObject {
 
+    /**
+     * A superclass for things that represent sets of Indels
+     */
+
+    /**
+     * min target cut by indel
+     */
     protected int minTarg;
+    /**
+     * min target cut by indel
+     */
     protected int maxTarg;
 
+    /**
+     * get the inner wildcard of any indel set
+     */
     public abstract WildCard getInnerWC();
 
     @Override
@@ -34,26 +47,47 @@ public abstract class IndelSet extends BEASTObject {
 
     }
 
+    /**
+     * get the singleton associated with any indel
+     */
     public abstract Singleton getSingleton();
 
+    /**
+     * get the min target deactivated by said indel
+     */
     public abstract int getminTargDeac();
 
+    /**
+     * get the min target cut by said indel
+     */
     public int getminTarg() {
         return minTarg;
     }
 
+    /**
+     * get the max target cut by said indel
+     */
     public int getmaxTarg(){
         return maxTarg;
 
     }
 
-
+    /**
+     * get the max target deactivated by said indel
+     */
     public abstract int getmaxTargDeac();
 
+
+    /**
+     * get the target tract induced by said indel
+     */
     public abstract TargetTract getTargetTract();
 
+    /**
+     * Obtain the intersection of 2 indel sets.
+     */
     public static IndelSet intersect(IndelSet set1, IndelSet set2) {
-        //obtain the intersection of 2 indel sets. We first check whether sets are identical
+        //We first check whether sets are identical
 
         if(set1.equals(set2)) {
             return set1;
@@ -86,6 +120,11 @@ public abstract class IndelSet extends BEASTObject {
 
 
     public static class SingletonWC extends IndelSet {
+
+        /**
+         * A singleton wildcard is the union of a singleton and its inner wildcard. It represents all underlying possible indels
+         * (inlc. masked) identifiable with an event in a sequence.
+         */
 
         protected int startPos;
         protected int delLeng;
@@ -156,7 +195,9 @@ public abstract class IndelSet extends BEASTObject {
     }
 
     public static class TargetTract extends IndelSet{
-
+        /**
+         * The set of indel that cut and deactivate the same target(s) minTargDeac to maxTargDeac
+         */
         protected int minTargDeac;
         protected int maxTargDeac;
 
@@ -264,6 +305,9 @@ public abstract class IndelSet extends BEASTObject {
     }
 
     public static class Singleton extends IndelSet {
+        /**
+         * This represents an indel set containing a single indel event
+         */
 
         protected int startPos;
         protected int delLen;
@@ -343,6 +387,11 @@ public abstract class IndelSet extends BEASTObject {
 
 
     public static class WildCard extends IndelSet {
+
+        /**
+         *  Set of all indel tracts that only deactivate targets within the range mintrgt and maxtargt, inclusive
+         */
+
 
         public WildCard() {
         }

@@ -14,18 +14,75 @@ import static java.lang.Math.min;
 
 public class BarcodeMeta extends BEASTObject {
 
+    /** Barcode metadata:
+     *  User input of barcode design features and analysis metadata
+     */
+
+    /**
+     *  unedited barcode sequence, as a list of target sequences
+     */
     protected List<String> uneditedBarcode;
+
+    /**
+     *  number of targets
+     */
     public int nTargets;
+
+    /**
+     * offset from 3' end of target for Cas9 cutting,
+     * so a cut_site of 6 means that we start inserting
+     * such that the inserted seq is 6 nucleotides from
+     * the 3' end of the target
+     */
     protected int barcodeCutSite;
+
+
+    /**
+     * which positions to the left and right of the
+     * cut site must not be disturbed for the target to
+     * remain active
+     */
     protected int[] crucialPosLen;
-    public List<Integer> leftLongTrimMin;
-    public List<Integer> rightLongTrimMin;
-    public List<Integer> leftMaxTrim;
-    public List<Integer> rightMaxTrim;
-    public DoubleMatrix absCutSites ;
-    public List<Pair<Integer,Integer>> posSites;
+
+
     public int maxSumSteps = 3000;
     public int maxExtraSteps = 1;
+
+    //parameters computed with inputs:
+
+    /**
+     *  Min length of a long trim for target i -- left
+     */
+    public List<Integer> leftLongTrimMin;
+
+    /**
+     *  Min length of a long trim for target i -- right
+     */
+    public List<Integer> rightLongTrimMin;
+
+    /**
+     *  Max length of any trim for target i -- left
+     */
+    public List<Integer> leftMaxTrim;
+
+    /**
+     *  Max length of any trim for target i -- right
+     */
+    public List<Integer> rightMaxTrim;
+
+    /**
+     *  absolute positions of cut locations
+     */
+    public DoubleMatrix absCutSites ;
+
+
+    /**
+     *  Range of positions for each target
+     *  regarding which positions must be unedited
+     *  for this target to still be active.
+     */
+    public List<Pair<Integer,Integer>> posSites;
+
 
     @Override
     public void initAndValidate() {
@@ -38,15 +95,6 @@ public class BarcodeMeta extends BEASTObject {
         crucialPosLen = crucialPsLn;
         maxSumSteps = maxSumStps;
         maxExtraSteps = maxExtraStps;
-
-        /*offset from 3' end of target for Cas9 cutting,
-        so a cut_site of 6 means that we start inserting
-        such that the inserted seq is 6 nucleotides from
-        the 3' end of the target*/
-
-         /*which positions to the left and right of the
-        cut site must not be disturbed for the target to
-        remain active*/
 
         List<Integer> barcodeSubstringsLengths = new ArrayList<>();
         Integer origLength = 0;

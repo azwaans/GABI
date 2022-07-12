@@ -4,8 +4,6 @@ import beast.core.parameter.RealParameter;
 import beast.core.util.Log;
 import beast.evolution.alignment.*;
 import beast.evolution.substitutionmodel.Frequencies;
-import beast.evolution.tree.Tree;
-import beast.util.TreeParser;
 import lineageTree.substitutionmodel.GeneralGestalt;
 import org.jblas.DoubleMatrix;
 import org.junit.Test;
@@ -52,21 +50,21 @@ public class GeneralGestaltTest {
         gestaltModel.initAndValidate();
         //gestaltModel.trim_long_params = trim_long_params;
        // gestaltModel.trim_short_params =trim_short_params;
-        gestaltModel.longTrimFactors = new Double[]{0.05,0.05};
+        //gestaltModel.longTrimFactors = new Double[]{0.05,0.05};
         IndelSet.TargetTract testing = new IndelSet.TargetTract(2,2,2,2);
         //1st, extract the indexc for target tract 2222 in the target tract dict:
         Integer testingIndex = gestaltModel.targetTractDict.get(testing);
         //2nd, extract value from the target tract hazards double matrix:
         Double testingValue = gestaltModel.targetTractHazards.get(testingIndex);
         //lastly, assert
-        assertEquals(gestaltModel.cutRates[2], testingValue, 1e-5);
+        assertEquals(gestaltModel.cutRates.get(0).getValue(2), testingValue, 1e-5);
         testing = new IndelSet.TargetTract(0,2,0,2);
         //1st, extract the indexc for target tract 0001 in the target tract dict:
         testingIndex = gestaltModel.targetTractDict.get(testing);
         //2nd, extract value from the target tract hazards double matrix:
         testingValue = gestaltModel.targetTractHazards.get(testingIndex);
         //lastly, assert:
-        assertEquals(gestaltModel.doubleCutWeight * (gestaltModel.cutRates[0]+gestaltModel.cutRates[2]), testingValue, 1e-5);
+        assertEquals(gestaltModel.doubleCutWeight.getValue() * (gestaltModel.cutRates.get(0).getValue(0) + gestaltModel.cutRates.get(0).getValue(2)), testingValue, 1e-5);
 
 
     }
@@ -156,7 +154,7 @@ public class GeneralGestaltTest {
         TargetStatus test = new TargetStatus(inputlist);
         testing.add(test);
         Double hazawaynode = gestaltModel.createHazardAwayTargetStatuses(testing).get(0);
-        Double myhazard = (1 + gestaltModel.longTrimFactors[1])* (1 + gestaltModel.longTrimFactors[0]) * gestaltModel.cutRates[2];
+        Double myhazard = (1 + gestaltModel.longTrimFactors.get(0).getValue(1))* (1 + gestaltModel.longTrimFactors.get(0).getValue(0)) * gestaltModel.cutRates.get(0).getValue(2);
         assertEquals(myhazard, hazawaynode, 1e-5);
 
 
@@ -203,9 +201,9 @@ public class GeneralGestaltTest {
         TargetStatus test = new TargetStatus(inputlist);
         testing.add(test);
         Double hazawaynode = gestaltModel.createHazardAwayTargetStatuses(testing).get(0);
-        Double trimlongshortboth = (1 + gestaltModel.longTrimFactors[1])* (1 + gestaltModel.longTrimFactors[0]);
-        Double sum = gestaltModel.cutRates[2] + gestaltModel.cutRates[3] ;
-        Double myhazard = (trimlongshortboth * sum) + (trimlongshortboth * sum * gestaltModel.doubleCutWeight) ;
+        Double trimlongshortboth = (1 + gestaltModel.longTrimFactors.get(0).getValue(1))* (1 + gestaltModel.longTrimFactors.get(0).getValue(0));
+        Double sum = gestaltModel.cutRates.get(0).getValue(2) + gestaltModel.cutRates.get(0).getValue(3);
+        Double myhazard = (trimlongshortboth * sum) + (trimlongshortboth * sum * gestaltModel.doubleCutWeight.getValue()) ;
         assertEquals(myhazard, hazawaynode, 1e-5);
 
 
@@ -254,9 +252,9 @@ public class GeneralGestaltTest {
         TargetStatus test = new TargetStatus(inputlist);
         testing.add(test);
         Double hazawaynode = gestaltModel.createHazardAwayTargetStatuses(testing).get(0);
-        Double trimlongshortboth = (1 + gestaltModel.longTrimFactors[1])* (1 + gestaltModel.longTrimFactors[0]);
-        Double sum = gestaltModel.cutRates[2] + gestaltModel.cutRates[6] ;
-        Double myhazard = (trimlongshortboth * sum) * (1 + gestaltModel.doubleCutWeight) ;
+        Double trimlongshortboth = (1 + gestaltModel.longTrimFactors.get(0).getValue(1))* (1 + gestaltModel.longTrimFactors.get(0).getValue(1));
+        Double sum = gestaltModel.cutRates.get(0).getValue(2) + gestaltModel.cutRates.get(0).getValue(6);
+        Double myhazard = (trimlongshortboth * sum) * (1 + gestaltModel.doubleCutWeight.getValue()) ;
         assertEquals(myhazard, hazawaynode, 1e-5);
 
 
@@ -305,10 +303,10 @@ public class GeneralGestaltTest {
         TargetStatus test = new TargetStatus(inputlist);
         testing.add(test);
         Double hazawaynode = gestaltModel.createHazardAwayTargetStatuses(testing).get(0);
-        Double trimlongshortboth = (1 + gestaltModel.longTrimFactors[1])* (1 + gestaltModel.longTrimFactors[0]);
-        Double sum1 = gestaltModel.cutRates[2] + gestaltModel.cutRates[3] ;
-        Double sum2 = gestaltModel.cutRates[5] + gestaltModel.cutRates[6] ;
-        Double myhazard = (trimlongshortboth * (sum1 + sum2)) + (gestaltModel.doubleCutWeight * 3 * trimlongshortboth * (sum1 + sum2)) ;
+        Double trimlongshortboth = (1 + gestaltModel.longTrimFactors.get(0).getValue(1))* (1 + gestaltModel.longTrimFactors.get(0).getValue(0));
+        Double sum1 = gestaltModel.cutRates.get(0).getValue(2) + gestaltModel.cutRates.get(0).getValue(3);
+        Double sum2 = gestaltModel.cutRates.get(0).getValue(5) + gestaltModel.cutRates.get(0).getValue(6);
+        Double myhazard = (trimlongshortboth * (sum1 + sum2)) + (gestaltModel.doubleCutWeight.getValue() * 3 * trimlongshortboth * (sum1 + sum2)) ;
         assertEquals(myhazard, hazawaynode, 1e-5);
 
 
@@ -355,8 +353,8 @@ public class GeneralGestaltTest {
         TargetStatus test = new TargetStatus(inputlist);
         testing.add(test);
         Double hazawaynode = gestaltModel.createHazardAwayTargetStatuses(testing).get(0);
-        Double trimlongshortboth = (1 + gestaltModel.longTrimFactors[1])* (1 + gestaltModel.longTrimFactors[0]);
-        Double myhazard = (trimlongshortboth * gestaltModel.cutRates[2]) + ((1 + gestaltModel.longTrimFactors[1])* gestaltModel.cutRates[0]) + (gestaltModel.cutRates[0]+gestaltModel.cutRates[2] ) * gestaltModel.doubleCutWeight * (1 + gestaltModel.longTrimFactors[1])  ;
+        Double trimlongshortboth = (1 + gestaltModel.longTrimFactors.get(0).getValue(1))* (1 + gestaltModel.longTrimFactors.get(0).getValue(0));
+        Double myhazard = (trimlongshortboth * gestaltModel.cutRates.get(0).getValue(2)) + ((1 + gestaltModel.longTrimFactors.get(0).getValue(1))* gestaltModel.cutRates.get(0).getValue(0)) + (gestaltModel.cutRates.get(0).getValue(0) + gestaltModel.cutRates.get(0).getValue(2)) * gestaltModel.doubleCutWeight.getValue() * (1 + gestaltModel.longTrimFactors.get(0).getValue(1))  ;
         assertEquals(myhazard, hazawaynode, 1e-5);
 
 
@@ -393,6 +391,8 @@ public class GeneralGestaltTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         gestaltModel.initAndValidate();
+        gestaltModel.hazardAwayDict = gestaltModel.createHazardAwayDict();
+
         //////////////////test_get_hazard_away 1
         TargetStatus target_stat_start = new TargetStatus();
         ArrayList<TargetDeactTract> temp1 = new ArrayList<>();
@@ -419,7 +419,7 @@ public class GeneralGestaltTest {
         transition_wrapper.CreateStatusMap();
 
         DoubleMatrix qMat = gestaltModel.createRateMatrix(transition_wrapper);
-        Double trimlongshortboth = (1 + gestaltModel.longTrimFactors[1])* (1 + gestaltModel.longTrimFactors[0]);
+        Double trimlongshortboth = (1 + gestaltModel.longTrimFactors.get(0).getValue(1))* (1 + gestaltModel.longTrimFactors.get(0).getValue(0));
         //FIRST CHECK: row sums = 0
         Log.info.println("FULL MATRIX" + qMat);
         Log.info.println("qmat dimensions rows" + qMat.getRows());
@@ -427,32 +427,32 @@ public class GeneralGestaltTest {
         Log.info.println("first value from status map:");
 
         Double val1 = qMat.get(transition_wrapper.statusMap.get(target_stat_start),transition_wrapper.statusMap.get(target_stat1));
-        Double hazard1 = gestaltModel.doubleCutWeight * (gestaltModel.cutRates[0] + gestaltModel.cutRates[1]) + gestaltModel.cutRates[0] * gestaltModel.longTrimFactors[1] + gestaltModel.cutRates[1] * gestaltModel.longTrimFactors[0];
+        Double hazard1 = gestaltModel.doubleCutWeight.getValue() * (gestaltModel.cutRates.get(0).getValue(0) + gestaltModel.cutRates.get(0).getValue(1)) + gestaltModel.cutRates.get(0).getValue(0) * gestaltModel.longTrimFactors.get(0).getValue(1) + gestaltModel.cutRates.get(0).getValue(1) * gestaltModel.longTrimFactors.get(0).getValue(0);
         assertEquals(hazard1, val1, 1e-5);
 
 
         Double val2 = qMat.get(transition_wrapper.statusMap.get(target_stat_start),transition_wrapper.statusMap.get(target_stat2));
-        Double hazard2 = gestaltModel.doubleCutWeight * (
-                gestaltModel.cutRates[0] + gestaltModel.cutRates[3]
-                 + (gestaltModel.cutRates[0] + gestaltModel.cutRates[2]) * gestaltModel.longTrimFactors[1]
-                + (gestaltModel.cutRates[1] + gestaltModel.cutRates[3]) * gestaltModel.longTrimFactors[0]
-                 + gestaltModel.longTrimFactors[0] * (gestaltModel.cutRates[1] + gestaltModel.cutRates[2]) * gestaltModel.longTrimFactors[1]);
+        Double hazard2 = gestaltModel.doubleCutWeight.getValue() * (
+                gestaltModel.cutRates.get(0).getValue(0) + gestaltModel.cutRates.get(0).getValue(3)
+                 + (gestaltModel.cutRates.get(0).getValue(0) + gestaltModel.cutRates.get(0).getValue(2)) * gestaltModel.longTrimFactors.get(0).getValue(1)
+                + (gestaltModel.cutRates.get(0).getValue(1) + gestaltModel.cutRates.get(0).getValue(3)) * gestaltModel.longTrimFactors.get(0).getValue(0)
+                 + gestaltModel.longTrimFactors.get(0).getValue(0) * (gestaltModel.cutRates.get(0).getValue(1) + gestaltModel.cutRates.get(0).getValue(2)) * gestaltModel.longTrimFactors.get(0).getValue(1));
         assertEquals(hazard2, val2, 1e-5);
 
         Double val3 = qMat.get(transition_wrapper.statusMap.get(target_stat1),transition_wrapper.statusMap.get(target_stat2));
         Double hazard3 = (
-                gestaltModel.doubleCutWeight * (gestaltModel.cutRates[2] + gestaltModel.cutRates[3]) * (1 + gestaltModel.longTrimFactors[0])
-                 + gestaltModel.cutRates[3] * gestaltModel.longTrimFactors[0]
-                + gestaltModel.cutRates[2] * gestaltModel.longTrimFactors[1] * (1 + gestaltModel.longTrimFactors[0]));
+                gestaltModel.doubleCutWeight.getValue() * (gestaltModel.cutRates.get(0).getValue(2) + gestaltModel.cutRates.get(0).getValue(3)) * (1 + gestaltModel.longTrimFactors.get(0).getValue(0))
+                 + gestaltModel.cutRates.get(0).getValue(3) * gestaltModel.longTrimFactors.get(0).getValue(0)
+                + gestaltModel.cutRates.get(0).getValue(2) * gestaltModel.longTrimFactors.get(0).getValue(1) * (1 + gestaltModel.longTrimFactors.get(0).getValue(0)));
         assertEquals(hazard3, val3, 1e-5);
 
         Double val4 = qMat.get(transition_wrapper.statusMap.get(target_stat2),transition_wrapper.statusMap.get(target_stat2));
-        Double sumRates4_9 =  gestaltModel.cutRates[4] +gestaltModel.cutRates[5] + gestaltModel.cutRates[6] + gestaltModel.cutRates[7] + gestaltModel.cutRates[8];
+        Double sumRates4_9 =  gestaltModel.cutRates.get(0).getValue(4) + gestaltModel.cutRates.get(0).getValue(5) + gestaltModel.cutRates.get(0).getValue(6) + gestaltModel.cutRates.get(0).getValue(7) + gestaltModel.cutRates.get(0).getValue(8);
         Double hazard4 = (
-                gestaltModel.doubleCutWeight * trimlongshortboth * sumRates4_9 * 4
-                 + (1 + gestaltModel.longTrimFactors[0]) * (1 + gestaltModel.longTrimFactors[1]) * sumRates4_9)
-                 + (1 + gestaltModel.longTrimFactors[0]) * gestaltModel.cutRates[9]
-                 + gestaltModel.doubleCutWeight * (1 + gestaltModel.longTrimFactors[0]) * (sumRates4_9 + 5 * gestaltModel.cutRates[9]) ;
+                gestaltModel.doubleCutWeight.getValue() * trimlongshortboth * sumRates4_9 * 4
+                 + (1 + gestaltModel.longTrimFactors.get(0).getValue(0)) * (1 + gestaltModel.longTrimFactors.get(0).getValue(1)) * sumRates4_9)
+                 + (1 + gestaltModel.longTrimFactors.get(0).getValue(0)) * gestaltModel.cutRates.get(0).getValue(9)
+                 + gestaltModel.doubleCutWeight.getValue() * (1 + gestaltModel.longTrimFactors.get(0).getValue(0)) * (sumRates4_9 + 5 * gestaltModel.cutRates.get(0).getValue(9)) ;
         assertEquals(-hazard4, val4, 1e-5);
 
         assertEquals(0.0, qMat.get(transition_wrapper.statusMap.get(target_stat1),transition_wrapper.statusMap.get(target_stat_start)), 1e-5);

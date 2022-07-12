@@ -10,6 +10,10 @@ import java.util.List;
 
 public class TargetDeactTract extends BEASTObject {
 
+    /**
+     * This class represents realisations of a deactivating event of a specific range of targets
+     */
+
     protected int minTargDeac;
     protected int maxTargDeac;
 
@@ -24,6 +28,10 @@ public class TargetDeactTract extends BEASTObject {
 
 
     }
+
+    /**
+     * returns all possible statuses that could have lead to a DeacTract (all possible masked statuses)
+     */
 
     public List<TargetStatus> getContainedStatuses(){
         //first create an array of 0 and 1

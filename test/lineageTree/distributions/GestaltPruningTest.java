@@ -66,8 +66,9 @@ public class GestaltPruningTest {
 
 
 
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -130,7 +131,9 @@ public class GestaltPruningTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -196,7 +199,9 @@ public class GestaltPruningTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -261,7 +266,9 @@ public class GestaltPruningTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -334,7 +341,9 @@ public class GestaltPruningTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -406,7 +415,9 @@ public class GestaltPruningTest {
                 "crucialPos", crucialPos,
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -475,7 +486,9 @@ public class GestaltPruningTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -540,7 +553,9 @@ public class GestaltPruningTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -606,7 +621,9 @@ public class GestaltPruningTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -673,7 +690,9 @@ public class GestaltPruningTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -739,7 +758,9 @@ public class GestaltPruningTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -805,7 +826,9 @@ public class GestaltPruningTest {
                 "crucialPos", crucialPos,
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -871,7 +894,9 @@ public class GestaltPruningTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -943,7 +968,9 @@ public class GestaltPruningTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -1029,7 +1056,9 @@ public class GestaltPruningTest {
                 "crucialPos", crucialPos,
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -1114,7 +1143,9 @@ public class GestaltPruningTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -1198,7 +1229,9 @@ public class GestaltPruningTest {
                 "crucialPos", crucialPos,
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -1274,7 +1307,9 @@ public class GestaltPruningTest {
                 "crucialPos", crucialPos,
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 
@@ -1353,7 +1388,9 @@ public class GestaltPruningTest {
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
         likelihood.substitutionModel = gestaltModel;
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData);
+        Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
+
+        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
 
         System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
 

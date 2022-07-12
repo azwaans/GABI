@@ -1,5 +1,7 @@
 package lineageTree.substitutionmodel;
 
+import beast.core.Citation;
+import beast.core.Description;
 import beast.core.Input;
 import beast.core.parameter.IntegerParameter;
 import beast.core.parameter.RealParameter;
@@ -16,25 +18,27 @@ import cern.jet.random.Poisson;
 import cern.jet.random.engine.RandomEngine;
 import org.jblas.DoubleMatrix;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Stream;
 import java.util.*;
 import org.apache.commons.math3.util.Pair;
-import org.jblas.MatrixFunctions;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static org.jblas.DoubleMatrix.*;
 import static org.jblas.MatrixFunctions.*;
 
+@Description("Mutation model of GESTALT barcode evolution, as described in Feng et Al, 2021. Stores model parameters and processes them for calculation of the tree likelihood. ")
+@Citation(value =
+        "Feng J et Al. (2021) Estimation of cell lineage trees a\n"+
+                "  by maximum-likelihood phylogenetics \n" +
+                "  15.1:343-362.", DOI = "10.1214/20-AOAS1400", year = 2021, firstAuthorSurname = "feng")
 
 public class GeneralGestalt extends SubstitutionModel.Base {
 
-        //metadata inputs
+
+    //metadata inputs
          public Input<String> uneditedBarcodeInput = new Input<>("barcodeSequence",
                 "The exact sequence of the unedited barcode, split in targets and spacers.");
          public Input<Integer> cutSiteInput = new Input<>("cutSite",
@@ -74,29 +78,42 @@ public class GeneralGestalt extends SubstitutionModel.Base {
             "Penalty parameter for target cut rates",0.01);
 
 
-        //TODO remove this
-        /**
-         * flag to indicate matrix is up to date *
-         */
-        //protected boolean updateMatrix = false;
+
 
         //processed metadata
-        Integer numTargets;
+        static Integer numTargets;
         public BarcodeMeta metaData;
 
         //target cut parameters
-        public Double[] cutRates = {1.09459452, 1.03371947, 1.02624685};
-        public Double doubleCutWeight = 0.03;
+        //public Double[] cutRates = {1.09459452, 1.03371947, 1.02624685};
+        public List<RealParameter> cutRates;
+
+        //public Double doubleCutWeight = 0.03;
+        public RealParameter doubleCutWeight;
+
         //toy example clt_calc: public Double doubleCutWeight = 0.3;
         //tune_topology: public Double doubleCutWeight = 0.1;
 
         //indel parameters
-        public Double[] longTrimFactors = {0.04,0.04};
-        public Double[] trimZeroProbs = {0.5,0.5,0.5,0.5};
-        public Double[] trimShortParams = {3.0,3.0};
-        public Double[] trimLongParams = {3.0,3.0};
-        Double insertZeroProb = 0.5;
-        Double[] insertParams = {2.0};
+        //public Double[] longTrimFactors = {0.04,0.04};
+        public List<RealParameter> longTrimFactors;
+
+        //public Double[] trimZeroProbs = {0.5,0.5,0.5,0.5};
+        public List<RealParameter> trimZeroProbs;
+
+       //public Double[] trimShortParams = {3.0,3.0};
+        public List<RealParameter> trimShortParams;
+
+        //public Double[] trimLongParams = {3.0,3.0};
+        public List<RealParameter> trimLongParams;
+
+        //Double insertZeroProb = 0.5;
+        RealParameter insertZeroProb;
+
+
+        //Double[] insertParams = {2.0};
+        List<RealParameter> insertParams;
+
         //toy example clt_calc: Double[] insertParams = {2.0};
         //tune_topology: Double[] insertParams = {1.0};
         boolean usePoisson= true;
@@ -106,21 +123,31 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         public Double branchLensPenalty = 0.0;
 
 
-        //Computed/rearranged model parameters
-        DoubleMatrix trimShortParams_reshaped;
-        DoubleMatrix trimLongParams_reshaped;
+
         public Hashtable<TargetStatus, Double> hazardAwayDict;
-        Hashtable<IndelSet.Singleton,Integer> singletonIndexDict = new Hashtable<>();
-        DoubleMatrix singletonLogCondProb;
-        DoubleMatrix singletonCondProb;
+        static Hashtable<IndelSet.Singleton,Integer> singletonIndexDict = new Hashtable<>();
+
+
+
+
+
         DoubleMatrix trimZeroProbsDict = DoubleMatrix.zeros(2,2);
         Poisson insertDist;
         List<AbstractDiscreteDistribution> delShortDist;
         List<AbstractDiscreteDistribution> delLongDist;
-        Hashtable<TargetStatus, Hashtable<TargetStatus, List<IndelSet.TargetTract>>> targStatTransitionsDict;
-        public DoubleMatrix targetTractHazards;
-        public Hashtable<IndelSet.TargetTract,Integer> targetTractDict;
-        Hashtable<TargetStatus,Hashtable<TargetStatus,DoubleMatrix>> targ_stat_transition_hazards_dict;
+
+        //conditional probabilities of the trims, this needs to be updated for each move involving parameter changes
+        static DoubleMatrix singletonCondProb;
+
+        //dictionary for storing hazards between target statuses -- assuming all moves are possible
+        public static Hashtable<TargetStatus, Hashtable<TargetStatus, List<IndelSet.TargetTract>>> targStatTransitionsDict;
+
+        // precalculcated hazards for all the target tracts to speed up overall calculation
+        public static DoubleMatrix targetTractHazards;
+        public static Hashtable<IndelSet.TargetTract,Integer> targetTractDict;
+
+        //this is to store hazards to potentially avoid recalculation
+        public static Hashtable<TargetStatus,Hashtable<TargetStatus,DoubleMatrix>> targ_stat_transition_hazards_dict;
 
 
 
@@ -139,44 +166,53 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         numTargets = metaData.nTargets;
 
         //target cut parameters
-        cutRates = cutRatesInput.get().get(0).getValues();
-        doubleCutWeight = doubleCutWeightInput.get().getValue();
+        //cutRates = cutRatesInput.get().get(0);
+        cutRates = cutRatesInput.get();
+
+        //doubleCutWeight = doubleCutWeightInput.get().getValue();
+        doubleCutWeight = doubleCutWeightInput.get();
 
         //indel parameters
-        longTrimFactors = longTrimFactorsInput.get().get(0).getValues();
-        insertZeroProb = insertZeroProbInput.get().getValue();
-        trimZeroProbs = trimZeroProbsInput.get().get(0).getValues();
-        trimShortParams = trimShortParamsInput.get().get(0).getValues();
-        trimLongParams = trimLongParamsInput.get().get(0).getValues();
-        insertParams = insertParamsInput.get().get(0).getValues();
+        //longTrimFactors = longTrimFactorsInput.get().get(0).getValues();
+        longTrimFactors = longTrimFactorsInput.get();
 
+        //insertZeroProb = insertZeroProbInput.get().getValue();
+        insertZeroProb = insertZeroProbInput.get();
+
+        //trimZeroProbs = trimZeroProbsInput.get().get(0).getValues();
+        trimZeroProbs = trimZeroProbsInput.get();
+
+        //trimShortParams = trimShortParamsInput.get().get(0).getValues();
+        trimShortParams = trimShortParamsInput.get();
+
+        //trimLongParams = trimLongParamsInput.get().get(0).getValues();
+        trimLongParams = trimLongParamsInput.get();
+
+        //insertParams = insertParamsInput.get().get(0).getValues();
+        insertParams = insertParamsInput.get();
 
         //penalization parameters
         branchLensPenalty = branchPenParamInput.get();
         cutRatesPenalty =  targetLamPenParamInput.get();
 
-        //to remove
-        nrOfStates = cutRatesInput.get().get(0).getDimension() + 2;
 
+        for (int i = 0; i< cutRates.size(); i++){
 
-        for (int i=0; i<cutRates.length; i++){
-
-            if (cutRates[i] <= 0) {
+            if (cutRates.get(i).getValue() <= 0) {
                 throw new RuntimeException("All cut rates must be positive!");
             }
 
         }
 
-        // check cut rates
-        for (int i=0; i<longTrimFactors.length; i++){
 
-            if (longTrimFactors[i] > 1 || longTrimFactors[i] < 0) {
+        for (int i=0; i<longTrimFactors.size(); i++){
+
+            if (longTrimFactors.get(i).getValue() > 1 ||longTrimFactors.get(i).getValue() < 0) {
                 throw new RuntimeException("long trim factors are assumed to be less than 1");
             }
 
         }
-
-        if (doubleCutWeight <= 0) {
+        if (doubleCutWeight.getValue() <= 0) {
             throw new RuntimeException("Double cut weight must be positive!");
         }
 
@@ -185,17 +221,13 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         }
 
 
-        trimZeroProbsDict.put(0,0,trimZeroProbs[0]);
-        trimZeroProbsDict.put(0,1,trimZeroProbs[1]);
-        trimZeroProbsDict.put(1,0,trimZeroProbs[2]);
-        trimZeroProbsDict.put(1,1,trimZeroProbs[3]);
-
-
         targStatTransitionsDict = TargetStatus.getAllTransitions(numTargets);
         Pair<DoubleMatrix,Hashtable<IndelSet.TargetTract,Integer>> doubleMatrixHashtablePair = createAllTargetTractHazards();
 
         targetTractHazards = doubleMatrixHashtablePair.getFirst();
         targetTractDict = doubleMatrixHashtablePair.getSecond();
+
+
         targ_stat_transition_hazards_dict = new Hashtable<>();
 
         for(TargetStatus stat:targStatTransitionsDict.keySet()) {
@@ -203,160 +235,13 @@ public class GeneralGestalt extends SubstitutionModel.Base {
             targ_stat_transition_hazards_dict.put(stat,empty);
         }
 
-        hazardAwayDict = createHazardAwayDict();
-
-        trimLongParams_reshaped = new DoubleMatrix(2,1);
-        trimLongParams_reshaped.put(0,trimLongParams[0]);
-        trimLongParams_reshaped.put(1,trimLongParams[1]);
-
-        trimShortParams_reshaped = new DoubleMatrix(2,1);
-        trimShortParams_reshaped.put(0,trimShortParams[0]);
-        trimShortParams_reshaped.put(1,trimShortParams[1]);
 
     }
 
-    public Double createTopologyLogLikelihood(beast.evolution.tree.TreeInterface tree, Hashtable<Integer, TransitionWrap> transitionWrappers) {
-        Integer rootNodeID = tree.getRoot().getNr();
-        Hashtable<Integer, DoubleMatrix> transMats = new Hashtable<>();
-        //TODO check that
-        //Hashtable<Integer, DoubleMatrix> Ddiags = new Hashtable<>();
-        Hashtable<Integer, DoubleMatrix> ptMats = new Hashtable<>();
-        Hashtable<Integer, DoubleMatrix> down_probs_dict= new Hashtable<>();
-        Hashtable<Integer, DoubleMatrix> LProb = new Hashtable<>();
-        Hashtable<Integer, Double> logScalingTerms = new Hashtable<>();
-        for (Node node:tree.listNodesPostOrder(null,null)) {
-            if(node.isLeaf()) {
-                //Log.info.println("NODE IS LEAF");
-
-                TransitionWrap nodeWrap = transitionWrappers.get(node.getNr());
-                DoubleMatrix probArray = DoubleMatrix.zeros(nodeWrap.numStatuses+1,1);
-                TargetStatus LEAF = nodeWrap.leafState;
-                //Log.info.println(Arrays.asList(LEAF.getBinaryStatus(10)));
-                Integer observedKey = nodeWrap.statusMap.get(nodeWrap.leafState);
-                //Log.info.println("size of the status map"+nodeWrap.statusMap.size());
-                //Log.info.println("printing the observed key :"+observedKey);
-                //Log.info.println("printing the node number :"+node.getNr());
-                //Log.info.println("printing the node ID :"+node.getID());
-                //Log.info.println("IS the node a leaf"+node.isLeaf());
-
-                probArray.put(observedKey,1.0);
-                LProb.put(node.getNr(),probArray);
-            }
-            else {
-                //Log.info.println("NODE IS NOT LEAF");
-
-                TransitionWrap nodeWrap = transitionWrappers.get(node.getNr());
-                DoubleMatrix logLprobNode = initializeLowerLogProb(nodeWrap,node);
-                //Log.info.println("initial logLprobNode"+ logLprobNode);
-
-                DoubleMatrix hasPosProb = DoubleMatrix.ones(1);
-                for (Node child: node.getChildren()) {
-
-                    //Log.info.println("CHILD NODE");
-
-                    TransitionWrap childNodeWrap = transitionWrappers.get(child.getNr());
-                    //TODO check the trim probs init
-                    //trans_mats[child.node_id], trim_probs[child.node_id] = self._create_transition_matrix(
-                    //                        child_wrapper)
-                    DoubleMatrix childMat = createRateMatrix(childNodeWrap);
-                    //Log.info.println("childMat " + childMat);
-
-                    transMats.put(child.getNr(),childMat);
-                   /* DoubleMatrix expInput = new DoubleMatrix((childMat.toArray2()));*/
-                    childMat.muli(node.getHeight() - child.getHeight());
-
-                    DoubleMatrix ptMat = expm(childMat);
-                    //Log.info.println("ptMat " + ptMat);
-                    //TODO check AFTER THIS
-
-                    ptMats.put(child.getNr(),ptMat);
-                    //TO DO check matrix multiplication IS CORRECT, JUST CAREFUL WITH DECIMALS !
-
-                    DoubleMatrix chOrderedDownProbs = ptMat.mmul(LProb.get(child.getNr()));
-
-                    DoubleMatrix downProbs = new DoubleMatrix();
-                    if (! node.isRoot()) {
-                        nodeWrap = transitionWrappers.get(node.getNr());
-                        downProbs = reorderLikelihoods(chOrderedDownProbs,nodeWrap,childNodeWrap);
-
-                    //TODO CHECK BEFORE THIS
-                    }
-                    //ROOT BLOCK!!!!
-                    else {
-                        //Log.info.println("ROOT block !");
-                        Integer chId = childNodeWrap.statusMap.get(new TargetStatus());
-                        double downProb = chOrderedDownProbs.get(chId);
-                        downProb = max(downProb,0.0);
-                        downProbs = new DoubleMatrix(1,1,downProb);
-                        down_probs_dict.put(chId,downProbs);
-                        //Log.info.println("en of ROOT block !");
-                        //CORRECT UNTIL NOW!!!!
-                    }
-
-                    /*if (child.isLeaf()) {
-                    //TODO change the abundance weight
-                    Double leafAbundanceWeight = 1.0;
-                    }*/
-                    Double leafAbundanceWeight = 1.0;
-                    hasPosProb = downProbs.ge(0);
-                    //TODO LOSS OF DOWN PROBS DIMENSION!!!!
-
-                    //ISSUE WITH THE ADDI ??
-                    //Log.info.println("logLprobNode before" + logLprobNode );
-                   // Log.info.println("downProbs before" + downProbs );
-                   // Log.info.println("hasPosProb" + hasPosProb );
-                    Double dummy = downProbs.add((hasPosProb.neg()).add(1).mul( 1e-30 )).get(0);
-                    NumberFormat formatter = new DecimalFormat();
-
-                    //Log.info.println("downProbs.addi((hasPosProb.neg()).add(1).mul( 1e-30 )) non zero!" + (formatter.format(dummy)));
-                    //Log.info.println("is it  > 0 ?" + (dummy > 0) );
-                    //Log.info.println("is it  = 0 ?" + (dummy == 0) );
-                    //Log.info.println("log of that" + log(dummy) );
-                    //Log.info.println("log of that" + log(dummy) );
-                    //proctection against states with zero probability.
-
-                    logLprobNode = logLprobNode.addi(logi(downProbs.addi((hasPosProb.neg()).add(1).mul( 1e-30 ))))  ;
-                    //Log.info.println("logLprobNode after" + logLprobNode);
-                    //Log.info.println("END CHILD NODE ITER");
-
-                }
-               //Log.info.println("logLprobNode" + logLprobNode);
-                Double logScalingTerm = logLprobNode.max();
-                LProb.put(node.getNr(),expi((logLprobNode.subi(logScalingTerm)).muli(hasPosProb)));
-                logScalingTerms.put(node.getNr(), logScalingTerm);
-            }
 
 
 
-        }
-       // Log.info.println("LProb" + LProb.get(0).get(1) *1000000000);
-        Collection<Double> logScalingTermsAll = logScalingTerms.values();
-        //Log.info.println("logScalingTermsAll" + logScalingTermsAll);
-
-        List<Double> terms = new ArrayList<>(logScalingTermsAll);
-        Double fullScaling = 0.0;
-        for(int i = 0; i < terms.size();++i) {
-            fullScaling = fullScaling + terms.get(i);
-        }
-        DoubleMatrix logLikAlleles = log(LProb.get(rootNodeID)).addi(fullScaling);
-        //Log.info.println("logLikAlleles" + logLikAlleles);
-        //Log.info.println("fullScaling" + fullScaling);
-        /*Lprob = Lprob;
-        down_probs_dict = down_probs_dict;
-        pt_matrix = pt_matrix;
-       trans_mats = trans_mats;
-        trim_probs = trim_probs;*/
-//        if(Double.isNaN(logLikAlleles.get(0))) {
-//            Log.info.println("is NAN");
-//            return Double.NEGATIVE_INFINITY;
-//        }
-//        else {
-            return logLikAlleles.get(0);
-//        }
-    }
-
-
-    DoubleMatrix reorderLikelihoods(DoubleMatrix orderedDownProbs, TransitionWrap newWrapper, TransitionWrap oldWrapper) {
+    public static DoubleMatrix reorderLikelihoods(DoubleMatrix orderedDownProbs, TransitionWrap newWrapper, TransitionWrap oldWrapper) {
       List<Pair<Integer,Double>> indexVals = new ArrayList<>();
         for (TargetStatus newstat: newWrapper.transStatuses ) {
             if (oldWrapper.statusMap.containsKey(newstat)) {
@@ -370,19 +255,15 @@ public class GeneralGestalt extends SubstitutionModel.Base {
       return downProbs;
     }
 
-
-
-    public DoubleMatrix initializeLowerLogProb(TransitionWrap nodeWrap, Node node) {
-        //HERE WE ARE WORKING WITH BIFURCATIONS, THERE ARE NO UNRESOLVED MULTIFURACTIONS, as in the original code.
-        DoubleMatrix zero = DoubleMatrix.zeros(1);
-        return zero;
-    }
-
+    /**
+     * Calculates the rates at which all possible target tracts are introduced in the barcode, and maps each target tract rate to its index.
+     */
     public Pair<DoubleMatrix,Hashtable<IndelSet.TargetTract,Integer>> createAllTargetTractHazards() {
         TargetStatus targetStatusAllActive = new TargetStatus();
         List<IndelSet.TargetTract> allTargetTracts = targetStatusAllActive.getPossibleTargetTracts(new ArrayList<>(),metaData.nTargets);
         Hashtable<IndelSet.TargetTract,Integer> ttDict = new Hashtable<>();
-        for(int i = 0;i<allTargetTracts.size();i++) {
+        int size = allTargetTracts.size();
+        for(int i = 0;i<size;i++) {
             ttDict.put(allTargetTracts.get(i),i);
         }
         int nTTs = allTargetTracts.size();
@@ -390,7 +271,8 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         DoubleMatrix maxTargets = new DoubleMatrix(nTTs);
         DoubleMatrix longLeftStatuses = new DoubleMatrix(nTTs);
         DoubleMatrix longRightStatuses = new DoubleMatrix(nTTs);
-        for(int i=0;i<allTargetTracts.size();i++ ) {
+        size = allTargetTracts.size();
+        for(int i=0;i<size;i++ ) {
             IndelSet.TargetTract currentTT = allTargetTracts.get(i);
             minTargets.put(i,currentTT.getminTarg());
             maxTargets.put(i,currentTT.getmaxTarg());
@@ -401,24 +283,26 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         DoubleMatrix allHazards = createHazardTargetTract(minTargets, maxTargets, longLeftStatuses, longRightStatuses);
         return new Pair(allHazards,ttDict);
 
-
     }
 
 
 
 
-
+    /**
+     * calculates the rates at which target tracts are introduced in the barcode given the targets cut, and the length of the deletion (short/long) at each side of the cut
+     */
     public DoubleMatrix createHazardTargetTract(DoubleMatrix minTargets, DoubleMatrix maxTargets,DoubleMatrix longLeftStatuses, DoubleMatrix longRightStatuses ) {
 
-        //TODO CAREFUL BECAUSE DOUBLEMATRIX FUNCTIONS ARE IN PLACE FUNCTIONS!!
+
         DoubleMatrix logLeftTrimFactor = new DoubleMatrix(longLeftStatuses.length);
         DoubleMatrix logRightTrimFactor = new DoubleMatrix(longRightStatuses.length);
-        for(int i=0;i< longLeftStatuses.length;i++ ){
+        int length = longLeftStatuses.length;
+        for(int i=0;i< length;i++ ){
             if(longLeftStatuses.get(i) == 1.0) {
-                logLeftTrimFactor.put(i,log(longTrimFactors[0])); }
+                logLeftTrimFactor.put(i,log(longTrimFactors.get(0).getValue(0))); }
             else { logLeftTrimFactor.put(i,0.0); }
             if(longRightStatuses.get(i) == 1.0) {
-                logRightTrimFactor.put(i,log(longTrimFactors[1])); }
+                logRightTrimFactor.put(i,log(longTrimFactors.get(0).getValue(1))); }
             else { logRightTrimFactor.put(i,0.0); }
         }
 
@@ -426,9 +310,10 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
         DoubleMatrix gatheredTargetLamMin = new DoubleMatrix(minTargets.length);
         DoubleMatrix gatheredTargetLamMax = new DoubleMatrix(minTargets.length);
-        for(int i=0;i<minTargets.length;i++) {
-            gatheredTargetLamMin.put(i,cutRates[(int) minTargets.get(i)]);
-            gatheredTargetLamMax.put(i,cutRates[(int) maxTargets.get(i)]);
+        length = minTargets.length;
+        for(int i=0;i<length;i++) {
+            gatheredTargetLamMin.put(i, cutRates.get(0).getValue((int) minTargets.get(i)));
+            gatheredTargetLamMax.put(i, cutRates.get(0).getValue((int) maxTargets.get(i)));
 
         }
 
@@ -445,19 +330,11 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         logDoubleLambdaPart.addi(logLeftTrimFactor);
         logDoubleLambdaPart.addi(logRightTrimFactor);
         logDoubleLambdaPart.addi(logi(gatherMinandMax));
-        logDoubleLambdaPart.addi(log(doubleCutWeight));
-        //HERE SHOULD GET SOME POSITIVE VALUES!!
-
-       /* (log_left_trim_factor
-                + tf.log(tf.gather(self.target_lams, min_target) + tf.gather(self.target_lams, max_target))
-                + log_right_trim_factor
-                + tf.log(self.double_cut_weight))*/
-
-
+        logDoubleLambdaPart.addi(log(doubleCutWeight.getValue()));
 
         DoubleMatrix hazard = new DoubleMatrix(minTargets.length);
-
-        for(int i=0;i<minTargets.length;i++) {
+        length = minTargets.length;
+        for(int i=0;i<length;i++) {
             if(minTargets.get(i) == maxTargets.get(i)) {
                 hazard.put(i,logFocalLambdaPart.get(i));
             }
@@ -474,52 +351,10 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
 
 
-    /*
-    Calculate transition probability matrix for loss without editing
-    The transition probability matrix for loss with editing differs only in the first row.
-     */
-    public void getLossProbabilities(double[] matrix, double expOfDeltaLoss){
-
-        // fill diagonal and final column
-        for (int i=0; i<nrOfStates; i++){
-            for (int j=0; j<nrOfStates; j++){
-
-                if ( i==j ){
-                    matrix[i*nrOfStates + j] = expOfDeltaLoss;
-                }else if(j == nrOfStates-1){
-                    matrix[i*nrOfStates + j] = 1 - expOfDeltaLoss;
-                }else{
-                    matrix[i*nrOfStates + j] = 0;
-                }
-            }
-        }
-        // set final diagonal element to 1
-        matrix[nrOfStates * nrOfStates - 1] = 1;
-    }
-
     @Override
     public void getTransitionProbabilities(Node node, double startTime, double endTime, double rate, double[] matrix) {
 
-       /* double delta = startTime - endTime;
-        double expOfDeltaLoss = Math.exp(-delta * lossRate);
 
-        // calculate transition probabilities for loss process
-        getLossProbabilities(matrix, expOfDeltaLoss);
-
-        // for loss & editing, add the editing transition probabilities
-        if ( (endTime >= (editingHeight - editingDuration)) & (endTime < editingHeight)){
-
-            Stream<Double> scarSum = Stream.of(scarRates);
-            Double scarRateSum = scarSum.reduce(0.0, (subtotal, element) -> subtotal + element);
-            //.sum();
-
-            // fill first row
-            matrix[0] = Math.exp(-delta * (lossRate + scarRateSum));
-            for (int i=0; i<nrOfStates-2; i++){
-                matrix[i+1] = (scarRates[i] * expOfDeltaLoss - scarRates[i] * Math.exp(-delta * (lossRate + scarRateSum))) / scarRateSum;
-            }
-            matrix[nrOfStates-1] = 1 - expOfDeltaLoss;
-        }*/
     }
 
     @Override
@@ -531,15 +366,13 @@ public class GeneralGestalt extends SubstitutionModel.Base {
     }
 
 
-
+    /**
+     * Creates the instantaneous transition matrix of the aggregated Markov chain
+     */
     public DoubleMatrix createRateMatrix(TransitionWrap wrapper) {
 
-        Integer matrxLen = wrapper.numStatuses + 1;
         DoubleMatrix targTractLeft = createMarginalTransitionMatrixLeft(wrapper);
         DoubleMatrix trimProbsLeft = createTrimInstantProbMatrixLeft(wrapper);
-
-        //TODO CHECK IF TENSORS ARE FINITE
-
 
         DoubleMatrix qMatrix = targTractLeft.muli(trimProbsLeft);
         DoubleMatrix lastColumn = qMatrix.rowSums();
@@ -550,7 +383,9 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
     }
 
-
+    /**
+     * Creates the matrix for rates for the introduction of target tracts into barcodes with specific satuses.
+     */
     public DoubleMatrix createMarginalTransitionMatrixLeft(TransitionWrap wrapper) {
         //first component in the factorization
         //                of the instantaneous transition rates, the part that deals with the target status
@@ -650,7 +485,13 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
     }
 
-    public DoubleMatrix createTrimInstantProbMatrixLeft(TransitionWrap childWrap){
+    /**
+     * Creates the matrix of conditional probabilities of each trim.
+     * The entry in (i,j) is the trim probability for transitioning from target status i
+     *  to target status j.
+     */
+
+    public static DoubleMatrix createTrimInstantProbMatrixLeft(TransitionWrap childWrap){
         //The second component when factorizing the instantaneous transition rates
         //                between the meta-states. This is the matrix of conditional probabilities of each trim.
         //                So the entry in (i,j) is the trim probability for transitioning from target status i
@@ -700,21 +541,14 @@ public class GeneralGestalt extends SubstitutionModel.Base {
                         sparseIndices.add(new Pair(startKey,endKey));
                         IndelSet.Singleton sg = (IndelSet.Singleton) singletonSet.toArray()[0];
                         Double trimProbVal = singletonCondProb.get(singletonIndexDict.get(sg));
-                        //sparseVals.add(trimProbVal -1 );
                         sparseVals.add(trimProbVal);
-                        //Log.info.println(" trimProbVal" + trimProbVal);
-                        //Log.info.println(" 1 + trimProbVal -1" + (1+ trimProbVal -1));
-                        //Log.info.println(" trimProbVal -1" + (trimProbVal -1));
-                        //Log.info.println(" trimProbVal -1" + (trimProbVal -1));
-                        //Log.info.println(" equals -1.0 or not" + ((trimProbVal -1) == -1.0));
+
 
 
 
                     }
                     else if (singletonSet.size()>1) {
                         sparseIndices.add(new Pair(startKey,endKey));
-                        //Log.info.println("LENGTH superior to 1");
-                        //sparseVals.add(-1.0);
                         sparseVals.add(0.0);
                     }
 
@@ -728,18 +562,11 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         int outputLength = childWrap.numStatuses+1;
         int[] outputShape = new int[] {outputLength,outputLength -1};
         if(sparseVals.size() !=0) {
-            //DoubleMatrix zeroes = DoubleMatrix.zeros(outputShape[0],outputShape[1]);
         DoubleMatrix qMatrixLeft = DoubleMatrix.ones(outputShape[0],outputShape[1]);
         for(int i=0;i<sparseIndices.size();i++) {
-           // Log.info.println(" tobereturned sparsevals" + (sparseVals.get(i)));
-            //Log.info.println("filling tobereturned" + (1.0 + sparseVals.get(i)));
-            //qMatrixLeft.put(sparseIndices.get(i).getFirst(),sparseIndices.get(i).getSecond(),1.0 + sparseVals.get(i));
             qMatrixLeft.put(sparseIndices.get(i).getFirst(),sparseIndices.get(i).getSecond(), sparseVals.get(i));
 
-
-
         }
-            //qMatrixLeft.max(zeroes);
         return qMatrixLeft;
         }
         else{
@@ -748,24 +575,23 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
     }
 
-
+    /**
+     *  returns a matrix of hazards of transitioning away from specific target statuses
+     */
     public DoubleMatrix createHazardAwayTargetStatuses(List<TargetStatus> targetStatuses) {
 
         //For each target status create a corresponding vector containing the associated cut rate or 0 if it is already
         //inactive
-
         DoubleMatrix activeTargetHazards = DoubleMatrix.zeros(targetStatuses.size(),numTargets);
         DoubleMatrix activeMasks = DoubleMatrix.zeros(targetStatuses.size(),numTargets);
         for(int i=0;i<targetStatuses.size();++i) {
             Integer[] binaryrep = targetStatuses.get(i).getBinaryStatus(numTargets);
             for(int j=0; j<numTargets; j++) {
                 activeMasks.put(i,j, 1 - binaryrep[j]);
-                activeTargetHazards.put(i,j,activeMasks.get(i,j) * cutRates[j]);
+                activeTargetHazards.put(i,j,activeMasks.get(i,j) * cutRates.get(0).getValue(j));
             }
         }
 
-
-        // TODO CHECK THAT if the barcode only contains a single target, just return the cut rates as is:
         if(numTargets == 1) {
             return activeTargetHazards.getColumn(0);
         }
@@ -776,38 +602,28 @@ public class GeneralGestalt extends SubstitutionModel.Base {
             indicesInner[i-1] = i;
         }
 
-
-        DoubleMatrix focalHazards = ((activeTargetHazards.getColumn(0)).muli(1+ longTrimFactors[1])).addi(((activeTargetHazards.getColumns(indicesInner)).rowSums()).muli((1+ longTrimFactors[1])*(1+longTrimFactors[0]))).addi((activeTargetHazards.getColumn(activeTargetHazards.getColumns()-1)).muli(1+ longTrimFactors[0]));
+        DoubleMatrix focalHazards = ((activeTargetHazards.getColumn(0)).muli(1+ longTrimFactors.get(0).getValue(1))).addi(((activeTargetHazards.getColumns(indicesInner)).rowSums()).muli((1+ longTrimFactors.get(0).getValue(1))*(1+longTrimFactors.get(0).getValue(0)))).addi((activeTargetHazards.getColumn(activeTargetHazards.getColumns()-1)).muli(1+ longTrimFactors.get(0).getValue(0)));
         DoubleMatrix middleHazards = (activeTargetHazards.getColumns(indicesInner).rowSums()) ;
         DoubleMatrix numMiddle = (activeMasks.getColumns(indicesInner).rowSums()) ;
-        DoubleMatrix middleDoubleCutHazards = middleHazards.muli((numMiddle.subi(1)).muli((1 + longTrimFactors[0])*(1 + longTrimFactors[1])));
-        //(1 + self.trim_long_factor[0]) * (1 + self.trim_long_factor[1]) * (num_in_middle - 1) * middle_hazards
-
-        //CORRECT UNTIL HERE
-
+        DoubleMatrix middleDoubleCutHazards = middleHazards.muli((numMiddle.subi(1)).muli((1 + longTrimFactors.get(0).getValue(0))*(1 + longTrimFactors.get(0).getValue(1))));
         DoubleMatrix numAfterStarts = (activeMasks.getColumns(indicesInner).rowSums());
-        DoubleMatrix startToOtherHazard = activeMasks.getColumn(0).muli(1 + longTrimFactors[1]).muli((numAfterStarts.muli(activeTargetHazards.getColumn(0))).addi((activeTargetHazards.getColumns(indicesInner).rowSums())));
-       /* start_to_other_hazard = active_masks[:,0] * (1 + self.trim_long_factor[1]) * (
-                num_after_start * active_targ_hazards[:, 0] + tf.reduce_sum(active_targ_hazards[:, 1:-1], axis=1))*/
-
+        DoubleMatrix startToOtherHazard = activeMasks.getColumn(0).muli(1 + longTrimFactors.get(0).getValue(1)).muli((numAfterStarts.muli(activeTargetHazards.getColumn(0))).addi((activeTargetHazards.getColumns(indicesInner).rowSums())));
         DoubleMatrix numBeforeEnd = (activeMasks.getColumns(indicesInner).rowSums());
-
-        DoubleMatrix endToOtherHazard = (activeMasks.getColumn(activeMasks.getColumns()-1)).muli(1 + longTrimFactors[0]).muli((numBeforeEnd).muli((activeTargetHazards.getColumn(activeTargetHazards.getColumns()-1))).addi((activeTargetHazards.getColumns(indicesInner).rowSums())));
-
-       /* active_masks[:,-1] * (1 + self.trim_long_factor[0]) * (
-                num_before_end * active_targ_hazards[:, -1] + tf.reduce_sum(active_targ_hazards[:, 1:-1], axis=1))*/
-        //correct!
+        DoubleMatrix endToOtherHazard = (activeMasks.getColumn(activeMasks.getColumns()-1)).muli(1 + longTrimFactors.get(0).getValue(0)).muli((numBeforeEnd).muli((activeTargetHazards.getColumn(activeTargetHazards.getColumns()-1))).addi((activeTargetHazards.getColumns(indicesInner).rowSums())));
         DoubleMatrix startToEndHazards = (activeMasks.getColumn(0)).muli(activeMasks.getColumn(activeMasks.getColumns()-1)).muli((activeTargetHazards.getColumn(0).addi(activeTargetHazards.getColumn(activeTargetHazards.getColumns()-1))));
-        /*active_masks[:,0] * active_masks[:,-1] * (
-                active_targ_hazards[:, 0] + active_targ_hazards[:, -1])*/
 
-        DoubleMatrix hazardAwayNodes = focalHazards.addi((middleDoubleCutHazards.addi(startToOtherHazard).addi(endToOtherHazard).addi(startToEndHazards)).muli(doubleCutWeight));
+
+        DoubleMatrix hazardAwayNodes = focalHazards.addi((middleDoubleCutHazards.addi(startToOtherHazard).addi(endToOtherHazard).addi(startToEndHazards)).muli(doubleCutWeight.getValue()));
 
         return hazardAwayNodes;
 
 
 
     }
+
+    /**
+     * get all possible singletons from the computed set of ancestral states  for a specific tree and leaf sequences
+     */
 
     public static List<IndelSet.Singleton> getAllSingletons(beast.evolution.tree.TreeInterface tree,Hashtable<Integer, AncStates> statesDict ) {
         Set<IndelSet.Singleton> singletonSet = new HashSet();
@@ -829,15 +645,11 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
     }
 
-    /*def get_all_singletons(topology: CellLineageTree):
-    singletons = set()
-        for leaf in topology:
-            for leaf_anc_state in leaf.anc_state_list:
-            for singleton_wc in leaf_anc_state.indel_set_list:
-    sg = singleton_wc.get_singleton()
-            singletons.add(sg)
-            return singletons*/
 
+
+    /**
+     * get all possible conditional probabilities of the trims (all at once to speed the computation)
+     */
 
     public void initSingletonProbs(List<IndelSet.Singleton> singletons) {
 
@@ -846,21 +658,35 @@ public class GeneralGestalt extends SubstitutionModel.Base {
             singletonIndexDict.put(singletons.get(i),i);
         }
         createTrimInsertDistributions(singletons.size());
-        singletonLogCondProb = createLogIndelProbs(singletons);
-        //Log.info.println("singletonLogCondProb" + singletonLogCondProb);
-        singletonCondProb = expi(singletonLogCondProb);
+
+        singletonCondProb = expi(createLogIndelProbs(singletons));
         //Log.info.println("singletonCondProb" + singletonCondProb);
 
 
     }
 
-    public void createTrimInsertDistributions(int numSingletons) {
+    /**
+     * Creates the basic trim + insert helper distributions
+     */
 
+    public void createTrimInsertDistributions(int numSingletons) {
+        DoubleMatrix trimLongParams_reshaped = new DoubleMatrix(2,1);
+//        trimLongParams_reshaped.put(0,trimLongParams[0]);
+//        trimLongParams_reshaped.put(1,trimLongParams[1]);
+        trimLongParams_reshaped.put(0,trimLongParams.get(0).getValue(0));
+        trimLongParams_reshaped.put(1,trimLongParams.get(0).getValue(1));
+
+        DoubleMatrix trimShortParams_reshaped = new DoubleMatrix(2,1);
+//        trimShortParams_reshaped.put(0,trimShortParams[0]);
+//        trimShortParams_reshaped.put(1,trimShortParams[1]);
+        trimShortParams_reshaped.put(0,trimShortParams.get(0).getValue(0));
+        trimShortParams_reshaped.put(1,trimShortParams.get(0).getValue(1));
+        //reshaping must be done here
         delShortDist = makeDelDist(trimShortParams_reshaped, 2, usePoisson);
         delLongDist = makeDelDist(trimLongParams_reshaped, 2, true);
         if (usePoisson) {
 
-             insertDist = new Poisson(exp(insertParams[0]),RandomEngine.makeDefault());
+             insertDist = new Poisson(exp(insertParams.get(0).getValue(0)),RandomEngine.makeDefault());
        }
        /*else {
 
@@ -868,6 +694,10 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         }*/
 
     }
+
+    /**
+     * Creates a basic trim helper distribution
+     */
 
     public List<AbstractDiscreteDistribution> makeDelDist(DoubleMatrix params, int nTrimTypes, boolean usePoisson) {
         List<AbstractDiscreteDistribution> delDistList = new ArrayList<>();
@@ -888,7 +718,16 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
     }
 
+    /**
+     * Create the conditional probability of indels
+     */
     public DoubleMatrix createLogIndelProbs(List<IndelSet.Singleton> singletons) {
+
+        trimZeroProbsDict.put(0,0,trimZeroProbs.get(0).getValue(0));
+        trimZeroProbsDict.put(0,1,trimZeroProbs.get(0).getValue(1));
+        trimZeroProbsDict.put(1,0,trimZeroProbs.get(0).getValue(2));
+        trimZeroProbsDict.put(1,1,trimZeroProbs.get(0).getValue(3));
+
         if(singletons.size() == 0) {
             return new DoubleMatrix();
         }
@@ -906,7 +745,7 @@ public class GeneralGestalt extends SubstitutionModel.Base {
             //Log.info.println("allLogProbs" + allLogProbs);
 
             //SOMETHING TO INITIALIZE
-            Double logShortFocalNormalization = log(1-(trimZeroProbsDict.get(0,0)*trimZeroProbsDict.get(1,0)*insertZeroProb));
+            Double logShortFocalNormalization = log(1-(trimZeroProbsDict.get(0,0)*trimZeroProbsDict.get(1,0)*insertZeroProb.getValue()));
             //Log.info.println("logShortFocalNormalization" + logShortFocalNormalization);
 
             boolean[] isLongIndel = new boolean[singletons.size()];
@@ -930,7 +769,9 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
     }
 
-
+    /**
+     * Create insert probabilities
+     */
     public DoubleMatrix createInsertProbs(List<IndelSet.Singleton> singletons) {
 
         List<Integer> insertLengths = new ArrayList<>();
@@ -945,25 +786,28 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         for(int i=0; i<insertLengths.size();i++) {
             insertLenProb.put(i,insertDist.pdf(max((insertLengths.get(i)-1),0)));
         }
-        DoubleMatrix Return =new DoubleMatrix(insertLengths.size());
+        DoubleMatrix Probs =new DoubleMatrix(insertLengths.size());
         for(int i=0;i<insertLengths.size();i++) {
             if(insertLengths.get(i) == 0) {
-                Return.put(i,insertZeroProb);
+                Probs.put(i,insertZeroProb.getValue());
             }
-            else { Return.put(i,(1-insertZeroProb)*insertLenProb.get(i));}
+            else { Probs.put(i,(1-insertZeroProb.getValue())*insertLenProb.get(i));}
         }
 
-        return Return;
+        return Probs;
     }
 
 
-
+    /**
+     * Create deletion probabilities for the left side of the cut
+     */
     public DoubleMatrix createLeftDelProbs(List<IndelSet.Singleton> singletons) {
         List<Integer> minTargets = new ArrayList<>();
         DoubleMatrix isLeftLongs = new DoubleMatrix(singletons.size());
         DoubleMatrix isIntertargets = new DoubleMatrix(singletons.size());
         DoubleMatrix startpos = new DoubleMatrix(singletons.size());
-        for(int i=0;i<singletons.size();i++) {
+        int size = singletons.size();
+        for(int i=0;i<size;i++) {
             IndelSet.Singleton sg = singletons.get(i);
             minTargets.add(sg.getminTarg());
             isLeftLongs.put(i,sg.isLeftLong() ? 1.0 : 0.0);
@@ -974,7 +818,8 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         DoubleMatrix minTargetSites = new DoubleMatrix(minTargets.size());
         DoubleMatrix leftTrimLongMin = new DoubleMatrix(minTargets.size());
         DoubleMatrix leftTrimLongMax = new DoubleMatrix(minTargets.size());
-        for(int i=0;i<minTargets.size();i++) {
+        size = minTargets.size();
+        for(int i=0;i<size;i++) {
             minTargetSites.put(i,metaData.absCutSites.get(minTargets.get(i)));
             leftTrimLongMin.put(i,metaData.leftLongTrimMin.get(minTargets.get(i)));
             leftTrimLongMax.put(i,metaData.leftMaxTrim.get(minTargets.get(i)));
@@ -989,13 +834,16 @@ public class GeneralGestalt extends SubstitutionModel.Base {
     }
 
 
-
+    /**
+     * Create deletion probabilities for the right side of the cut
+     */
     public DoubleMatrix createRightDelProbs(List<IndelSet.Singleton> singletons) {
         List<Integer> maxTargets = new ArrayList<>();
         DoubleMatrix isRightLongs = new DoubleMatrix(singletons.size());
         DoubleMatrix isIntertargets = new DoubleMatrix(singletons.size());
         DoubleMatrix endpos = new DoubleMatrix(singletons.size());
-        for(int i=0;i<singletons.size();i++) {
+        int size = singletons.size();
+        for(int i=0;i<size;i++) {
             IndelSet.Singleton sg = singletons.get(i);
             maxTargets.add(sg.getmaxTarg());
             isRightLongs.put(i,sg.isRightLong() ? 1.0 : 0.0);
@@ -1005,7 +853,8 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         DoubleMatrix maxTargetSites = new DoubleMatrix(singletons.size());
         DoubleMatrix rightTrimLongMin = new DoubleMatrix(singletons.size());
         DoubleMatrix rightTrimLongMax = new DoubleMatrix(singletons.size());
-        for(int i=0;i<maxTargets.size();i++) {
+        size = maxTargets.size();
+        for(int i=0;i<size;i++) {
             maxTargetSites.put(i,metaData.absCutSites.get(maxTargets.get(i)));
             rightTrimLongMin.put(i,metaData.rightLongTrimMin.get(maxTargets.get(i)));
             rightTrimLongMax.put(i,metaData.rightMaxTrim.get(maxTargets.get(i)));
@@ -1026,13 +875,16 @@ public class GeneralGestalt extends SubstitutionModel.Base {
     }
 
 
-
-
+    /**
+     * calculate the log conditional probability of the deletions found in
+     *  each of the singletons
+     */
     public DoubleMatrix createDelProbs(DoubleMatrix trimLen,DoubleMatrix isLongs,DoubleMatrix isIntertargets,DoubleMatrix trimMins,DoubleMatrix trimMaxs,boolean isRight) {
     int esRight = (isRight ? 1 : 0);
 
     DoubleMatrix trimZeroProbs = new DoubleMatrix(isIntertargets.length);
-    for(int i=0;i<isIntertargets.length;i++ ) {
+    int length = isIntertargets.length;
+    for(int i=0;i<length;i++ ) {
         if (isIntertargets.get(i) == 1) {
             trimZeroProbs.put(i, trimZeroProbsDict.get(esRight, 1));
         } else {
@@ -1048,7 +900,8 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
         Poisson delShortD = (Poisson) delShortDist.get(0);
         DoubleMatrix shortNonZeroProb = new DoubleMatrix(trimZeroProbs.length);
-        for(int i=0; i<trimZeroProbs.length;i++) {
+        length = trimZeroProbs.length;
+        for(int i=0; i<length;i++) {
             int pdfInput = (int) max(trimLen.get(i)-1,0);
             int cdfInput = (int) trimMaxs.get(i)-1;
             shortNonZeroProb.put(i,(1- trimZeroProbs.get(i))* delShortD.pdf(pdfInput)/(delShortD.cdf(cdfInput)));
@@ -1058,34 +911,36 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
         Poisson delLongD = (Poisson) delLongDist.get(esRight);
         DoubleMatrix LongProb = new DoubleMatrix(trimZeroProbs.length);
-        for(int i=0; i<trimZeroProbs.length;i++) {
+        length = trimZeroProbs.length;
+        for(int i=0; i<length;i++) {
             int pdfInput = (int) max(trimLen.get(i) - trimMins.get(i), 0);
             int cdfInput = (int) max(trimMaxs.get(i) - trimMins.get(i), 0);
             LongProb.put(i,delLongD.pdf(pdfInput)/(delLongD.cdf(cdfInput)));
         }
 
-        DoubleMatrix Return = new DoubleMatrix(trimLen.length);
-        for(int i=0;i<trimLen.length;i++) {
+        DoubleMatrix Probs = new DoubleMatrix(trimLen.length);
+        length = trimLen.length;
+        for(int i=0;i<length;i++) {
             if(trimLen.get(i) == 0) {
-                Return.put(i,trimZeroProbs.get(i));
+                Probs.put(i,trimZeroProbs.get(i));
             }
             else {
                 if(isLongs.get(i) == 1) {
-                    Return.put(i,LongProb.get(i));
+                    Probs.put(i,LongProb.get(i));
                 }
                 else {
-                    Return.put(i,shortNonZeroProb.get(i));
+                    Probs.put(i,shortNonZeroProb.get(i));
                 }
             }
         }
 
-    return Return;
+    return Probs;
 
     }
 
-
-
-
+    /** Returns:
+     *  Dictionary mapping all possible TargetStatus to matrix for the hazard away,
+     */
     public Hashtable<TargetStatus,Double> createHazardAwayDict() {
         Set<TargetStatus> targetStatuses = targStatTransitionsDict.keySet();
 
@@ -1094,23 +949,13 @@ public class GeneralGestalt extends SubstitutionModel.Base {
         DoubleMatrix hazardAwayNodes = createHazardAwayTargetStatuses(targetStatusesList);
 
         Hashtable<TargetStatus, Double> hazardAwayDict = new Hashtable<>();
-        for(int i=0;i<targetStatusesList.size();i++) {
+        int size = targetStatusesList.size();
+        for(int i=0;i<size;i++) {
             hazardAwayDict.put(targetStatusesList.get(i),hazardAwayNodes.get(i));
         }
         return hazardAwayDict;
 
     }
-
-    public Double createTopologyLogLikBarcode(Hashtable<Integer,TransitionWrap> transitionWrapper) {
-
-
-
-
-
-
-        return 0.0;
-    }
-
 }
 
 

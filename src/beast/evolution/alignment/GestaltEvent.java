@@ -8,18 +8,39 @@ import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.Comparator;
 
-@Description("Class representing gestalt event objects")
 public class GestaltEvent extends BEASTObject implements Comparable<GestaltEvent> {
 
+    /**
+     *  Class representing GESTALT indels, which are building blocks of GESTALT alleles/sequences
+     */
     final public Input<String> dataInput = new Input<>("value",
             "Event data, encoded as an underscore-separated list of integers and strings" +
                     "In either case, whitespace is ignored.", Input.Validate.REQUIRED);
 
+
+    /**
+     *  indel start position
+     */
     protected int startPos;
+    /**
+     *  deletion length
+     */
     protected int delLen;
+    /**
+     *  min target affected by indel
+     */
     protected int minTarg;
+    /**
+     *  max target affected by indel
+     */
     protected int maxTarg;
+    /**
+     *  insertion sequence
+     */
     protected String insSeq;
+    /**
+     * deletion end position
+     */
     protected int delEnd;
 
     public int compareTo(GestaltEvent ev2) {
@@ -29,9 +50,7 @@ public class GestaltEvent extends BEASTObject implements Comparable<GestaltEvent
     public GestaltEvent() {
     }
     /**
-     * Constructor for testing.
-     *
-     * @param event
+     * Constructor
      */
     public GestaltEvent(String event) {
         dataInput.setValue(event, this);
@@ -54,12 +73,7 @@ public class GestaltEvent extends BEASTObject implements Comparable<GestaltEvent
             insSeq = strs[4];
         }
         else {insSeq ="";}
-
-
-
-
-
-    } // initAndValidate
+    }
 
 
     /**
