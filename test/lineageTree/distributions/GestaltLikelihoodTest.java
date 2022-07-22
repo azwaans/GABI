@@ -21,7 +21,7 @@ public class GestaltLikelihoodTest {
      * @throws Exception
      */
     @Test
-    public void testLikelihoodSingleBranchNothing() {
+    public void testBranchLikelihoodNoEvents() {
 
         // Test for a single branch with no indels
         String newick = "(CHILD1:0.1);";
@@ -79,7 +79,7 @@ public class GestaltLikelihoodTest {
      * @throws Exception
      */
     @Test
-    public void testLikelihoodSingleBranch() {
+    public void  testBranchLikelihood() {
 
         // Test for a single branch
         String newick = "(CHILD1:10):0.0;";
@@ -138,7 +138,7 @@ public class GestaltLikelihoodTest {
      * @throws Exception
      */
     @Test
-    public void testLikelihoodSingleBranchIntertarget() {
+    public void testBranchLikelihoodBigIntertargetDel() {
 
         // Test for a single branch
         String newick = "(CHILD1:10):0.0;";
@@ -197,7 +197,7 @@ public class GestaltLikelihoodTest {
      * @throws Exception
      */
     @Test
-    public void testLikelihoodDoubleBranchIntertarget() {
+    public void testTwoBranchLikelihoodBigIntertargetDel() {
 
         // Test for a single branch
         String newick = "(CHILD2:5);";
@@ -252,11 +252,11 @@ public class GestaltLikelihoodTest {
 
 
     /**
-     * Basic test for the likelihood calculation with a single indel, 2 branches
+     * Basic test for the likelihood calculation with for 3 leaves
      * @throws Exception
      */
     @Test
-    public void testLikelihoodTreeThreeLeaves() {
+    public void testMultifurcationResolution() {
 
         // Test for a single branch
         String newick = "(((CHILD1:1,CHILD3:1)INTERNAL:1,CHILD2:2):2.0):0.0;";
@@ -312,11 +312,11 @@ public class GestaltLikelihoodTest {
     }
 
     /**
-     * Basic test for the likelihood calculation with a single indel, 2 branches
+     * Basic test for the likelihood calculation with a single indel, test_multifurcation_vs_bifurcation
      * @throws Exception
      */
     @Test
-    public void testLikelihoodTree() {
+    public void testMultifurcationVsBifurcation() {
 
         // Test for a single branch
         String newick = "(CHILD0:3,((CHILD4:1,COPY01:1)CHILD2:1,CHILD3:2)CHILD1:1);";
@@ -379,7 +379,7 @@ public class GestaltLikelihoodTest {
      * @throws Exception
      */
     @Test
-    public void testLikelihoodRealData_1_branchEvents3132() {
+    public void testLikelihoodRealDataSingleBranch1() {
 
 
         // Test for a single branch
@@ -438,7 +438,7 @@ public class GestaltLikelihoodTest {
     }
 
     @Test
-    public void testLikelihoodRealData_1_branchEventsTOGETHER() {
+    public void  testLikelihoodRealDataSingleBranch2() {
 
 
         // Test for a single branch
@@ -496,7 +496,7 @@ public class GestaltLikelihoodTest {
     }
 
     @Test
-    public void testLikelihoodRealData_1_branchEventsTOGETHER2() {
+    public void testLikelihoodRealDataSingleBranch3() {
 
 
         // Test for a single branch
@@ -555,7 +555,7 @@ public class GestaltLikelihoodTest {
 
 
     @Test
-    public void testLikelihoodRealData_1_branchEventsTOGETHER3() {
+    public void testLikelihoodRealDataSingleBranch4() {
 
 
         // Test for a single branch
@@ -613,7 +613,7 @@ public class GestaltLikelihoodTest {
     }
 
     @Test
-    public void testLikelihoodRealData_1_branchEventsALONE () {
+    public void testLikelihoodRealDataSingleBranch5 () {
 
 
         // Test for a single branch
@@ -668,17 +668,17 @@ public class GestaltLikelihoodTest {
 
         assertEquals(-146.36092311, logL, 1e-5);   // Reference GAPML python version
 
-        a = new Sequence("1", "66_130_1_5_,");
-        alignment = new Alignment();
-        alignment.initByName("sequence", a,"dataType", "user defined");
-
-        likelihood = new gestaltTreeLikelihood();
-        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
-        logL = likelihood.calculateLogP();
-
-        System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
-        assertEquals(-62.48962775, logL, 1e-5);
+//        a = new Sequence("1", "66_130_1_5_,");
+//        alignment = new Alignment();
+//        alignment.initByName("sequence", a,"dataType", "user defined");
+//
+//        likelihood = new gestaltTreeLikelihood();
+//        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
+//        likelihood.substitutionModel = gestaltModel;
+//        logL = likelihood.calculateLogP();
+//
+//        System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
+//        assertEquals(-62.48962775, logL, 1e-5);
 
         // Test for a single branch
         // EVENTS 1_1 amd 1_2
@@ -690,7 +690,7 @@ public class GestaltLikelihoodTest {
      * @throws Exception
      */
     @Test
-    public void testLikelihoodRealData_1_branch2() {
+    public void testLikelihoodRealDataSingleBranch6() {
 
 
         // Test for a single branch
@@ -747,7 +747,7 @@ public class GestaltLikelihoodTest {
     }
 
     @Test
-    public void testLikelihoodRealData_1_branch3() {
+    public void testLikelihoodRealDataSingleBranch7() {
 
 
         // Test for a single branch

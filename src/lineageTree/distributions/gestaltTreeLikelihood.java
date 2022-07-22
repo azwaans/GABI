@@ -106,7 +106,7 @@ public class gestaltTreeLikelihood extends Distribution {
     public void sample(State state, Random random) {}
 
     public void initAndValidate() {
-        Log.info.println("initializing tree likelihood!!!!!!!!!!!");
+        Log.info.println("initializing tree likelihood");
         // sanity check: site model should be an instance of the base site model class
         if (!(siteModelInput.get() instanceof SiteModel.Base)) {
             throw new IllegalArgumentException("siteModel input should be of type SiteModel.Base");
@@ -363,15 +363,16 @@ public class gestaltTreeLikelihood extends Distribution {
         }
 
         //get transition wrappers
+        long start1 = System.nanoTime();
         transitionWrappers = TransitionWrap.createTransitionWrappers(tree, dataInput.get(), substitutionModel.metaData, statesDict);
-
+        long end1 = System.nanoTime();
+        System.out.println("Elapsed Time in seconds: "+ (end1-start1)*0.000000001);
 //        //initialize leaf partial likelihoods
 //        setPartials(tree.getRoot());
 //
 //        //populate partial likelihoods with postorder traversal
 //        traversal(tree.getRoot());
 //
-//        //todo clean this up, looks highly inefficient
 //        // take care of scaling terms
 //        Collection<Double> logScalingTermsAll = logScalingTerms.values();
 //        List<Double> terms = new ArrayList<>(logScalingTermsAll);

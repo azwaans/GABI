@@ -1,10 +1,8 @@
 package beast.evolution.alignment;
+import beast.core.util.Log;
 import beast.evolution.tree.Node;
 import beast.core.BEASTObject;
-import beast.core.util.Log;
-import org.antlr.v4.runtime.misc.Triple;
 import org.apache.commons.math3.util.Pair;
-import org.junit.Test;
 
 import java.util.*;
 
@@ -305,60 +303,95 @@ public class TransitionWrap extends BEASTObject {
         }
 
         List<Integer> requestedInactive = requestStatus.getInactiveTargets(nTargets);
-        List<Triple<Integer, List<IndelSet.TargetTract>, Boolean>> stateQueue = new ArrayList<>();
-        Hashtable<Pair<List<IndelSet.TargetTract>, Boolean>, Hashtable<Integer, List<Pair<List<IndelSet.TargetTract>, Boolean>>>> fullDict = new Hashtable<>();
-        //fill the a dictionary of states for the parent states, and prepare the state quueue
-        for (List<IndelSet.TargetTract> temp : parentTtList) {
 
+        //flag for old
+        //List<Triple<Integer, List<IndelSet.TargetTract>, Boolean>> stateQueue = new ArrayList<>();
+        //ATTEMPTNG TO USE THE priority queue implementation instead of the homemade list
+        PriorityQueue<QueueObject> statequeue = new PriorityQueue<>();
+
+        Hashtable<StateAlongPath, Hashtable<Integer, List<StateAlongPath>>> stateToParentDict = new Hashtable<>();
+        //fill the a dictionary of states for the parent states, and prepare the state quueue
+
+
+        //attempt at tthis loop with prioruty qwueue:
+
+        for (List<IndelSet.TargetTract> temp : parentTtList) {
             TargetStatus parentStat = new TargetStatus();
             parentStat.fillWithTargetTracts(temp);
             List<Integer> parentInactive = parentStat.getInactiveTargets(nTargets);
             //is the requested status a subset of the parent statuses?
             Boolean isPassed = parentInactive.containsAll(requestedInactive);
 
-            Pair<List<IndelSet.TargetTract>, Boolean> parentEntry = new Pair(temp, isPassed);
-            Triple<Integer, List<IndelSet.TargetTract>, Boolean> initialEntry = new Triple(0, temp, isPassed);
-            stateQueue.add(initialEntry);
+           StateAlongPath parentEntry = new StateAlongPath(temp, isPassed);
+
+            //flag for old
+            //Triple<Integer, List<IndelSet.TargetTract>, Boolean> initialEntry = new Triple(0, temp, isPassed);
+            QueueObject initialEntry = new QueueObject(0,temp,isPassed);
+            statequeue.add(initialEntry);
             //TO DO: CHECK initial entry put in there!
             //making an empty list to correctly initialize:
             List<IndelSet.TargetTract> empty = new ArrayList<>();
-            fullDict.put(parentEntry, new Hashtable() {{
-                put(0, new Pair(empty, false));
+            stateToParentDict.put(parentEntry, new Hashtable() {{
+                put(0, new StateAlongPath(empty, false));
             }});
 
         }
+
+
+
+
+
+//        for (List<IndelSet.TargetTract> temp : parentTtList) {
+//
+//            TargetStatus parentStat = new TargetStatus();
+//            parentStat.fillWithTargetTracts(temp);
+//            List<Integer> parentInactive = parentStat.getInactiveTargets(nTargets);
+//            //is the requested status a subset of the parent statuses?
+//            Boolean isPassed = parentInactive.containsAll(requestedInactive);
+//
+//            Pair<List<IndelSet.TargetTract>, Boolean> parentEntry = new Pair(temp, isPassed);
+//            Triple<Integer, List<IndelSet.TargetTract>, Boolean> initialEntry = new Triple(0, temp, isPassed);
+//            stateQueue.add(initialEntry);
+//            //TO DO: CHECK initial entry put in there!
+//            //making an empty list to correctly initialize:
+//            List<IndelSet.TargetTract> empty = new ArrayList<>();
+//            stateToParentDict.put(parentEntry, new Hashtable() {{
+//                put(0, new Pair(empty, false));
+//            }});
+//
+//        }
         //Max targets
         List<Integer> maxTargets = ancStates.getMaxTargetStatus().getInactiveTargets(nTargets);
 
-        //find all paths of at most max steps long from the parent states
-        while (stateQueue.size() != 0) {
 
-            //The priority queue is currently dequeued in the wrong order
-            List<Integer> allDist = new ArrayList<>();
-            for (int i = 0; i < stateQueue.size(); i++) {
-                allDist.add(stateQueue.get(i).a);
-            }
-            int dequeueDist = Collections.min(allDist);
-            int indexDequeue = 0;
-            for(int i = 0;i<allDist.size();++i) {
-                if (allDist.get(i)==dequeueDist) {
-                    indexDequeue = i;
-                }
-            }
+        while (! statequeue.isEmpty()) {
 
-            Triple<Integer, List<IndelSet.TargetTract>, Boolean> currentTriple = stateQueue.remove(indexDequeue);
+//            //The priority queue is dequeued in the wrong order
+//            List<Integer> allDist = new ArrayList<>();
+//            for (int i = 0; i < stateQueue.size(); i++) {
+//                allDist.add(stateQueue.get(i).a);
+//            }
+//            int dequeueDist = Collections.min(allDist);
+//            int indexDequeue = 0;
+//            for(int i = 0;i<allDist.size();++i) {
+//                if (allDist.get(i)==dequeueDist) {
+//                    indexDequeue = i;
+//                }
+//            }
 
-            if (currentTriple.a >= maxSteps) {
+            QueueObject current = statequeue.remove();
+
+            if (current.distance >= maxSteps) {
                 continue;
             }
 
-            Integer dist = currentTriple.a;
-            List<IndelSet.TargetTract> state = currentTriple.b;
-            boolean statePassedReq = currentTriple.c;
+            Integer dist = current.distance;
+            List<IndelSet.TargetTract> state = current.state.targetTactList;
+            boolean statePassedReq = current.state.statePassedRequested;
 
 
             TargetStatus targStat = new TargetStatus();
-            targStat.fillWithTargetTracts(currentTriple.b);
+            targStat.fillWithTargetTracts(current.state.targetTactList);
 
             //getting the difference between AncState status and the obtained targStat:
             List<Integer> difference = new ArrayList<>(maxTargets);
@@ -390,34 +423,34 @@ public class TransitionWrap extends BEASTObject {
 
                 }
                 //add the new state to queue
-                Triple<Integer, List<IndelSet.TargetTract>, Boolean> childEntry = new Triple<>(dist + 1, newState, newStatePassedReq);
+                QueueObject childEntry = new QueueObject(dist + 1, newState, newStatePassedReq);
 
-                stateQueue.add(childEntry);
-                Pair<List<IndelSet.TargetTract>, Boolean> childKey = new Pair<>(newState, newStatePassedReq);
+                statequeue.add(childEntry);
+                StateAlongPath childKey = new StateAlongPath(newState, newStatePassedReq);
                 //if no entry is present, just add a new one
 
 
-                if (!fullDict.containsKey(childKey)) {
-                    fullDict.put(childKey, new Hashtable() {{
-                        put(dist + 1, new Pair(state, statePassedReq));
+                if (!stateToParentDict.containsKey(childKey)) {
+                    stateToParentDict.put(childKey, new Hashtable() {{
+                        put(dist + 1, new StateAlongPath(state, statePassedReq));
                     }});
                 }
                 //if there is already the key, append the nested hashtable:
-                if (fullDict.containsKey(childKey)) {
+                if (stateToParentDict.containsKey(childKey)) {
                     // append the nested hashmap instead
-                    Hashtable<Integer, List<Pair<List<IndelSet.TargetTract>, Boolean>>> appendedHashtable = fullDict.get(childKey);
-                    List<Pair<List<IndelSet.TargetTract>, Boolean>> replacementList = new ArrayList<>();
+                    Hashtable<Integer, List<StateAlongPath>> appendedHashtable = stateToParentDict.get(childKey);
+                    List<StateAlongPath> replacementList = new ArrayList<>();
                     if (appendedHashtable.containsKey(dist+1)) {
                         // we append the list and change the hashtable
                         try {
-                            replacementList = fullDict.get(childKey).get(dist + 1);
+                            replacementList = stateToParentDict.get(childKey).get(dist + 1);
                         }
                         catch (Exception e) {
-                            Pair<List<IndelSet.TargetTract>, Boolean> replacementPair = (Pair<List<IndelSet.TargetTract>, Boolean>) fullDict.get(childKey).get(dist + 1);
+                            StateAlongPath replacementPair = (StateAlongPath) stateToParentDict.get(childKey).get(dist + 1);
                             replacementList.add(replacementPair);
 
                         }
-                        replacementList.add(new Pair(state, statePassedReq));
+                        replacementList.add(new StateAlongPath(state, statePassedReq));
                         Set noDup = new LinkedHashSet();
                         noDup.addAll(replacementList);
                         replacementList.clear();
@@ -426,57 +459,213 @@ public class TransitionWrap extends BEASTObject {
                     }
                     else {
                         //we just add a dictionary entry in the hashtable
-                        replacementList.add(new Pair(state, statePassedReq));
+                        replacementList.add(new StateAlongPath(state, statePassedReq));
                         appendedHashtable.put(dist+1,replacementList);
                     }
-                    fullDict.put(childKey,appendedHashtable);
+                    stateToParentDict.put(childKey,appendedHashtable);
 
 
                 }
             }
         }
+//flag for old
+        //find all paths of at most max steps long from the parent states
+//        while (stateQueue.size() != 0) {
+//
+//            //The priority queue is dequeued in the wrong order
+//            List<Integer> allDist = new ArrayList<>();
+//            for (int i = 0; i < stateQueue.size(); i++) {
+//                allDist.add(stateQueue.get(i).a);
+//            }
+//            int dequeueDist = Collections.min(allDist);
+//            int indexDequeue = 0;
+//            for(int i = 0;i<allDist.size();++i) {
+//                if (allDist.get(i)==dequeueDist) {
+//                    indexDequeue = i;
+//                }
+//            }
+//
+//            Triple<Integer, List<IndelSet.TargetTract>, Boolean> currentTriple = stateQueue.remove(indexDequeue);
+//
+//            if (currentTriple.a >= maxSteps) {
+//                continue;
+//            }
+//
+//            Integer dist = currentTriple.a;
+//            List<IndelSet.TargetTract> state = currentTriple.b;
+//            boolean statePassedReq = currentTriple.c;
+//
+//
+//            TargetStatus targStat = new TargetStatus();
+//            targStat.fillWithTargetTracts(currentTriple.b);
+//
+//            //getting the difference between AncState status and the obtained targStat:
+//            List<Integer> difference = new ArrayList<>(maxTargets);
+//            difference.removeAll(targStat.getInactiveTargets(nTargets));
+//            List<Integer> activeAnyTargs = difference;
+//
+//            List<IndelSet.TargetTract> possibleTTracts = targStat.getPossibleTargetTracts(activeAnyTargs,nTargets);
+//
+//
+//            for (IndelSet.TargetTract possibleTTract : possibleTTracts) {
+//                //attempting to merge the possible TTtracts in the state!
+//                //check the possible tract is ok:
+//                //check that both merged states are the same
+//                List<IndelSet.TargetTract> newState = IndelSet.TargetTract.merge(possibleTTract, state);
+//
+//                if (!ancStates.isPossible(newState)) {
+//                    //the merged state is impossible
+//                    continue;
+//                }
+//
+//                boolean newStatePassedReq = statePassedReq;
+//                if (!statePassedReq) {
+//                    //if the previous state was not passed, check if the new one is!
+//                    TargetStatus newStatus = new TargetStatus();
+//                    newStatus.fillWithTargetTracts(newState);
+//                    List<Integer> newInactiveTarg = newStatus.getInactiveTargets(nTargets);
+//                    // is the new status a superset of the ancestral state(max target) ?
+//                    newStatePassedReq = newInactiveTarg.containsAll(maxTargets);
+//
+//                }
+//                //add the new state to queue
+//                Triple<Integer, List<IndelSet.TargetTract>, Boolean> childEntry = new Triple<>(dist + 1, newState, newStatePassedReq);
+//
+//                stateQueue.add(childEntry);
+//                Pair<List<IndelSet.TargetTract>, Boolean> childKey = new Pair<>(newState, newStatePassedReq);
+//                //if no entry is present, just add a new one
+//
+//
+//                if (!stateToParentDict.containsKey(childKey)) {
+//                    stateToParentDict.put(childKey, new Hashtable() {{
+//                        put(dist + 1, new Pair(state, statePassedReq));
+//                    }});
+//                }
+//                //if there is already the key, append the nested hashtable:
+//                if (stateToParentDict.containsKey(childKey)) {
+//                    // append the nested hashmap instead
+//                    Hashtable<Integer, List<Pair<List<IndelSet.TargetTract>, Boolean>>> appendedHashtable = stateToParentDict.get(childKey);
+//                    List<Pair<List<IndelSet.TargetTract>, Boolean>> replacementList = new ArrayList<>();
+//                    if (appendedHashtable.containsKey(dist+1)) {
+//                        // we append the list and change the hashtable
+//                        try {
+//                            replacementList = stateToParentDict.get(childKey).get(dist + 1);
+//                        }
+//                        catch (Exception e) {
+//                            Pair<List<IndelSet.TargetTract>, Boolean> replacementPair = (Pair<List<IndelSet.TargetTract>, Boolean>) stateToParentDict.get(childKey).get(dist + 1);
+//                            replacementList.add(replacementPair);
+//
+//                        }
+//                        replacementList.add(new Pair(state, statePassedReq));
+//                        Set noDup = new LinkedHashSet();
+//                        noDup.addAll(replacementList);
+//                        replacementList.clear();
+//                        replacementList.addAll(noDup);
+//                        appendedHashtable.put(dist+1,replacementList);
+//                    }
+//                    else {
+//                        //we just add a dictionary entry in the hashtable
+//                        replacementList.add(new Pair(state, statePassedReq));
+//                        appendedHashtable.put(dist+1,replacementList);
+//                    }
+//                    stateToParentDict.put(childKey,appendedHashtable);
+//
+//
+//                }
+//            }
+//        }
         //backtracking the paths:
-        List<Pair<Pair<List<IndelSet.TargetTract>, Boolean>, Integer>> closeBy = new ArrayList<>();
+//        List<Pair<Pair<List<IndelSet.TargetTract>, Boolean>, Integer>> closeBy = new ArrayList<>();
+//
+//
+//        for (Map.Entry<Pair<List<IndelSet.TargetTract>, Boolean>, Hashtable<Integer, List<Pair<List<IndelSet.TargetTract>, Boolean>>>> entry : stateToParentDict.entrySet()) {
+//
+//            Pair<List<IndelSet.TargetTract>, Boolean> metaStateKey = entry.getKey();
+//            if (!metaStateKey.getSecond()) {
+//                continue;
+//            }
+//
+//            Hashtable<Integer, List<Pair<List<IndelSet.TargetTract>, Boolean>>> subDict = entry.getValue();
+//
+//            for (Integer stepCount : subDict.keySet()) {
+//
+//                Queue<Triple<List<IndelSet.TargetTract>, Boolean, Integer>> ancestorQueue = new LinkedList<>();
+//                Triple forqueue = new Triple(metaStateKey.getFirst(), metaStateKey.getSecond(), stepCount);
+//                ancestorQueue.add(forqueue);
+//                while (!ancestorQueue.isEmpty()) {
+//
+//                    Triple<List<IndelSet.TargetTract>, Boolean, Integer> ancestorEntry = ancestorQueue.remove();
+//
+//                    Pair dictExtractkey = new Pair(ancestorEntry.a, ancestorEntry.b);
+//                    Hashtable<Integer, List<Pair<List<IndelSet.TargetTract>, Boolean>>> attempt = stateToParentDict.get(dictExtractkey);
+//
+//                    if (ancestorEntry.c >= 1) {
+//                        if ((!closeBy.contains(ancestorEntry)) && (stateToParentDict.get(dictExtractkey).containsKey(ancestorEntry.c))) {
+//                            Hashtable<Integer, List<Pair<List<IndelSet.TargetTract>, Boolean>>> subdictio = stateToParentDict.get(dictExtractkey);
+//                            try {
+//                                for (Pair<List<IndelSet.TargetTract>, Boolean> temp : subdictio.get(ancestorEntry.c)) {
+//                                    ancestorQueue.add(new Triple(temp.getFirst(), temp.getSecond(), ancestorEntry.c - 1));
+//                                }
+//                            } catch (Exception e) {
+//                                Pair<List<IndelSet.TargetTract>, Boolean> temp = (Pair<List<IndelSet.TargetTract>, Boolean>) subdictio.get(ancestorEntry.c);
+//                                ancestorQueue.add(new Triple(temp.getFirst(), temp.getSecond(), ancestorEntry.c - 1));
+//                            } finally {
+//                            }
+//
+//                        }
+//                    }
+//
+//                    Pair<Pair<List<IndelSet.TargetTract>, Boolean>, Integer> closeByIn = new Pair(dictExtractkey, ancestorEntry.c);
+//                    closeBy.add(closeByIn);
+//                }
+//            }
+//        }
+//        assert closeBy.size() > 0;
+//        List<List<IndelSet.TargetTract>> finalOut = new ArrayList<>();
+//        for (int i = 0; i < closeBy.size(); ++i) {
+//            finalOut.add(closeBy.get(i).getFirst().getFirst());
+//        }
+//
+//        return finalOut;
+//    }
+        List<Pair<StateAlongPath, Integer>> closeBy = new ArrayList<>();
 
 
-        for (Map.Entry<Pair<List<IndelSet.TargetTract>, Boolean>, Hashtable<Integer, List<Pair<List<IndelSet.TargetTract>, Boolean>>>> entry : fullDict.entrySet()) {
+        for (Map.Entry<StateAlongPath, Hashtable<Integer, List<StateAlongPath>>> entry : stateToParentDict.entrySet()) {
 
-            Pair<List<IndelSet.TargetTract>, Boolean> metaStateKey = entry.getKey();
-            if (!metaStateKey.getSecond()) {
+            StateAlongPath metaStateKey = entry.getKey();
+            if (!metaStateKey.statePassedRequested) {
                 continue;
             }
 
-            Hashtable<Integer, List<Pair<List<IndelSet.TargetTract>, Boolean>>> subDict = entry.getValue();
+            Hashtable<Integer, List<StateAlongPath>> subDict = entry.getValue();
 
             for (Integer stepCount : subDict.keySet()) {
 
-                Queue<Triple<List<IndelSet.TargetTract>, Boolean, Integer>> ancestorQueue = new LinkedList<>();
-                Triple forqueue = new Triple(metaStateKey.getFirst(), metaStateKey.getSecond(), stepCount);
+                Queue<QueueObject> ancestorQueue = new LinkedList<>();
+                QueueObject forqueue = new QueueObject(stepCount,metaStateKey.targetTactList, metaStateKey.statePassedRequested);
                 ancestorQueue.add(forqueue);
                 while (!ancestorQueue.isEmpty()) {
 
-                    Triple<List<IndelSet.TargetTract>, Boolean, Integer> ancestorEntry = ancestorQueue.remove();
-
-                    Pair dictExtractkey = new Pair(ancestorEntry.a, ancestorEntry.b);
-                    Hashtable<Integer, List<Pair<List<IndelSet.TargetTract>, Boolean>>> attempt = fullDict.get(dictExtractkey);
-
-                    if (ancestorEntry.c >= 1) {
-                        if ((!closeBy.contains(ancestorEntry)) && (fullDict.get(dictExtractkey).containsKey(ancestorEntry.c))) {
-                            Hashtable<Integer, List<Pair<List<IndelSet.TargetTract>, Boolean>>> subdictio = fullDict.get(dictExtractkey);
+                    QueueObject ancestorEntry = ancestorQueue.remove();
+                    StateAlongPath dictExtractkey = new StateAlongPath(ancestorEntry.state.targetTactList, ancestorEntry.state.statePassedRequested);
+                    if (ancestorEntry.distance >= 1) {
+                        if ((!closeBy.contains(ancestorEntry)) && ((stateToParentDict.get(dictExtractkey )).containsKey(ancestorEntry.distance))) {
+                            Hashtable<Integer, List<StateAlongPath>> subdictio = stateToParentDict.get(dictExtractkey);
                             try {
-                                for (Pair<List<IndelSet.TargetTract>, Boolean> temp : subdictio.get(ancestorEntry.c)) {
-                                    ancestorQueue.add(new Triple(temp.getFirst(), temp.getSecond(), ancestorEntry.c - 1));
+                                for (StateAlongPath temp : subdictio.get(ancestorEntry.distance)) {
+                                    ancestorQueue.add(new QueueObject(ancestorEntry.distance - 1,temp.targetTactList, temp.statePassedRequested ));
                                 }
                             } catch (Exception e) {
-                                Pair<List<IndelSet.TargetTract>, Boolean> temp = (Pair<List<IndelSet.TargetTract>, Boolean>) subdictio.get(ancestorEntry.c);
-                                ancestorQueue.add(new Triple(temp.getFirst(), temp.getSecond(), ancestorEntry.c - 1));
+                                StateAlongPath temp = (StateAlongPath) subdictio.get(ancestorEntry.distance);
+                                ancestorQueue.add(new QueueObject(ancestorEntry.distance -1,temp.targetTactList, temp.statePassedRequested ));
                             } finally {
                             }
 
                         }
                     }
 
-                    Pair<Pair<List<IndelSet.TargetTract>, Boolean>, Integer> closeByIn = new Pair(dictExtractkey, ancestorEntry.c);
+                    Pair<StateAlongPath, Integer> closeByIn = new Pair(dictExtractkey, ancestorEntry.distance);
                     closeBy.add(closeByIn);
                 }
             }
@@ -484,7 +673,7 @@ public class TransitionWrap extends BEASTObject {
         assert closeBy.size() > 0;
         List<List<IndelSet.TargetTract>> finalOut = new ArrayList<>();
         for (int i = 0; i < closeBy.size(); ++i) {
-            finalOut.add(closeBy.get(i).getFirst().getFirst());
+            finalOut.add(closeBy.get(i).getFirst().targetTactList);
         }
 
         return finalOut;
