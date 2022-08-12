@@ -816,8 +816,8 @@ public class GestaltLikelihoodTest {
         String newick = "((3:4,4:4)1:1,1:5);";
         Sequence a = new Sequence("1", "36_3_0_0_aaGTATa,66_130_1_5_,251_16_8_8_,None,None,");
         Sequence b = new Sequence("3", "38_38_0_1_,82_47_2_3_,145_54_4_5_,251_11_8_8_,264_18_9_9_aa,");
-        Sequence c = new Sequence("4", "38_1_0_0_,67_7_1_1_,115_144_3_8_,271_11_9_9_a,None,");
-
+        Sequence c = new Sequence("4", "38_1_0_0_,67_7_1_1_,115_144_3_8_,None,None,");
+        //271_11_9_9_a from 4
         Alignment alignment = new Alignment();
         alignment.initByName("sequence", a,"sequence", b,"sequence", c,"dataType", "user defined");
 
@@ -859,8 +859,8 @@ public class GestaltLikelihoodTest {
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
-
-        assertEquals(-315.71539001, logL, 1e-5);   // Reference GAPML python version
+        //-315.71539001
+        assertEquals(-278.7269, logL, 1e-5);   // Reference GAPML python version
 
 
     }

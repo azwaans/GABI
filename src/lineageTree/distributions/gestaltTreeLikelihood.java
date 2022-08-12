@@ -1,6 +1,7 @@
 package lineageTree.distributions;
 
 import beast.evolution.likelihood.LikelihoodCore;
+import beast.evolution.tree.Tree;
 import org.jblas.DoubleMatrix;
 
 import java.util.*;
@@ -74,7 +75,7 @@ public class gestaltTreeLikelihood extends Distribution {
     protected Hashtable<Integer, DoubleMatrix> partials0;
 //    protected Hashtable<Integer, DoubleMatrix> partials1;
 
-//    protected Hashtable<Integer, Double> logScalingTerms ;
+    protected Hashtable<Integer, Double> logScalingTerms ;
 
     protected Hashtable<Integer, DoubleMatrix> ptMat0;
     /**
@@ -139,8 +140,8 @@ public class gestaltTreeLikelihood extends Distribution {
         //CHANGE BLOCK
 
          partials0 = new Hashtable<>();
-//         partials1 = new Hashtable<>();
-//         logScalingTerms = new Hashtable<>();
+         //partials1 = new Hashtable<>();
+         logScalingTerms = new Hashtable<>();
 
 
 
@@ -231,8 +232,9 @@ public class gestaltTreeLikelihood extends Distribution {
         try {
             //STEP2 :
             //CHANGE BLOCK
-            //if (traverse(tree.getRoot()) != Tree.IS_CLEAN)
+            //if (traverse(tree.getRoot()) != Tree.IS_CLEAN) {
                 calcLogP();
+            //}
             //CHANGE BLOCK
         }
         catch (ArithmeticException e) {
@@ -367,27 +369,30 @@ public class gestaltTreeLikelihood extends Distribution {
         transitionWrappers = TransitionWrap.createTransitionWrappers(tree, dataInput.get(), substitutionModel.metaData, statesDict);
         long end1 = System.nanoTime();
         System.out.println("Elapsed Time in seconds: "+ (end1-start1)*0.000000001);
-//        //initialize leaf partial likelihoods
-//        setPartials(tree.getRoot());
-//
-//        //populate partial likelihoods with postorder traversal
-//        traversal(tree.getRoot());
-//
-//        // take care of scaling terms
-//        Collection<Double> logScalingTermsAll = logScalingTerms.values();
-//        List<Double> terms = new ArrayList<>(logScalingTermsAll);
-//        Double fullScaling = 0.0;
-//        for(int i = 0; i < terms.size();++i) {
-//            fullScaling = fullScaling + terms.get(i);
-//        }
-//
-//        //get the likelihood from the root partial
-//        int rootIndex = tree.getRoot().getNr();
-//        DoubleMatrix logLikAlleles = logi(partials0.get(rootIndex)).addi(fullScaling);
+        //initialize leaf partial likelihoods
+        setPartials(tree.getRoot());
 
-        Double likelihood = createTopologyLogLikelihood(tree,transitionWrappers);
-        Log.info.println("LOG LIKELIHOOD ALLELES"+likelihood);
-        logP = likelihood;
+        //populate partial likelihoods with postorder traversal
+        traversal(tree.getRoot());
+
+        // take care of scaling terms
+        Collection<Double> logScalingTermsAll = logScalingTerms.values();
+        List<Double> terms = new ArrayList<>(logScalingTermsAll);
+        Double fullScaling = 0.0;
+        for(int i = 0; i < terms.size();++i) {
+            fullScaling = fullScaling + terms.get(i);
+        }
+
+        //get the likelihood from the root partial
+        int rootIndex = tree.getRoot().getNr();
+        DoubleMatrix logLikAlleles = logi(partials0.get(rootIndex)).addi(fullScaling);
+//        start1 = System.nanoTime();
+//        Double likelihood = createTopologyLogLikelihood(tree,transitionWrappers);
+//        end1 = System.nanoTime();
+//        System.out.println("Elapsed Time in seconds: "+ (end1-start1)*0.000000001);
+
+        Log.info.println("LOG LIKELIHOOD ALLELES"+logLikAlleles.get(0));
+        logP = logLikAlleles.get(0);
 
     }
 
@@ -402,80 +407,80 @@ public class gestaltTreeLikelihood extends Distribution {
 //    }
 
 
-//    public void traversal(Node node) {
-//
-//
-//        if(node != null) {
-//            if (!node.isLeaf()) {
-//                // Traverse down the two child nodes
-//                final Node child1 = node.getLeft(); //Two children
-//                traversal(child1);
-//
-//                final Node child2 = node.getRight();
-//                traversal(child2);
-//
-//
-//                //DoubleMatrix nodeLogPartials = GeneralGestalt.initializeLowerLogProb(transitionWrappers.get(node.getNr()),node);
-//                DoubleMatrix nodeLogPartials = DoubleMatrix.zeros(1);
-//                DoubleMatrix hasPosProb = ones(1);
-//
-//
-//                for (Node child : node.getChildren()) {
-//
-//
-//                    TransitionWrap childNodeWrap = transitionWrappers.get(child.getNr());
-//
-//                    //Create the probability matrix exp(Qt)
-//                    final double branchRate = branchRateModel.getRateForBranch(node);
-//                    final double branchTime = child.getLength() * branchRate;
-//                    //Log.info.println("Clock rate"+branchRate);
-//                    DoubleMatrix rateM = substitutionModel.createRateMatrix(childNodeWrap);
-//                    DoubleMatrix ptMat = expm(rateM.muli(branchTime));
-//                    //ptMats.put(child.getNr(),ptMat);
-//                    //Log.info.println("PTMATRIX"+ptMat);
-//
-//                    //Get the probability for the data descended from the child node, assuming that the node
-//                    //has a particular target tract repr.
-//                    //These down probs are ordered according to the child node's numbering of the TTs states
-//                    DoubleMatrix chOrderedDownProbs = ptMat.mmul(partials0.get(child.getNr()));
-//                    DoubleMatrix downProbs = new DoubleMatrix();
-//
-//                    if (!node.isRoot()) {
-//
-//                        // Reorder summands according to node's numbering of tract_repr states
-//                        downProbs = GeneralGestalt.reorderLikelihoods(chOrderedDownProbs, transitionWrappers.get(node.getNr()), childNodeWrap);
-//
-//                    } else {
-//                        //For the root node, we just want the probability where the root node is unmodified
-//                        //No need to reorder
-//                        Integer childUnmodifiedIndex = childNodeWrap.statusMap.get(new TargetStatus());
-//                        double downProb = chOrderedDownProbs.get(childUnmodifiedIndex);
-//                        downProb = max(downProb, 0.0);
-//                        downProbs = new DoubleMatrix(1, 1, downProb);
-//                    }
-//                    //todo: implement node abundances
-//                    //if (child.isLeaf()) {
-//                    //Double leafAbundanceWeight = 1.0;
-//                    hasPosProb = downProbs.ge(0);
-//
-//
-//                    //protection against states with zero probability.
-//                    nodeLogPartials = nodeLogPartials.addi(logi(downProbs.addi((hasPosProb.neg()).add(1).mul(1e-30))));
-//
-//
-//                }
-//                Double logScalingTerm = nodeLogPartials.max();
-//
-//
-//                setNodePartials(node.getNr(), expi((nodeLogPartials.subi(logScalingTerm)).muli(hasPosProb)));
-//
-//                logScalingTerms.put(node.getNr(), logScalingTerm);
-//            }
-//
-//
-//        }
-//
-//    }
+    public void traversal(Node node) {
+
+
+        if(node != null) {
+            if (!node.isLeaf()) {
+                // Traverse down the two child nodes
+                final Node child1 = node.getLeft(); //Two children
+                traversal(child1);
+
+                final Node child2 = node.getRight();
+                traversal(child2);
+
+
+                //DoubleMatrix nodeLogPartials = GeneralGestalt.initializeLowerLogProb(transitionWrappers.get(node.getNr()),node);
+                DoubleMatrix nodeLogPartials = DoubleMatrix.zeros(1);
+                DoubleMatrix hasPosProb = ones(1);
+
+
+                for (Node child : node.getChildren()) {
+
+
+                    TransitionWrap childNodeWrap = transitionWrappers.get(child.getNr());
+
+                    //Create the probability matrix exp(Qt)
+                    final double branchRate = branchRateModel.getRateForBranch(node);
+                    final double branchTime = child.getLength() * branchRate;
+                    //Log.info.println("Clock rate"+branchRate);
+                    DoubleMatrix rateM = substitutionModel.createRateMatrix(childNodeWrap);
+                    DoubleMatrix ptMat = expm(rateM.muli(branchTime));
+                    //ptMats.put(child.getNr(),ptMat);
+                    //Log.info.println("PTMATRIX"+ptMat);
+
+                    //Get the probability for the data descended from the child node, assuming that the node
+                    //has a particular target tract repr.
+                    //These down probs are ordered according to the child node's numbering of the TTs states
+                    DoubleMatrix chOrderedDownProbs = ptMat.mmul(partials0.get(child.getNr()));
+                    DoubleMatrix downProbs = new DoubleMatrix();
+
+                    if (!node.isRoot()) {
+
+                        // Reorder summands according to node's numbering of tract_repr states
+                        downProbs = GeneralGestalt.reorderLikelihoods(chOrderedDownProbs, transitionWrappers.get(node.getNr()), childNodeWrap);
+
+                    } else {
+                        //For the root node, we just want the probability where the root node is unmodified
+                        //No need to reorder
+                        Integer childUnmodifiedIndex = childNodeWrap.statusMap.get(new TargetStatus());
+                        double downProb = chOrderedDownProbs.get(childUnmodifiedIndex);
+                        downProb = max(downProb, 0.0);
+                        downProbs = new DoubleMatrix(1, 1, downProb);
+                    }
+                    //todo: implement node abundances
+                    //if (child.isLeaf()) {
+                    //Double leafAbundanceWeight = 1.0;
+                    hasPosProb = downProbs.ge(0);
+
+
+                    //protection against states with zero probability.
+                    nodeLogPartials = nodeLogPartials.addi(logi(downProbs.addi((hasPosProb.neg()).add(1).mul(1e-30))));
+
+
+                }
+                Double logScalingTerm = nodeLogPartials.max();
+
+
+                setNodePartials(node.getNr(), expi((nodeLogPartials.subi(logScalingTerm)).muli(hasPosProb)));
+
+                logScalingTerms.put(node.getNr(), logScalingTerm);
+            }
+
+
+        }
+
+    }
 
 
     public Double createTopologyLogLikelihood(TreeInterface tree, Hashtable<Integer, TransitionWrap> transitionWrappers) {
