@@ -16,6 +16,7 @@ import cern.jet.random.AbstractDiscreteDistribution;
 import cern.jet.random.NegativeBinomial;
 import cern.jet.random.Poisson;
 import cern.jet.random.engine.RandomEngine;
+import org.antlr.v4.runtime.atn.Transition;
 import org.jblas.DoubleMatrix;
 
 import java.util.ArrayList;
@@ -353,6 +354,19 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
     @Override
     public void getTransitionProbabilities(Node node, double startTime, double endTime, double rate, double[] matrix) {
+
+
+    }
+
+    public DoubleMatrix getTransitionProbabilities(Node node,TransitionWrap wrap, double branchLength, double rate) {
+
+
+        //Create the probability matrix exp(Qt)
+        final double branchTime = branchLength * rate;
+        //Log.info.println("Clock rate"+branchRate);
+        DoubleMatrix rateM = this.createRateMatrix(wrap);
+        DoubleMatrix ptma = (expm(rateM.muli(branchTime)));
+        return ptma;
 
 
     }
@@ -718,9 +732,12 @@ public class GeneralGestalt extends SubstitutionModel.Base {
 
     }
 
-    /**
-     * Create the conditional probability of indels
-     */
+
+
+
+        /**
+         * Create the conditional probability of indels
+         */
     public DoubleMatrix createLogIndelProbs(List<IndelSet.Singleton> singletons) {
 
         trimZeroProbsDict.put(0,0,trimZeroProbs.get(0).getValue(0));
