@@ -125,6 +125,10 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
 
         partials = null;
         ptMat = null;
+
+        logScalingTerms = null;
+
+
     }
 
 

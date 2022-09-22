@@ -144,7 +144,7 @@ public class gestaltTreeLikelihood extends Distribution {
 
         //CHANGE BLOCK
         likelihoodCore = new GapmlLikelihoodCore();
-        likelihoodCore.initCore(treeInput.get().getNodeCount());
+        initCore();
         //CHANGE BLOCK
 
 
@@ -158,23 +158,22 @@ public class gestaltTreeLikelihood extends Distribution {
     }
 
     //CHANGE BLOCK
-//    protected void initCore() {
-//        final int nodeCount = treeInput.get().getNodeCount();
-//        GapmlLikelihoodCore.init(nodeCount);
-//
-//        /**
-//         * set leaf partials in likelihood core *
-//         */
-//
-//        setPartials(treeInput.get().getRoot());
-//        hasDirt = Tree.IS_FILTHY;
+    protected void initCore() {
+        final int nodeCount = treeInput.get().getNodeCount();
+        likelihoodCore.init(nodeCount);
+
+        /**
+         * set leaf partials in likelihood core *
+         */
+
+        hasDirt = Tree.IS_FILTHY;
 //        for (int i = 0; i < intNodeCount; i++) {
 //            likelihoodCore.createNodePartials(extNodeCount + i);
 //            // ANTOINE: this is only to create an empty array of size PartialSize:
 //            // the size is : partialsSize = patternCount * nrOfStates;
 //            // in partials : [][][] -> [0/1][NodeIndex][double[partialsSize]]
 //        }
-//    }
+    }
 
 //    /**
 //     * set leaf partials in likelihood core *
@@ -244,7 +243,12 @@ public class gestaltTreeLikelihood extends Distribution {
 
         //get transition wrappers
         long start1 = System.nanoTime();
-        transitionWrappers = TransitionWrap.createTransitionWrappers(tree, dataInput.get(), substitutionModel.metaData, statesDict);
+
+        if(hasDirt == Tree.IS_DIRTY | transitionWrappers == null) {
+            Log.info.println("we are attempting to recalculate all of the transition wrappers, has dirt is:" + hasDirt);
+            transitionWrappers = TransitionWrap.createTransitionWrappers(tree, dataInput.get(), substitutionModel.metaData, statesDict);
+        }
+
         long end1 = System.nanoTime();
         System.out.println("Elapsed Time in seconds: "+ (end1-start1)*0.000000001);
         likelihoodCore.transitionWrappers = transitionWrappers ;
@@ -599,6 +603,28 @@ public class gestaltTreeLikelihood extends Distribution {
 //        return branchLengPen + cutRatesPen;
 //
 //    }
+    /**
+     * check state for changed variables and update temp results if necessary *
+     */
+    @Override
+    protected boolean requiresRecalculation() {
+        hasDirt = Tree.IS_CLEAN;
+
+        if (dataInput.get().isDirtyCalculation()) {
+            hasDirt = Tree.IS_FILTHY;
+            return true;
+        }
+        if (m_siteModel.isDirtyCalculation()) {
+            hasDirt = Tree.IS_DIRTY;
+            return true;
+        }
+        if (branchRateModel != null && branchRateModel.isDirtyCalculation()) {
+            //m_nHasDirt = Tree.IS_DIRTY;
+            return true;
+        }
+        return treeInput.get().somethingIsDirty();
+    }
+
 
 
 
