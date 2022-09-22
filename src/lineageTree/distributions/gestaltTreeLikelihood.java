@@ -102,7 +102,7 @@ public class gestaltTreeLikelihood extends Distribution {
 
     protected Hashtable<Integer, TransitionWrap> transitionWrappers;
 
-    protected LikelihoodCore likelihoodCore;
+    protected GapmlLikelihoodCore likelihoodCore;
 
 
     @Override
@@ -143,8 +143,8 @@ public class gestaltTreeLikelihood extends Distribution {
         Alignment alignment = dataInput.get();
 
         //CHANGE BLOCK
-        //likelihoodCore = new GapmlLikelihoodCore();
-        //initCore();
+        likelihoodCore = new GapmlLikelihoodCore();
+        likelihoodCore.initCore(treeInput.get().getNodeCount());
         //CHANGE BLOCK
 
 
@@ -176,32 +176,32 @@ public class gestaltTreeLikelihood extends Distribution {
 //        }
 //    }
 
-    /**
-     * set leaf partials in likelihood core *
-     */
-    //CHANGE BLOCK
-    protected void setPartials(Node node) {
-        //this is for the purpose of working with single branch trees with potentially no left/right
-        if (node != null) {
-
-
-            if (node.isLeaf()) {
-
-                TransitionWrap nodeWrap = transitionWrappers.get(node.getNr());
-                DoubleMatrix leafPartials = zeros(nodeWrap.numStatuses + 1, 1);
-                Integer observedStateKey = nodeWrap.statusMap.get(nodeWrap.leafState);
-                leafPartials.put(observedStateKey, 1.0);
-                setNodePartials(node.getNr(), leafPartials);
-
-
-            } else {
-                setPartials(node.getLeft());
-                setPartials(node.getRight());
-
-            }
-        }
-    }
-    //CHANGE block
+//    /**
+//     * set leaf partials in likelihood core *
+//     */
+//    //CHANGE BLOCK
+//    protected void setLeafPartials(Node node) {
+//        //this is for the purpose of working with single branch trees with potentially no left/right
+////        if (node != null) {
+//
+//
+////            if (node.isLeaf()) {
+////
+//                TransitionWrap nodeWrap = transitionWrappers.get(node.getNr());
+//                DoubleMatrix leafPartials = zeros(nodeWrap.numStatuses + 1, 1);
+//                Integer observedStateKey = nodeWrap.statusMap.get(nodeWrap.leafState);
+//                leafPartials.put(observedStateKey, 1.0);
+//                setNodePartials(node.getNr(), leafPartials);
+//
+//
+////            } else {
+////                setPartials(node.getLeft());
+////                setPartials(node.getRight());
+////
+////            }
+//
+//    }
+//    //CHANGE block
 
 
     /**
@@ -216,7 +216,7 @@ public class gestaltTreeLikelihood extends Distribution {
     }
 
     /**
-     * Sets matrix from matrix
+     * Sets matrix
      */
     public void setNodeMatrix(int nodeIndex, DoubleMatrix Mat) {
         ptMat.put(nodeIndex,Mat);
@@ -247,14 +247,11 @@ public class gestaltTreeLikelihood extends Distribution {
         transitionWrappers = TransitionWrap.createTransitionWrappers(tree, dataInput.get(), substitutionModel.metaData, statesDict);
         long end1 = System.nanoTime();
         System.out.println("Elapsed Time in seconds: "+ (end1-start1)*0.000000001);
+        likelihoodCore.transitionWrappers = transitionWrappers ;
+        //GapmlLikelihoodCore.init(tree.getNodeCount());
+        //this.partials = new Hashtable<>();
+        //this.ptMat = new Hashtable<>();
 
-        //initialize leaf partial likelihoods
-        partials = new Hashtable<>();
-        ptMat = new Hashtable<>();
-
-        setPartials(tree.getRoot());
-
-        Log.info.println("tree what is up" + tree.getRoot());
 
         try {
             //STEP2 :
@@ -318,7 +315,7 @@ public class gestaltTreeLikelihood extends Distribution {
                 //likelihoodCore.setNodeMatrixForUpdate(nodeIndex);
                 TransitionWrap nodeWrap = transitionWrappers.get(node.getNr());
                 DoubleMatrix ptMat = substitutionModel.getTransitionProbabilities(node.getParent(), nodeWrap, node.getLength(), branchRate);
-                setNodeMatrix(nodeIndex, ptMat);
+                likelihoodCore.setNodeMatrix(nodeIndex, ptMat);
 
 
                 //assign values of states for probability transition matrix for node with number nodeIndex
@@ -327,8 +324,11 @@ public class gestaltTreeLikelihood extends Distribution {
                 update |= Tree.IS_DIRTY;
             }
 
-            // If the node is internal, update the partial likelihoods.
-            if (!node.isLeaf()) {
+            // Only update the partial likelihoods if the node is a leaf
+            if(node.isLeaf()) {
+                likelihoodCore.setLeafPartials(node);
+            }
+            else {
 
                 // Traverse down the two child nodes
                 final Node child1 = node.getLeft(); //Two children
@@ -342,8 +342,9 @@ public class gestaltTreeLikelihood extends Distribution {
 
 
                     update |= (update1 | update2);
-                    DoubleMatrix nodeLogPartials = calculatePartials(node);
-                    setNodePartials(node.getNr(), nodeLogPartials);
+                    //likelihoodCore.setNodePartialsForUpdate(nodeIndex);
+                    DoubleMatrix nodeLogPartials = likelihoodCore.calculatePartials(node);
+                    likelihoodCore.setNodePartials(node.getNr(), nodeLogPartials);
 
 
                 }
@@ -360,7 +361,7 @@ public class gestaltTreeLikelihood extends Distribution {
         final TreeInterface tree = treeInput.get();
 
         // take care of scaling terms
-        Collection<Double> logScalingTermsAll = logScalingTerms.values();
+        Collection<Double> logScalingTermsAll = likelihoodCore.logScalingTerms.values();
         List<Double> terms = new ArrayList<>(logScalingTermsAll);
         Double fullScaling = 0.0;
         for(int i = 0; i < terms.size();++i) {
@@ -369,7 +370,7 @@ public class gestaltTreeLikelihood extends Distribution {
 
         //get the likelihood from the root partial
         int rootIndex = tree.getRoot().getNr();
-        DoubleMatrix logLikAlleles = logi(partials.get(rootIndex)).addi(fullScaling);
+        DoubleMatrix logLikAlleles = logi(likelihoodCore.getNodePartials(rootIndex)).addi(fullScaling);
 //        start1 = System.nanoTime();
 //        Double likelihood = createTopologyLogLikelihood(tree,transitionWrappers);
 //        end1 = System.nanoTime();
@@ -390,57 +391,57 @@ public class gestaltTreeLikelihood extends Distribution {
 //        partials1.put(nodeIndex,new DoubleMatrix(partialsSizes[nodeIndex])) ;
 //    }
 
-    public DoubleMatrix calculatePartials(Node node) {
-
-
-        DoubleMatrix nodeLogPartials = DoubleMatrix.zeros(1);
-        DoubleMatrix hasPosProb = ones(1);
-
-            //here, combine child 1 + child 2 partial
-            for(Node child: node.getChildren()) {
-                TransitionWrap childNodeWrap = transitionWrappers.get(child.getNr());
-                DoubleMatrix Mat = ptMat.get(child.getNr());
-
-                //ptMats.put(child.getNr(),ptMat);
-                //Log.info.println("PTMATRIX"+ptMat);
-
-                //Get the probability for the data descended from the child node, assuming that the node
-                //has a particular target tract repr.
-                //These down probs are ordered according to the child node's numbering of the TTs states
-                DoubleMatrix chOrderedDownProbs = Mat.mmul(partials.get(child.getNr()));
-                DoubleMatrix downProbs = new DoubleMatrix();
-
-                if (!node.isRoot()) {
-
-                    // Reorder summands according to node's numbering of tract_repr states
-                    downProbs = GeneralGestalt.reorderLikelihoods(chOrderedDownProbs, transitionWrappers.get(node.getNr()), childNodeWrap);
-
-                }
-
-                if (node.isRoot()) {
-                    //For the root node, we just want the probability where the root node is unmodified
-                    //No need to reorder
-                    Integer childUnmodifiedIndex = childNodeWrap.statusMap.get(new TargetStatus());
-                    double downProb = chOrderedDownProbs.get(childUnmodifiedIndex);
-                    downProb = max(downProb, 0.0);
-                    downProbs = new DoubleMatrix(1, 1, downProb);
-                }
-                //todo: implement node abundances
-                //if (child.isLeaf()) {
-                //Double leafAbundanceWeight = 1.0;
-                hasPosProb = downProbs.ge(0);
-
-
-                //protection against states with zero probability.
-                nodeLogPartials = nodeLogPartials.addi(logi(downProbs.addi((hasPosProb.neg()).add(1).mul(1e-30))));
-            }
-        Double logScalingTerm = nodeLogPartials.max();
-        logScalingTerms.put(node.getNr(), logScalingTerm);
-        return expi((nodeLogPartials.subi(logScalingTerm)).muli(hasPosProb));
-
-
-
-    }
+//    public DoubleMatrix calculatePartials(Node node) {
+//
+//
+//        DoubleMatrix nodeLogPartials = DoubleMatrix.zeros(1);
+//        DoubleMatrix hasPosProb = ones(1);
+//
+//            //here, combine child 1 + child 2 partial
+//            for(Node child: node.getChildren()) {
+//                TransitionWrap childNodeWrap = transitionWrappers.get(child.getNr());
+//                DoubleMatrix Mat = ptMat.get(child.getNr());
+//
+//                //ptMats.put(child.getNr(),ptMat);
+//                //Log.info.println("PTMATRIX"+ptMat);
+//
+//                //Get the probability for the data descended from the child node, assuming that the node
+//                //has a particular target tract repr.
+//                //These down probs are ordered according to the child node's numbering of the TTs states
+//                DoubleMatrix chOrderedDownProbs = Mat.mmul(partials.get(child.getNr()));
+//                DoubleMatrix downProbs = new DoubleMatrix();
+//
+//                if (!node.isRoot()) {
+//
+//                    // Reorder summands according to node's numbering of tract_repr states
+//                    downProbs = GeneralGestalt.reorderLikelihoods(chOrderedDownProbs, transitionWrappers.get(node.getNr()), childNodeWrap);
+//
+//                }
+//
+//                if (node.isRoot()) {
+//                    //For the root node, we just want the probability where the root node is unmodified
+//                    //No need to reorder
+//                    Integer childUnmodifiedIndex = childNodeWrap.statusMap.get(new TargetStatus());
+//                    double downProb = chOrderedDownProbs.get(childUnmodifiedIndex);
+//                    downProb = max(downProb, 0.0);
+//                    downProbs = new DoubleMatrix(1, 1, downProb);
+//                }
+//                //todo: implement node abundances
+//                //if (child.isLeaf()) {
+//                //Double leafAbundanceWeight = 1.0;
+//                hasPosProb = downProbs.ge(0);
+//
+//
+//                //protection against states with zero probability.
+//                nodeLogPartials = nodeLogPartials.addi(logi(downProbs.addi((hasPosProb.neg()).add(1).mul(1e-30))));
+//            }
+//        Double logScalingTerm = nodeLogPartials.max();
+//        logScalingTerms.put(node.getNr(), logScalingTerm);
+//        return expi((nodeLogPartials.subi(logScalingTerm)).muli(hasPosProb));
+//
+//
+//
+//    }
 
 
 //    public void traversal(Node node) {

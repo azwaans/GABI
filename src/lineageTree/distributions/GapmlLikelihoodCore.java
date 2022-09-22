@@ -1,11 +1,20 @@
 package lineageTree.distributions;
 
 
+import beast.evolution.alignment.TargetStatus;
 import beast.evolution.alignment.TransitionWrap;
 import beast.evolution.likelihood.LikelihoodCore;
+import beast.evolution.tree.Node;
+import lineageTree.substitutionmodel.GeneralGestalt;
 import org.jblas.DoubleMatrix;
 
 import java.util.Hashtable;
+
+import static java.lang.Math.max;
+import static org.jblas.DoubleMatrix.ones;
+import static org.jblas.DoubleMatrix.zeros;
+import static org.jblas.MatrixFunctions.expi;
+import static org.jblas.MatrixFunctions.logi;
 
 /**
  * standard likelihood core, uses no caching *
@@ -14,12 +23,11 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
     protected int nrOfStates;
     protected int nrOfNodes;
 
+    protected Hashtable<Integer, TransitionWrap> transitionWrappers;
 
-
-    protected static Hashtable<Integer, TransitionWrap> transitionWrappers;
-    protected static Hashtable<Integer, DoubleMatrix> ptMats;
-    protected static Hashtable<Integer, DoubleMatrix> partls;
-
+    protected Hashtable<Integer, DoubleMatrix> ptMat;
+    protected Hashtable<Integer, DoubleMatrix> partials;
+    protected Hashtable<Integer, Double> logScalingTerms ;
 
 
     protected int[] currentMatrixIndex;
@@ -28,17 +36,25 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
     protected int[] currentPartialsIndex;
     protected int[] storedPartialsIndex;
 
-    protected int[] currentWrapsIndex;
-    protected int[] storedWrapsIndex;
 
 
     public GapmlLikelihoodCore() {
     } // c'tor
 
+    public void initCore(int nodeCount) {
 
+        nrOfNodes = nodeCount;
 
+        partials = new Hashtable<>();
+        ptMat = new Hashtable<>();
+        logScalingTerms = new Hashtable<>();
 
+        currentMatrixIndex = new int[nodeCount];
+        storedMatrixIndex = new int[nodeCount];
 
+        currentPartialsIndex = new int[nodeCount];
+        storedPartialsIndex = new int[nodeCount];
+    }
 
 
     /**
@@ -50,17 +66,17 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
      */
     @Override
 	public void calculateLogLikelihoods(double[] partials, double[] frequencies, double[] outLogLikelihoods) {
-        int v = 0;
-        for (int k = 0; k < nrOfPatterns; k++) {
-
-            double sum = 0.0;
-            for (int i = 0; i < nrOfStates; i++) {
-
-                sum += frequencies[i] * partials[v];
-                v++;
-            }
-            outLogLikelihoods[k] = Math.log(sum) + getLogScalingFactor(k);
-        }
+//        int v = 0;
+//        for (int k = 0; k < nrOfPatterns; k++) {
+//
+//            double sum = 0.0;
+//            for (int i = 0; i < nrOfStates; i++) {
+//
+//                sum += frequencies[i] * partials[v];
+//                v++;
+//            }
+//            outLogLikelihoods[k] = Math.log(sum) + getLogScalingFactor(k);
+//        }
     }
 
     @Override
@@ -70,24 +86,27 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
 
 
     /**
-     * initializes partial likelihood arrays.
-     *
+     * initializes partial likelihood hashmaps.
      * @param nodeCount           the number of nodes in the tree
-     * @param patternCount        the number of patterns
-     * @param matrixCount         the number of matrices (i.e., number of categories)
-     * @param integrateCategories whether sites are being integrated over all matrices
      */
-	public static void init(int nodeCount) {
+	public void init(int nodeCount) {
 
-        this.nrOfNodes = nodeCount;
-        partls = new Hashtable<>();
-        ptMats = new Hashtable<>();
+        nrOfNodes = nodeCount;
+
+        this.partials = new Hashtable<>();
+        this.ptMat = new Hashtable<>();
+        this.logScalingTerms = new Hashtable<>();
 
         currentMatrixIndex = new int[nodeCount];
         storedMatrixIndex = new int[nodeCount];
 
         currentPartialsIndex = new int[nodeCount];
         storedPartialsIndex = new int[nodeCount];
+
+    }
+
+    @Override
+    public void initialize(int nodeCount, int patternCount, int matrixCount, boolean integrateCategories, boolean useAmbiguities) {
 
     }
 
@@ -104,21 +123,12 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
         currentMatrixIndex = null;
         storedMatrixIndex = null;
 
-        partls = null;
-        ptMats = null;
+        partials = null;
+        ptMat = null;
     }
 
 
 
-    /**
-     * Allocates partials for a node
-     */
-    @Override
-	public void createNodePartials(int nodeIndex) {
-        //at this stage, partial sizes are not known!
-        this.partials[0][nodeIndex] = null;
-        this.partials[1][nodeIndex] = null;
-    }
 
     /**
      * Sets partials for a node
@@ -126,9 +136,9 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
     @Override
 	public void setNodePartials(int nodeIndex, double[] partials) {
 
-        if (this.partials[0][nodeIndex] == null) {
-            createNodePartials(nodeIndex);
-        }
+//        if (this.partials[0][nodeIndex] == null) {
+//            createNodePartials(nodeIndex);
+//        }
 //        if (partials.length < partialsSize) {
 //            int k = 0;
 //            for (int i = 0; i < nrOfMatrices; i++) {
@@ -136,101 +146,66 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
 //                k += partials.length;
 //            }
 //        } else {
-            System.arraycopy(partials, 0, this.partials[0][nodeIndex], 0, partials.length);
+     //       System.arraycopy(partials, 0, this.partials[0][nodeIndex], 0, partials.length);
         //}
     }
 
-    @Override
-    public void getNodePartials(int nodeIndex, double[] partialsOut) {
-        System.arraycopy(partials[currentPartialsIndex[nodeIndex]][nodeIndex], 0, partialsOut, 0, partialsOut.length);
-    }
-
     /**
-     * Allocates states for a node
+     * set leaf partials in likelihood core *
      */
-    public void createNodeStates(int nodeIndex) {
+    //CHANGE BLOCK
+    protected void setLeafPartials(Node node) {
+        //this is for the purpose of working with single branch trees with potentially no left/right
+//        if (node != null) {
 
-        this.states[nodeIndex] = new int[nrOfPatterns];
+
+//            if (node.isLeaf()) {
+//
+        TransitionWrap nodeWrap = transitionWrappers.get(node.getNr());
+        DoubleMatrix leafPartials = zeros(nodeWrap.numStatuses + 1, 1);
+        Integer observedStateKey = nodeWrap.statusMap.get(nodeWrap.leafState);
+        leafPartials.put(observedStateKey, 1.0);
+        setNodePartials(node.getNr(), leafPartials);
+
+
+//            } else {
+//                setPartials(node.getLeft());
+//                setPartials(node.getRight());
+//
+//            }
+
     }
+    //CHANGE block
 
-    /**
-     * Sets states for a node
-     */
-    @Override
-	public void setNodeStates(int nodeIndex, int[] states) {
 
-        if (this.states[nodeIndex] == null) {
-            createNodeStates(nodeIndex);
-        }
-        System.arraycopy(states, 0, this.states[nodeIndex], 0, nrOfPatterns);
-    }
-
-    /**
-     * Gets states for a node
-     */
-    @Override
-	public void getNodeStates(int nodeIndex, int[] states) {
-        System.arraycopy(this.states[nodeIndex], 0, states, 0, nrOfPatterns);
-    }
 
     @Override
     public void setNodeMatrixForUpdate(int nodeIndex) {
         currentMatrixIndex[nodeIndex] = 1 - currentMatrixIndex[nodeIndex];
-
     }
 
 
-//    public void setNodeWrapForUpdate(int nodeIndex) {
-//        currentWrapIndex[nodeIndex] = 1 - currentWrapIndex[nodeIndex];
-//
-//    }
 
-
-    /**
-     * Sets probability matrix for a node
-     */
-	public static void setNodeMatrix(int nodeIndex, DoubleMatrix matrix) {
-       ptMats.put( nodeIndex + nodeIndex*currentMatrixIndex[nodeIndex],matrix);
+    public void setNodePartials(int nodeIndex, DoubleMatrix partial) {
+        partials.put(nodeIndex + currentPartialsIndex[nodeIndex]*nodeIndex,partial);
     }
 
-    /**
-     * Sets probability matrix for a node
-     */
-    @Override
-    public void setNodeMatrix(int nodeIndex, int matrixIndex, double[] matrix) {
-        System.arraycopy(matrix, 0, matrices[currentMatrixIndex[nodeIndex]][nodeIndex],
-                matrixIndex * matrixSize, matrixSize);
-    }
 
-//    /**
-//     * Sets Transition wrap for a node
-//     */
-//    public static void setNodeWrap(int nodeIndex, TransitionWrap wrap) {
-//        transitionWrappers.put(nodeIndex, wrap);
-//    }
-
-
-//    /**
-//     * Sets Transition wrap for a node
-//     */
-//    public static void getNodeWrap(int nodeIndex, TransitionWrap wrap) {
-//        wrap = transitionWrappers.get(nodeIndex);
-//    }
-
-    public void setPaddedNodeMatrices(int nodeIndex, double[] matrix) {
-        System.arraycopy(matrix, 0, matrices[currentMatrixIndex[nodeIndex]][nodeIndex],
-                0, nrOfMatrices * matrixSize);
+    public void setNodeMatrix(int nodeIndex, DoubleMatrix Mat) {
+        ptMat.put(nodeIndex + currentPartialsIndex[nodeIndex] * nodeIndex,Mat);
     }
 
 
     /**
      * Gets probability matrix for a node
-     * no usage!!! no need to change
      */
     @Override
 	public void getNodeMatrix(int nodeIndex, int matrixIndex, double[] matrix) {
-        System.arraycopy(matrices[currentMatrixIndex[nodeIndex]][nodeIndex],
-                matrixIndex * matrixSize, matrix, 0, matrixSize);
+    }
+
+    @Override
+    public void setUseScaling(double scale) {
+
     }
 
     @Override
@@ -238,21 +213,7 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
         currentPartialsIndex[nodeIndex] = 1 - currentPartialsIndex[nodeIndex];
     }
 
-    /**
-     * Sets the currently updating node partials for node nodeIndex. This may
-     * need to repeatedly copy the partials for the different category partitions
-     */
-    public void setCurrentNodePartials(int nodeIndex, double[] partials) {
-        if (partials.length < partialsSize) {
-            int k = 0;
-            for (int i = 0; i < nrOfMatrices; i++) {
-                System.arraycopy(partials, 0, this.partials[currentPartialsIndex[nodeIndex]][nodeIndex], k, partials.length);
-                k += partials.length;
-            }
-        } else {
-            System.arraycopy(partials, 0, this.partials[currentPartialsIndex[nodeIndex]][nodeIndex], 0, partials.length);
-        }
-    }
+
 
     /**
      * Calculates partial likelihoods at a node.
@@ -263,85 +224,64 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
      */
     @Override
 	public void calculatePartials(int nodeIndex1, int nodeIndex2, int nodeIndex3) {
-        if (states[nodeIndex1] != null) {
-            if (states[nodeIndex2] != null) {
-                calculateStatesStatesPruning(
-                        states[nodeIndex1], matrices[currentMatrixIndex[nodeIndex1]][nodeIndex1],
-                        states[nodeIndex2], matrices[currentMatrixIndex[nodeIndex2]][nodeIndex2],
-                        partials[currentPartialsIndex[nodeIndex3]][nodeIndex3]);
-            } else {
-                calculateStatesPartialsPruning(states[nodeIndex1], matrices[currentMatrixIndex[nodeIndex1]][nodeIndex1],
-                        partials[currentPartialsIndex[nodeIndex2]][nodeIndex2], matrices[currentMatrixIndex[nodeIndex2]][nodeIndex2],
-                        partials[currentPartialsIndex[nodeIndex3]][nodeIndex3]);
+
+
+    }
+
+
+    public DoubleMatrix calculatePartials(Node node) {
+
+
+        DoubleMatrix nodeLogPartials = DoubleMatrix.zeros(1);
+        DoubleMatrix hasPosProb = ones(1);
+
+        //here, combine child 1 + child 2 partial
+        for(Node child: node.getChildren()) {
+            int childNum = child.getNr();
+            TransitionWrap childNodeWrap = transitionWrappers.get(childNum);
+            DoubleMatrix Mat = ptMat.get(childNum + currentMatrixIndex[childNum] * childNum);
+
+            //ptMats.put(child.getNr(),ptMat);
+            //Log.info.println("PTMATRIX"+ptMat);
+
+            //Get the probability for the data descended from the child node, assuming that the node
+            //has a particular target tract repr.
+            //These down probs are ordered according to the child node's numbering of the TTs states
+            DoubleMatrix chOrderedDownProbs = Mat.mmul(partials.get(childNum + currentPartialsIndex[childNum] * childNum));
+            DoubleMatrix downProbs = new DoubleMatrix();
+
+            if (!node.isRoot()) {
+
+                // Reorder summands according to node's numbering of tract_repr states
+                downProbs = GeneralGestalt.reorderLikelihoods(chOrderedDownProbs, transitionWrappers.get(node.getNr()), childNodeWrap);
+
             }
-        } else {
-            if (states[nodeIndex2] != null) {
-                calculateStatesPartialsPruning(states[nodeIndex2], matrices[currentMatrixIndex[nodeIndex2]][nodeIndex2],
-                        partials[currentPartialsIndex[nodeIndex1]][nodeIndex1], matrices[currentMatrixIndex[nodeIndex1]][nodeIndex1],
-                        partials[currentPartialsIndex[nodeIndex3]][nodeIndex3]);
-            } else {
-                calculatePartialsPartialsPruning(partials[currentPartialsIndex[nodeIndex1]][nodeIndex1], matrices[currentMatrixIndex[nodeIndex1]][nodeIndex1],
-                        partials[currentPartialsIndex[nodeIndex2]][nodeIndex2], matrices[currentMatrixIndex[nodeIndex2]][nodeIndex2],
-                        partials[currentPartialsIndex[nodeIndex3]][nodeIndex3]);
+
+            if (node.isRoot()) {
+                //For the root node, we just want the probability where the root node is unmodified
+                //No need to reorder
+                Integer childUnmodifiedIndex = childNodeWrap.statusMap.get(new TargetStatus());
+                double downProb = chOrderedDownProbs.get(childUnmodifiedIndex);
+                downProb = max(downProb, 0.0);
+                downProbs = new DoubleMatrix(1, 1, downProb);
             }
+            //todo: implement node abundances
+            //if (child.isLeaf()) {
+            //Double leafAbundanceWeight = 1.0;
+            hasPosProb = downProbs.ge(0);
+
+
+            //protection against states with zero probability.
+            nodeLogPartials = nodeLogPartials.addi(logi(downProbs.addi((hasPosProb.neg()).add(1).mul(1e-30))));
         }
-
-        if (useScaling) {
-            scalePartials(nodeIndex3);
-        }
-
-//
-//        int k =0;
-//        for (int i = 0; i < patternCount; i++) {
-//            double f = 0.0;
-//
-//            for (int j = 0; j < stateCount; j++) {
-//                f += partials[currentPartialsIndices[nodeIndex3]][nodeIndex3][k];
-//                k++;
-//            }
-//            if (f == 0.0) {
-//                Logger.getLogger("error").severe("A partial likelihood (node index = " + nodeIndex3 + ", pattern = "+ i +") is zero for all states.");
-//            }
-//        }
-    }
-
-    @Override
-    public void integratePartials(int nodeIndex, double[] proportions, double[] outPartials) {
-
-    }
-
-    /**
-     * Calculates partial likelihoods at a node.
-     *
-     * @param nodeIndex1 the 'child 1' node
-     * @param nodeIndex2 the 'child 2' node
-     * @param nodeIndex3 the 'parent' node
-     * @param matrixMap  a map of which matrix to use for each pattern (can be null if integrating over categories)
-     */
-    public void calculatePartials(int nodeIndex1, int nodeIndex2, int nodeIndex3, int[] matrixMap) {
+        Double logScalingTerm = nodeLogPartials.max();
+        logScalingTerms.put(node.getNr(), logScalingTerm);
+        return expi((nodeLogPartials.subi(logScalingTerm)).muli(hasPosProb));
 
     }
 
 
-//    @Override
-//	public void integratePartials(int nodeIndex, double[] proportions, double[] outPartials) {
-//        calculateIntegratePartials(partials[currentPartialsIndex[nodeIndex]][nodeIndex], proportions, outPartials);
-//    }
 
-
-
-
-    /**
-     * Gets the partials for a particular node.
-     *
-     * @param nodeIndex   the node
-     * @param outPartials an array into which the partials will go
-     */
-    public void getPartials(int nodeIndex, double[] outPartials) {
-        double[] partials1 = partials[currentPartialsIndex[nodeIndex]][nodeIndex];
-
-        System.arraycopy(partials1, 0, outPartials, 0, partialsSize);
-    }
 
     /**
      * Store current state
@@ -357,16 +297,12 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
         currentPartialsIndex = storedPartialsIndex;
         storedPartialsIndex = tmp2;
 
-        int[] tmp3 = currentWrapsIndex;
-        currentWrapsIndex = storedWrapsIndex;
-        storedWrapsIndex = tmp3;
     }
 
     @Override
 	public void unstore() {
         System.arraycopy(storedMatrixIndex, 0, currentMatrixIndex, 0, nrOfNodes);
         System.arraycopy(storedPartialsIndex, 0, currentPartialsIndex, 0, nrOfNodes);
-        System.arraycopy(storedWrapsIndex, 0, currentWrapsIndex, 0, nrOfNodes);
 
     }
 
@@ -377,15 +313,83 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
     public void store() {
         System.arraycopy(currentMatrixIndex, 0, storedMatrixIndex, 0, nrOfNodes);
         System.arraycopy(currentPartialsIndex, 0, storedPartialsIndex, 0, nrOfNodes);
-        System.arraycopy(currentWrapsIndex, 0, storedWrapsIndex, 0, nrOfNodes);
     }
 
 
 
-    
+
     @Override
     public boolean getUseScaling() {
-        return useScaling;
+        return true;}
+
+    @Override
+    public double getLogScalingFactor(int patternIndex_) {
+        return 0;
     }
+
+    @Override
+    public void setNodeMatrix(int nodeIndex, int matrixIndex, double[] matrix) {
+    }
+
+    public void setCurrentNodePartials(int nodeIndex, double[] partials) {
+    }
+
+//    @Override
+//    public void integratePartials(int nodeIndex, double[] proportions, double[] outPartials) {
+//    }
+
+    @Override
+    public void integratePartials(int nodeIndex, double[] proportions, double[] outPartials) {
+//        calculateIntegratePartials(partials[currentPartialsIndex[nodeIndex]][nodeIndex], proportions, outPartials);
+    }
+
+    /**
+     * Allocates states for a node
+     */
+    public void createNodeStates(int nodeIndex) {
+    }
+
+    /**
+     * Sets states for a node
+     */
+    @Override
+    public void setNodeStates(int nodeIndex, int[] states) {
+    }
+
+    @Override
+    public void getNodeStates(int nodeIndex, int[] states) {
+
+    }
+
+    /**
+     * Allocates partials for a node
+     */
+    @Override
+    public void createNodePartials(int nodeIndex) {
+        //at this stage, partial sizes are not known!
+//        this.partials[0][nodeIndex] = null;
+//        this.partials[1][nodeIndex] = null;
+    }
+
+    @Override
+    public void getNodePartials(int nodeIndex, double[] partialsOut) {
+//        System.arraycopy(partials[currentPartialsIndex[nodeIndex]][nodeIndex], 0, partialsOut, 0, partialsOut.length);
+    }
+    public DoubleMatrix getNodePartials(int nodeIndex) {
+        return partials.get(nodeIndex + currentPartialsIndex[nodeIndex] *nodeIndex);
+    }
+
+    /**
+     * Gets the partials for a particular node.
+     *
+     * @param nodeIndex   the node
+     * @param outPartials an array into which the partials will go
+     */
+    public void getPartials(int nodeIndex, double[] outPartials) {
+//        double[] partials1 = partials[currentPartialsIndex[nodeIndex]][nodeIndex];
+//
+//        System.arraycopy(partials1, 0, outPartials, 0, partialsSize);
+    }
+
 
 } // class BeerLikelihoodCore
