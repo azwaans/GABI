@@ -1,7 +1,6 @@
 package beast.evolution.alignment;
 
 import beast.core.BEASTObject;
-import beast.core.util.Log;
 import org.apache.commons.math3.util.Pair;
 import org.jblas.DoubleMatrix;
 

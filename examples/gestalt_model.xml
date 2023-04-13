@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><beast beautitemplate='MultiTypeBirthDeath' beautistatus='' namespace="lineageTree.substitutionmodel.GeneralGestalt:beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood" required="" version="2.6">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><beast beautitemplate='MultiTypeBirthDeath' beautistatus='' namespace="beast.evolution.substitutionmodel.GeneralGestalt:beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood" required="" version="2.6">
 
     <!-- dataType has to be set to integer and the value must contain a ',' s.t. the class recognizes it as a comma separated string of integers-->
     <data  id="gestaltTest" spec="Alignment" name="alignment" >
-        <userDataType spec="beast.evolution.datatype.GstaltData"/>
+        <userDataType spec="beast.evolution.datatype.gestaltData"/>
         <sequence id="6" spec="Sequence" taxon="6"  value="38_1_0_0_TGGAGTCGAGAGCGCGCTCGTCGa,115_144_3_8_,271_11_9_9_a,None,None,None,"/>
         <sequence id="1" spec="Sequence" taxon="1"  value="37_2_0_0_ATaa,64_3_1_1_,114_14_3_3_,141_53_4_5_,197_4_6_6_a,244_34_8_8_,"/>
         <sequence id="2" spec="Sequence" taxon="2"  value="29_10_0_0_aaa,101_204_3_9_,None,None,None,None,"/>
@@ -122,12 +122,12 @@
 
             <!-- Tree likelihood -->
             <distribution id="likelihood" spec="util.CompoundDistribution">
-                <distribution id="treeLikelihood.gestaltTest" spec="lineageTree.distributions.gestaltTreeLikelihood" data="@gestaltTest" tree="@Tree.t:gestaltTest">
+                <distribution id="treeLikelihood.gestaltTest" spec="beast.evolution.distributions.gestaltTreeLikelihood" data="@gestaltTest" tree="@Tree.t:gestaltTest">
                     <siteModel id="SiteModel.s:gestaltTest" spec="SiteModel">
                         <parameter id="mutationRate.s:gestaltTest" spec="parameter.RealParameter" estimate="false" name="mutationRate">1.0</parameter>
 
                         <parameter id="proportionInvariant.s:gestaltTest" spec="parameter.RealParameter" estimate="false" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
-                        <substModel id="JC69.s:gestaltTest" spec="lineageTree.substitutionmodel.GeneralGestalt" barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA" cutSite="6" crucialPos="6 6" maxSumSteps= "20" maxExtraSteps="1" cutRates="@cutRates" longTrimScaling="@longTrimScaling" doubleCutWeight="@doubleCutWeight">
+                        <substModel id="JC69.s:gestaltTest" spec="beast.evolution.substitutionmodel.gestaltGeneral" barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA" cutSite="6" crucialPos="6 6" maxSumSteps= "20" maxExtraSteps="1" cutRates="@cutRates" longTrimScaling="@longTrimScaling" doubleCutWeight="@doubleCutWeight">
                             <frequencies id="freq" spec="beast.evolution.substitutionmodel.Frequencies" frequencies="1.0 0" estimate="false"/>
                         </substModel>
                     </siteModel>

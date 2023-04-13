@@ -1,11 +1,11 @@
-package lineageTree.distributions;
+package beast.evolution.distributions;
 
 
 import beast.evolution.alignment.TargetStatus;
 import beast.evolution.alignment.TransitionWrap;
 import beast.evolution.likelihood.LikelihoodCore;
 import beast.evolution.tree.Node;
-import lineageTree.substitutionmodel.GeneralGestalt;
+import beast.evolution.substitutionmodel.gestaltGeneral;
 import org.jblas.DoubleMatrix;
 
 import java.util.Hashtable;
@@ -19,8 +19,7 @@ import static org.jblas.MatrixFunctions.logi;
 /**
  * standard likelihood core, uses no caching *
  */
-public class GapmlLikelihoodCore extends LikelihoodCore {
-    protected int nrOfStates;
+public class gestaltLikelihoodCore extends LikelihoodCore {
     protected int nrOfNodes;
 
     protected Hashtable<Integer, TransitionWrap> transitionWrappers;
@@ -38,7 +37,7 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
 
 
 
-    public GapmlLikelihoodCore() {
+    public gestaltLikelihoodCore() {
     } // c'tor
 
     public void initCore(int nodeCount) {
@@ -127,12 +126,7 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
         ptMat = null;
 
         logScalingTerms = null;
-
-
     }
-
-
-
 
     /**
      * Sets partials for a node
@@ -157,29 +151,15 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
     /**
      * set leaf partials in likelihood core *
      */
-    //CHANGE BLOCK
     protected void setLeafPartials(Node node) {
-        //this is for the purpose of working with single branch trees with potentially no left/right
-//        if (node != null) {
 
 
-//            if (node.isLeaf()) {
-//
         TransitionWrap nodeWrap = transitionWrappers.get(node.getNr());
         DoubleMatrix leafPartials = zeros(nodeWrap.numStatuses + 1, 1);
         Integer observedStateKey = nodeWrap.statusMap.get(nodeWrap.leafState);
         leafPartials.put(observedStateKey, 1.0);
         setNodePartials(node.getNr(), leafPartials);
-
-
-//            } else {
-//                setPartials(node.getLeft());
-//                setPartials(node.getRight());
-//
-//            }
-
     }
-    //CHANGE block
 
 
 
@@ -244,10 +224,6 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
             int childNum = child.getNr();
             TransitionWrap childNodeWrap = transitionWrappers.get(childNum);
             DoubleMatrix Mat = ptMat.get(childNum + currentMatrixIndex[childNum] * childNum);
-
-            //ptMats.put(child.getNr(),ptMat);
-            //Log.info.println("PTMATRIX"+ptMat);
-
             //Get the probability for the data descended from the child node, assuming that the node
             //has a particular target tract repr.
             //These down probs are ordered according to the child node's numbering of the TTs states
@@ -257,7 +233,7 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
             if (!node.isRoot()) {
 
                 // Reorder summands according to node's numbering of tract_repr states
-                downProbs = GeneralGestalt.reorderLikelihoods(chOrderedDownProbs, transitionWrappers.get(node.getNr()), childNodeWrap);
+                downProbs = gestaltGeneral.reorderLikelihoods(chOrderedDownProbs, transitionWrappers.get(node.getNr()), childNodeWrap);
 
             }
 
@@ -319,8 +295,9 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
         System.arraycopy(currentPartialsIndex, 0, storedPartialsIndex, 0, nrOfNodes);
     }
 
-
-
+    public DoubleMatrix getNodePartials(int nodeIndex) {
+        return partials.get(nodeIndex + currentPartialsIndex[nodeIndex] *nodeIndex);
+    }
 
     @Override
     public boolean getUseScaling() {
@@ -335,16 +312,10 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
     public void setNodeMatrix(int nodeIndex, int matrixIndex, double[] matrix) {
     }
 
-    public void setCurrentNodePartials(int nodeIndex, double[] partials) {
-    }
 
-//    @Override
-//    public void integratePartials(int nodeIndex, double[] proportions, double[] outPartials) {
-//    }
 
     @Override
     public void integratePartials(int nodeIndex, double[] proportions, double[] outPartials) {
-//        calculateIntegratePartials(partials[currentPartialsIndex[nodeIndex]][nodeIndex], proportions, outPartials);
     }
 
     /**
@@ -370,30 +341,16 @@ public class GapmlLikelihoodCore extends LikelihoodCore {
      */
     @Override
     public void createNodePartials(int nodeIndex) {
-        //at this stage, partial sizes are not known!
-//        this.partials[0][nodeIndex] = null;
-//        this.partials[1][nodeIndex] = null;
+
     }
 
     @Override
     public void getNodePartials(int nodeIndex, double[] partialsOut) {
-//        System.arraycopy(partials[currentPartialsIndex[nodeIndex]][nodeIndex], 0, partialsOut, 0, partialsOut.length);
-    }
-    public DoubleMatrix getNodePartials(int nodeIndex) {
-        return partials.get(nodeIndex + currentPartialsIndex[nodeIndex] *nodeIndex);
-    }
-
-    /**
-     * Gets the partials for a particular node.
-     *
-     * @param nodeIndex   the node
-     * @param outPartials an array into which the partials will go
-     */
-    public void getPartials(int nodeIndex, double[] outPartials) {
-//        double[] partials1 = partials[currentPartialsIndex[nodeIndex]][nodeIndex];
-//
-//        System.arraycopy(partials1, 0, outPartials, 0, partialsSize);
     }
 
 
-} // class BeerLikelihoodCore
+
+
+
+
+} // class gestaltCore

@@ -1,8 +1,6 @@
 package beast.evolution.alignment;
 
 import beast.core.BEASTObject;
-import beast.core.util.Log;
-
 import java.math.BigInteger;
 import java.util.*;
 

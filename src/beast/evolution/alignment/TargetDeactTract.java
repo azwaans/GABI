@@ -1,10 +1,7 @@
 package beast.evolution.alignment;
 
 import beast.core.BEASTObject;
-import beast.core.util.Log;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 

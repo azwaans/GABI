@@ -14,7 +14,7 @@ import java.util.List;
  todo: check codeMap examples.
  */
 @Description("Datatype for string sequence representing barcodes states.")
-public class GstaltData extends Base {
+public class gestaltData extends Base {
 
 
     public void initAndValidate(){

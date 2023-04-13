@@ -1,6 +1,5 @@
-package lineageTree.distributions;
+package beast.evolution.distributions;
 
-import beast.evolution.likelihood.LikelihoodCore;
 import beast.evolution.tree.Tree;
 import org.jblas.DoubleMatrix;
 
@@ -19,11 +18,10 @@ import beast.evolution.sitemodel.SiteModel;
 import beast.evolution.sitemodel.SiteModelInterface;
 import beast.evolution.tree.Node;
 import beast.evolution.tree.TreeInterface;
-import lineageTree.substitutionmodel.GeneralGestalt;
+import beast.evolution.substitutionmodel.gestaltGeneral;
 
-//import static lineageTree.distributions.GapmlLikelihoodCore.ptMats;
-//import static lineageTree.distributions.GapmlLikelihoodCore.setNodeMatrix;
-import static org.jblas.DoubleMatrix.*;
+//import static beast.evolution.distributions.GapmlLikelihoodCore.ptMats;
+//import static beast.evolution.distributions.GapmlLikelihoodCore.setNodeMatrix;
 import static org.jblas.MatrixFunctions.*;
 
 import static java.lang.Math.max;
@@ -48,7 +46,7 @@ public class gestaltTreeLikelihood extends Distribution {
     final public Input<BranchRateModel.Base> branchRateModelInput = new Input<>("branchRateModel",
             "A model describing the rates on the branches of the beast.tree.");
 
-    protected GeneralGestalt substitutionModel;
+    protected gestaltGeneral substitutionModel;
 
     protected SiteModel.Base m_siteModel;
 
@@ -70,9 +68,7 @@ public class gestaltTreeLikelihood extends Distribution {
      */
     protected int hasDirt;
 
-    //protected Hashtable<Integer, TransitionWrap> transitionWrappers;
-
-    protected GapmlLikelihoodCore likelihoodCore;
+    protected gestaltLikelihoodCore likelihoodCore;
 
 
     @Override
@@ -98,8 +94,7 @@ public class gestaltTreeLikelihood extends Distribution {
         m_siteModel = (SiteModel.Base) siteModelInput.get();
         m_siteModel.setDataType(dataInput.get().getDataType());
 
-
-        substitutionModel = (GeneralGestalt) m_siteModel.substModelInput.get();
+        substitutionModel = (gestaltGeneral) m_siteModel.substModelInput.get();
         if (branchRateModelInput.get() != null) {
             branchRateModel = branchRateModelInput.get();
         } else {
@@ -109,11 +104,8 @@ public class gestaltTreeLikelihood extends Distribution {
         m_branchLengths = new double[nodeCount];
         storedBranchLengths = new double[nodeCount];
 
-
-        Alignment alignment = dataInput.get();
-
         //CHANGE BLOCK
-        likelihoodCore = new GapmlLikelihoodCore();
+        likelihoodCore = new gestaltLikelihoodCore();
         initCore();
 
 
@@ -137,8 +129,7 @@ public class gestaltTreeLikelihood extends Distribution {
 
         final TreeInterface tree = treeInput.get();
 
-
-        //get transition wrappers
+        //recording time
         long start1 = System.nanoTime();
 
         if(hasDirt == Tree.IS_FILTHY | likelihoodCore.transitionWrappers == null) {
@@ -169,14 +160,12 @@ public class gestaltTreeLikelihood extends Distribution {
         System.out.println("Elapsed Time in seconds: "+ (end1-start1)*0.000000001);
 
         try {
-            //STEP2 :
-            //CHANGE BLOCK
 
             //populate partial likelihoods with postorder traversal
             if (traverse(tree.getRoot()) != Tree.IS_CLEAN) {
                 calcLogP();
             }
-            //CHANGE BLOCK
+
         }
         catch (ArithmeticException e) {
             return Double.NEGATIVE_INFINITY;

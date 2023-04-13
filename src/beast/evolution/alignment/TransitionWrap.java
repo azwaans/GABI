@@ -1,5 +1,4 @@
 package beast.evolution.alignment;
-import beast.core.util.Log;
 import beast.evolution.tree.Node;
 import beast.core.BEASTObject;
 import org.apache.commons.math3.util.Pair;

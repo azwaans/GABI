@@ -1,11 +1,10 @@
-package lineageTree.distributions;
-
 import beast.core.parameter.RealParameter;
 import beast.core.util.Log;
 import beast.evolution.alignment.*;
 import beast.evolution.sitemodel.SiteModel;
 import beast.evolution.substitutionmodel.Frequencies;
-import lineageTree.substitutionmodel.GeneralGestalt;
+import beast.evolution.distributions.gestaltTreeLikelihood;
+import beast.evolution.substitutionmodel.gestaltGeneral;
 import beast.evolution.tree.Tree;
 import beast.util.TreeParser;
 import org.junit.Test;
@@ -54,7 +53,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -120,7 +119,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -188,7 +187,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -255,7 +254,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -330,7 +329,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -405,7 +404,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -475,7 +474,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -542,7 +541,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -610,7 +609,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -679,7 +678,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -747,7 +746,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -816,7 +815,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -883,7 +882,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -957,7 +956,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -1046,7 +1045,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -1132,7 +1131,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -1219,7 +1218,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -1297,7 +1296,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -1372,7 +1371,7 @@ public class GestaltPruningTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -1387,7 +1386,7 @@ public class GestaltPruningTest {
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
+
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
         Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);

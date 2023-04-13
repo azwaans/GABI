@@ -1,22 +1,18 @@
-package lineageTree.substitutionmodel;
+package beast.evolution.substitutionmodel;
 
 import beast.core.Citation;
 import beast.core.Description;
 import beast.core.Input;
 import beast.core.parameter.IntegerParameter;
 import beast.core.parameter.RealParameter;
-import beast.core.util.Log;
 import beast.evolution.alignment.*;
 import beast.evolution.datatype.DataType;
 import beast.evolution.datatype.IntegerData;
-import beast.evolution.substitutionmodel.EigenDecomposition;
-import beast.evolution.substitutionmodel.SubstitutionModel;
 import beast.evolution.tree.Node;
 import cern.jet.random.AbstractDiscreteDistribution;
 import cern.jet.random.NegativeBinomial;
 import cern.jet.random.Poisson;
 import cern.jet.random.engine.RandomEngine;
-import org.antlr.v4.runtime.atn.Transition;
 import org.jblas.DoubleMatrix;
 
 import java.util.ArrayList;
@@ -36,7 +32,7 @@ import static org.jblas.MatrixFunctions.*;
                 "  by maximum-likelihood phylogenetics \n" +
                 "  15.1:343-362.", DOI = "10.1214/20-AOAS1400", year = 2021, firstAuthorSurname = "feng")
 
-public class GeneralGestalt extends SubstitutionModel.Base {
+public class gestaltGeneral extends SubstitutionModel.Base {
 
 
     //metadata inputs

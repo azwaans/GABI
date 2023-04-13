@@ -1,10 +1,7 @@
-package lineageTree.distributions;
-
 import beast.core.parameter.RealParameter;
-import beast.core.util.Log;
 import beast.evolution.alignment.*;
 import beast.evolution.substitutionmodel.Frequencies;
-import lineageTree.substitutionmodel.GeneralGestalt;
+import beast.evolution.substitutionmodel.gestaltGeneral;
 import org.jblas.DoubleMatrix;
 import org.junit.Test;
 
@@ -13,11 +10,10 @@ import java.util.List;
 
 import static org.jblas.MatrixFunctions.powi;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 
-public class GeneralGestaltTest {
+public class gestaltGeneralTest {
 
     @Test
     public void test_hazard_1() {
@@ -37,7 +33,7 @@ public class GeneralGestaltTest {
 
          
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -87,7 +83,7 @@ public class GeneralGestaltTest {
 
          
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -106,7 +102,6 @@ public class GeneralGestaltTest {
         TargetStatus test = new TargetStatus(inputlist);
         testing.add(test);
         Double hazawaynode = gestaltModel.createHazardAwayTargetStatuses(testing).get(0);
-        Log.info.println("hazawaynode :"+hazawaynode);
         assertEquals(0, hazawaynode, 1e-5);
 
 
@@ -133,7 +128,7 @@ public class GeneralGestaltTest {
 
          
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -180,7 +175,7 @@ public class GeneralGestaltTest {
 
          
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -229,7 +224,7 @@ public class GeneralGestaltTest {
 
          
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -280,7 +275,7 @@ public class GeneralGestaltTest {
 
          
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -332,7 +327,7 @@ public class GeneralGestaltTest {
 
          
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -380,7 +375,7 @@ public class GeneralGestaltTest {
 
          
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -421,10 +416,6 @@ public class GeneralGestaltTest {
         DoubleMatrix qMat = gestaltModel.createRateMatrix(transition_wrapper);
         Double trimlongshortboth = (1 + gestaltModel.longTrimFactors.get(0).getValue(1))* (1 + gestaltModel.longTrimFactors.get(0).getValue(0));
         //FIRST CHECK: row sums = 0
-        Log.info.println("FULL MATRIX" + qMat);
-        Log.info.println("qmat dimensions rows" + qMat.getRows());
-        Log.info.println("qmat dimensions columns" + qMat.getColumns());
-        Log.info.println("first value from status map:");
 
         Double val1 = qMat.get(transition_wrapper.statusMap.get(target_stat_start),transition_wrapper.statusMap.get(target_stat1));
         Double hazard1 = gestaltModel.doubleCutWeight.getValue() * (gestaltModel.cutRates.get(0).getValue(0) + gestaltModel.cutRates.get(0).getValue(1)) + gestaltModel.cutRates.get(0).getValue(0) * gestaltModel.longTrimFactors.get(0).getValue(1) + gestaltModel.cutRates.get(0).getValue(1) * gestaltModel.longTrimFactors.get(0).getValue(0);

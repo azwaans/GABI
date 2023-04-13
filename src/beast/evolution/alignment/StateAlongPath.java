@@ -1,7 +1,5 @@
 package beast.evolution.alignment;
 
-import beast.core.util.Log;
-
 import java.util.List;
 
 public class StateAlongPath {

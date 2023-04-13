@@ -1,12 +1,8 @@
 package beast.evolution.alignment;
 
 import beast.core.BEASTObject;
-import beast.core.Description;
 import beast.core.Input;
-import beast.core.util.Log;
-import org.antlr.v4.runtime.misc.Pair;
 
-import java.util.Comparator;
 
 public class GestaltEvent extends BEASTObject implements Comparable<GestaltEvent> {
 

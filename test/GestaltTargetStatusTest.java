@@ -1,6 +1,3 @@
-package lineageTree.distributions;
-
-import beast.core.util.Log;
 import beast.evolution.alignment.BarcodeMeta;
 import beast.evolution.alignment.IndelSet;
 import beast.evolution.alignment.TargetDeactTract;

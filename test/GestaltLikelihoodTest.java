@@ -1,9 +1,8 @@
-package lineageTree.distributions;
-
 import beast.core.parameter.RealParameter;
 import beast.evolution.sitemodel.SiteModel;
 import beast.evolution.substitutionmodel.Frequencies;
-import lineageTree.substitutionmodel.GeneralGestalt;
+import beast.evolution.distributions.gestaltTreeLikelihood;
+import beast.evolution.substitutionmodel.gestaltGeneral;
 import beast.evolution.alignment.Alignment;
 import beast.evolution.alignment.Sequence;
 import beast.evolution.tree.Tree;
@@ -49,7 +48,7 @@ public class GestaltLikelihoodTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -64,7 +63,7 @@ public class GestaltLikelihoodTest {
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
+        
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -107,7 +106,7 @@ public class GestaltLikelihoodTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -122,7 +121,7 @@ public class GestaltLikelihoodTest {
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
+        
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -166,7 +165,7 @@ public class GestaltLikelihoodTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -181,7 +180,7 @@ public class GestaltLikelihoodTest {
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
+        
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -225,7 +224,7 @@ public class GestaltLikelihoodTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -240,7 +239,7 @@ public class GestaltLikelihoodTest {
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
+        
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -286,7 +285,7 @@ public class GestaltLikelihoodTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -301,7 +300,7 @@ public class GestaltLikelihoodTest {
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
+        
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -346,7 +345,7 @@ public class GestaltLikelihoodTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -361,7 +360,7 @@ public class GestaltLikelihoodTest {
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
+        
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -412,7 +411,7 @@ public class GestaltLikelihoodTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -427,7 +426,7 @@ public class GestaltLikelihoodTest {
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
+        
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -470,7 +469,7 @@ public class GestaltLikelihoodTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -485,7 +484,7 @@ public class GestaltLikelihoodTest {
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
+        
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -528,7 +527,7 @@ public class GestaltLikelihoodTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -543,7 +542,7 @@ public class GestaltLikelihoodTest {
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
+        
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -587,7 +586,7 @@ public class GestaltLikelihoodTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -602,7 +601,7 @@ public class GestaltLikelihoodTest {
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
+        
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -646,7 +645,7 @@ public class GestaltLikelihoodTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -661,7 +660,7 @@ public class GestaltLikelihoodTest {
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
+        
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -674,7 +673,7 @@ public class GestaltLikelihoodTest {
 //
 //        likelihood = new gestaltTreeLikelihood();
 //        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-//        likelihood.substitutionModel = gestaltModel;
+//        
 //        logL = likelihood.calculateLogP();
 //
 //        System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -721,7 +720,7 @@ public class GestaltLikelihoodTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -736,7 +735,7 @@ public class GestaltLikelihoodTest {
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
+        
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -778,7 +777,7 @@ public class GestaltLikelihoodTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -793,7 +792,7 @@ public class GestaltLikelihoodTest {
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
+        
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -840,7 +839,7 @@ public class GestaltLikelihoodTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        GeneralGestalt gestaltModel = new GeneralGestalt();
+        gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
@@ -855,7 +854,7 @@ public class GestaltLikelihoodTest {
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
         likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        likelihood.substitutionModel = gestaltModel;
+        
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
