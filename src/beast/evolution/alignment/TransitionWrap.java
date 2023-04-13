@@ -1,6 +1,8 @@
 package beast.evolution.alignment;
-import beast.evolution.tree.Node;
-import beast.core.BEASTObject;
+import beast.base.core.Log;
+import beast.base.evolution.alignment.Alignment;
+import beast.base.evolution.tree.Node;
+import beast.base.core.BEASTObject;
 import org.apache.commons.math3.util.Pair;
 
 import java.util.*;
@@ -192,14 +194,15 @@ public class TransitionWrap extends BEASTObject {
     /** in original implementation: annotate_ancestral_states
      * finds all possible Ancestral States at internal nodes
      */
-    public static Hashtable<Integer, AncStates> createStatesDict(beast.evolution.tree.TreeInterface tree, Alignment alinmt, List<Pair<Integer,Integer>> posSites,int nTargets) {
+    public static Hashtable<Integer, AncStates> createStatesDict(beast.base.evolution.tree.TreeInterface tree, Alignment alinmt, List<Pair<Integer,Integer>> posSites, int nTargets) {
         Hashtable<Integer, AncStates> statesDict = new Hashtable<>();
         for (Node node : tree.listNodesPostOrder(null, null)) {
 
             if (node.isLeaf()) {
 
 
-                String leafSeq = alinmt.sequences.get(node.getNr()).getData();
+                String leafSeq = alinmt.sequenceInput.get().get(node.getNr()).toString();
+                Log.info.println("leafSeq" + leafSeq);
                 AncStates leafState = AncStates.createObservedAlleleSet(leafSeq, posSites,nTargets);
                 statesDict.put(node.getNr(), leafState);
 
@@ -228,7 +231,7 @@ public class TransitionWrap extends BEASTObject {
     /** Creates a transition wrap for all nodes in the tree
      */
 
-    public static Hashtable<Integer, TransitionWrap> createTransitionWrappers(beast.evolution.tree.TreeInterface tree, Alignment alinmt, BarcodeMeta metaData,Hashtable<Integer, AncStates> statesDict) {
+    public static Hashtable<Integer, TransitionWrap> createTransitionWrappers(beast.base.evolution.tree.TreeInterface tree, Alignment alinmt, BarcodeMeta metaData,Hashtable<Integer, AncStates> statesDict) {
 
         Hashtable<Integer, TransitionWrap> wrapDict = new Hashtable<>();
 

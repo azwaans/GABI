@@ -1,14 +1,16 @@
 package beast.evolution.substitutionmodel;
 
-import beast.core.Citation;
-import beast.core.Description;
-import beast.core.Input;
-import beast.core.parameter.IntegerParameter;
-import beast.core.parameter.RealParameter;
+import beast.base.core.Citation;
+import beast.base.core.Description;
+import beast.base.core.Input;
+import beast.base.evolution.substitutionmodel.EigenDecomposition;
+import beast.base.evolution.substitutionmodel.SubstitutionModel;
+import beast.base.inference.parameter.IntegerParameter;
+import beast.base.inference.parameter.RealParameter;
 import beast.evolution.alignment.*;
-import beast.evolution.datatype.DataType;
-import beast.evolution.datatype.IntegerData;
-import beast.evolution.tree.Node;
+import beast.base.evolution.datatype.DataType;
+import beast.base.evolution.datatype.IntegerData;
+import beast.base.evolution.tree.Node;
 import cern.jet.random.AbstractDiscreteDistribution;
 import cern.jet.random.NegativeBinomial;
 import cern.jet.random.Poisson;
@@ -635,7 +637,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
      * get all possible singletons from the computed set of ancestral states  for a specific tree and leaf sequences
      */
 
-    public static List<IndelSet.Singleton> getAllSingletons(beast.evolution.tree.TreeInterface tree,Hashtable<Integer, AncStates> statesDict ) {
+    public static List<IndelSet.Singleton> getAllSingletons(beast.base.evolution.tree.TreeInterface tree,Hashtable<Integer, AncStates> statesDict ) {
         Set<IndelSet.Singleton> singletonSet = new HashSet();
         for (Node node: tree.getExternalNodes()) {
             if(node.isLeaf()) {

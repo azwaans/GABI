@@ -1,6 +1,6 @@
 package beast.evolution.alignment;
 
-import beast.core.BEASTObject;
+import beast.base.core.BEASTObject;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.*;

@@ -1,6 +1,6 @@
-import beast.core.parameter.RealParameter;
+import beast.base.inference.parameter.RealParameter;
 import beast.evolution.alignment.*;
-import beast.evolution.substitutionmodel.Frequencies;
+import beast.base.evolution.substitutionmodel.Frequencies;
 import beast.evolution.substitutionmodel.gestaltGeneral;
 import org.jblas.DoubleMatrix;
 import org.junit.Test;

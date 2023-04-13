@@ -1,12 +1,15 @@
-import beast.core.parameter.RealParameter;
-import beast.core.util.Log;
+import beast.base.evolution.alignment.Alignment;
+import beast.base.evolution.alignment.Sequence;
+
+import beast.base.inference.parameter.RealParameter;
+import beast.base.core.Log;
 import beast.evolution.alignment.*;
-import beast.evolution.sitemodel.SiteModel;
-import beast.evolution.substitutionmodel.Frequencies;
+import beast.base.evolution.sitemodel.SiteModel;
+import beast.base.evolution.substitutionmodel.Frequencies;
 import beast.evolution.distributions.gestaltTreeLikelihood;
 import beast.evolution.substitutionmodel.gestaltGeneral;
-import beast.evolution.tree.Tree;
-import beast.util.TreeParser;
+import beast.base.evolution.tree.Tree;
+import beast.base.evolution.tree.TreeParser;
 import org.junit.Test;
 
 import java.util.ArrayList;

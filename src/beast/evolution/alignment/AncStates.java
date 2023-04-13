@@ -1,7 +1,7 @@
 package beast.evolution.alignment;
 
-import beast.core.BEASTObject;
-import beast.core.Input;
+import beast.base.core.BEASTObject;
+import beast.base.core.Input;
 import org.apache.commons.math3.util.Pair;
 
 import java.util.*;
@@ -281,7 +281,8 @@ public class AncStates extends BEASTObject {
 
         static public AncStates createObservedAlleleSet (String sequenceInput, List<Pair<Integer,Integer>> posSites, Integer nTargets) {
             //create an ancestral state set for observed sequences at leaves
-            List<String> event_strings =  new LinkedList<String>(Arrays.asList(sequenceInput.split(",")));
+            String[] strings =  sequenceInput.split(":");
+            List<String> event_strings =  new LinkedList<String>(Arrays.asList(strings[1].split(",")));
             event_strings.removeAll(Collections.singleton("None"));
             //create a SGWC list.
             List<GestaltEvent> eventList = new ArrayList<>();

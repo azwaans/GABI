@@ -3,8 +3,8 @@ package beast.evolution.distributions;
 
 import beast.evolution.alignment.TargetStatus;
 import beast.evolution.alignment.TransitionWrap;
-import beast.evolution.likelihood.LikelihoodCore;
-import beast.evolution.tree.Node;
+import beast.base.evolution.likelihood.LikelihoodCore;
+import beast.base.evolution.tree.Node;
 import beast.evolution.substitutionmodel.gestaltGeneral;
 import org.jblas.DoubleMatrix;
 

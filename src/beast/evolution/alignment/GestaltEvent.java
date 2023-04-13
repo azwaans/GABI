@@ -1,7 +1,7 @@
 package beast.evolution.alignment;
 
-import beast.core.BEASTObject;
-import beast.core.Input;
+import beast.base.core.BEASTObject;
+import beast.base.core.Input;
 
 
 public class GestaltEvent extends BEASTObject implements Comparable<GestaltEvent> {

@@ -1,11 +1,11 @@
 package beast.evolution.datatype;
 
-import beast.core.Description;
-import beast.core.Input;
-import beast.core.parameter.IntegerParameter;
-import beast.core.util.Log;
+import beast.base.core.Description;
+import beast.base.core.Input;
+import beast.base.inference.parameter.IntegerParameter;
+import beast.base.core.Log;
 import beast.evolution.alignment.BarcodeMeta;
-import beast.evolution.datatype.DataType.Base;
+import beast.base.evolution.datatype.DataType.Base;
 
 import java.util.Arrays;
 import java.util.List;
