@@ -1,0 +1,21 @@
+<package name="typewriter" version="0.0.1">
+    <depends on='BEAST.base' atleast='2.7.0'/>
+    <depends on='BEAST.app' atleast='2.7.0'/>
+
+    <service type="beast.base.core.BEASTInterface">
+        <provider classname="gestalt.beast.evolution.alignment.AncStates"/>
+        <provider classname="gestalt.beast.evolution.alignment.BarcodeMeta"/>
+        <provider classname="gestalt.beast.evolution.alignment.GestaltEvent"/>
+        <provider classname="gestalt.beast.evolution.alignment.IndelSet"/>
+        <provider classname="gestalt.beast.evolution.alignment.QueueObject"/>
+        <provider classname="gestalt.beast.evolution.alignment.SetOperations"/>
+        <provider classname="gestalt.beast.evolution.alignment.StateAlongPath"/>
+        <provider classname="gestalt.beast.evolution.alignment.TargetDeactTract"/>
+        <provider classname="gestalt.beast.evolution.alignment.TargetStatus"/>
+        <provider classname="gestalt.beast.evolution.alignment.TransitionWrap"/>
+        <provider classname="gestalt.beast.evolution.distributions.gestaltLikelihoodCore"/>
+        <provider classname="gestalt.beast.evolution.distributions.gestaltTreeLikelihood"/>
+        <provider classname="gestalt.beast.evolution.substitutionmodel.gestaltGeneral"/>
+    </service>
+
+</package>
