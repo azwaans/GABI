@@ -1,8 +1,22 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><beast beautitemplate='MultiTypeBirthDeath' beautistatus='' namespace="beast.base.evolution.substitutionmodel.GeneralGestalt:beast.pkgmgmt:beast.base.core:beast.base.inference:beast.base.evolution.alignment:beast.base.evolution.tree.coalescent:beast.base.util:beast.base.math:beast.evolution.nuc:beast.base.evolution.operator:beast.base.inference.operator:beast.base.evolution.sitemodel:beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood" required="" version="2.6">
-
-    <!-- dataType has to be set to integer and the value must contain a ',' s.t. the class recognizes it as a comma separated string of integers-->
+<beast version='2.0'
+           namespace='beast.base.evolution.substitutionmodel.GeneralGestalt
+                        :beast.pkgmgmt
+                        :beast.base.core:beast.base.inference
+                        :beast.base.evolution.alignment
+                        :beast.base.evolution.tree.coalescent
+                        :beast.base.util
+                        :beast.base.math
+                        :beast.evolution.nuc
+                        :beast.base.evolution.operator
+                        :beast.base.inference.operator
+                        :beast.base.evolution.sitemodel
+                        :beast.base.evolution.substitutionmodel
+                        :beast.base.evolution.likelihood
+                        :evolution.datatype.gestaltData'
+    >
+    <!-- dataType has to be set to gestaltData and the value must contain a ',' s.t. the class recognizes it as a comma separated string of integers-->
     <data  id="gestaltTest" spec="Alignment" name="alignment" >
-        <userDataType spec="beast.evolution.datatype.gestaltData"/>
+        <userDataType spec="beast.base.evolution.datatype.gestaltData"/>
         <sequence id="6" spec="Sequence" taxon="6"  value="38_1_0_0_TGGAGTCGAGAGCGCGCTCGTCGa,115_144_3_8_,271_11_9_9_a,None,None,None,"/>
         <sequence id="1" spec="Sequence" taxon="1"  value="37_2_0_0_ATaa,64_3_1_1_,114_14_3_3_,141_53_4_5_,197_4_6_6_a,244_34_8_8_,"/>
         <sequence id="2" spec="Sequence" taxon="2"  value="29_10_0_0_aaa,101_204_3_9_,None,None,None,None,"/>
@@ -48,12 +62,14 @@
             </tree>
 
 
-             <parameter id="NumTargets" spec="parameter.IntegerParameter" dimension="1" lower="1" name="stateNode" > 3</parameter>
+             <parameter id="NumTargets" spec="parameter.IntegerParameter" dimension="1" lower="1" name="stateNode" >6</parameter>
              <parameter id="doubleCutWeight" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="Infinity"> 0.3 </parameter>
              <parameter id="cutRates" spec="parameter.RealParameter" dimension="10" lower="0.0" name="stateNode" upper="Infinity"> 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452</parameter>
-
-            <parameter id="longTrimScaling" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity"> 0.05 0.05 </parameter>
-
+             <parameter id="longTrimScaling" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity"> 0.04 0.04 </parameter>
+             <parameter id="shortTrim" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity"> 3.0 3.0 </parameter>
+             <parameter id="longTrim" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity"> 4.0 4.0 </parameter>
+             <parameter id="insert" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="Infinity"> 2.0 </parameter>
+             <parameter id="trimZeroProbs" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="Infinity"> 0.5 0.5 0.5 0.5 </parameter>
 
              <parameter id="clockRate.c:gestaltTest" spec="parameter.RealParameter" name="stateNode">1.0</parameter>
              <parameter id="freqParameter.s:gestaltTest" spec="parameter.RealParameter" dimension="4" lower="0.0" name="stateNode" upper="1.0">0.25</parameter>
@@ -122,12 +138,27 @@
 
             <!-- Tree likelihood -->
             <distribution id="likelihood" spec="beast.base.inference.CompoundDistribution">
-                <distribution id="treeLikelihood.gestaltTest" spec="beast.evolution.distributions.gestaltTreeLikelihood" data="@gestaltTest" tree="@Tree.t:gestaltTest">
+                <distribution id="treeLikelihood.gestaltTest" spec="gestalt.evolution.likelihood.gestaltTreeLikelihood" data="@gestaltTest" tree="@Tree.t:gestaltTest">
                     <siteModel id="SiteModel.s:gestaltTest" spec="SiteModel">
                         <parameter id="mutationRate.s:gestaltTest" spec="parameter.RealParameter" estimate="false" name="mutationRate">1.0</parameter>
 
                         <parameter id="proportionInvariant.s:gestaltTest" spec="parameter.RealParameter" estimate="false" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
-                        <substModel id="JC69.s:gestaltTest" spec="beast.evolution.substitutionmodel.gestaltGeneral" barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA" cutSite="6" crucialPos="6 6" maxSumSteps= "20" maxExtraSteps="1" cutRates="@cutRates" longTrimScaling="@longTrimScaling" doubleCutWeight="@doubleCutWeight">
+                        <substModel id="gestalt.s:gestaltTest" spec="gestalt.evolution.substitutionmodel.gestaltGeneral"
+                                    barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA"
+                                    cutSite="6"
+                                    crucialPos="6 6"
+                                    maxSumSteps= "20"
+                                    maxExtraSteps="1"
+                                    cutRates="@cutRates"
+                                    longTrimScalingFactors="@longTrimScaling"
+                                    doubleCutWeight="@doubleCutWeight"
+                                    insertZeroProb="0.5"
+                                    trimShortParams="@shortTrim"
+                                    trimLongParams="@longTrim"
+                                    insertParams="@insert"
+                                    trimZeroProbs="@trimZeroProbs"
+                                    >
+
                             <frequencies id="freq" spec="beast.base.evolution.substitutionmodel.Frequencies" frequencies="1.0 0" estimate="false"/>
                         </substModel>
                     </siteModel>
@@ -146,23 +177,23 @@
                   isNarrow="true" tree="@Tree.t:gestaltTest"
                   weight="30.0"/>
 
-       <!-- <operator id="ContempUniformOperator" spec="Uniform" tree="@Tree.t:gestaltTest" weight="30.0"/>
+       <operator id="ContempUniformOperator" spec="Uniform" tree="@Tree.t:gestaltTest" weight="30.0"/>
 
-        <operator id="ContempSubtreeSlide" spec="SubtreeSlide" tree="@Tree.t:gestaltTest" weight="15.0"/>
+        <!--TODO check behaviour with this operator!-->
+<!--        <operator id="ContempSubtreeSlide" spec="SubtreeSlide" tree="@Tree.t:gestaltTest" weight="15.0"/>-->
 
-        <operator id="ContempNarrow" spec="Exchange" tree="@Tree.t:gestaltTest" weight="15.0"/>
+<!--        <operator id="ContempNarrow" spec="Exchange" tree="@Tree.t:gestaltTest" weight="15.0"/>-->
 
-        <operator id="ContempWide" spec="Exchange" isNarrow="false" tree="@Tree.t:gestaltTest" weight="3.0"/>-->
+<!--        <operator id="ContempWide" spec="Exchange" isNarrow="false" tree="@Tree.t:gestaltTest" weight="3.0"/>-->
 
         <!-- phylogenetic operators -->
-       <operator id="cutRatesScaler" spec="ScaleOperator" parameter="@cutRates" scaleFactor="0.8" weight="3.0"/>
+        <operator id="cutRatesScaler" spec="ScaleOperator" parameter="@cutRates" scaleFactor="0.8" weight="3.0"/>
         <operator id="doubleCutScaler" spec="ScaleOperator" parameter="@doubleCutWeight" scaleFactor="0.8" weight="3.0"/>
         <operator id="longTrimScalingScaler" spec="ScaleOperator" parameter="@longTrimScaling" scaleFactor="0.8" weight="3.0"/>
 
 
         <!-- phylodynamic operators -->
         <operator id="popSizeScaler" spec="ScaleOperator" parameter="@popsize" scaleFactor="0.8" weight="3.0"/>
-
         <operator id="growthRateScaler" spec="ScaleOperator" optimise="false" parameter="@growthRate" scaleAll="true" scaleFactor="0.9" weight="3.0"/>
 
         <logger id="tracelog" spec="Logger" fileName="$(filebase).$(seed).log" logEvery="1">

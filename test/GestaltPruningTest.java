@@ -3,11 +3,11 @@ import beast.base.evolution.alignment.Sequence;
 
 import beast.base.inference.parameter.RealParameter;
 import beast.base.core.Log;
-import beast.evolution.alignment.*;
+import gestalt.evolution.alignment.*;
 import beast.base.evolution.sitemodel.SiteModel;
 import beast.base.evolution.substitutionmodel.Frequencies;
-import beast.evolution.distributions.gestaltTreeLikelihood;
-import beast.evolution.substitutionmodel.gestaltGeneral;
+import gestalt.evolution.likelihood.gestaltTreeLikelihood;
+import gestalt.evolution.substitutionmodel.gestaltGeneral;
 import beast.base.evolution.tree.Tree;
 import beast.base.evolution.tree.TreeParser;
 import org.junit.Test;

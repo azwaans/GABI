@@ -1,7 +1,7 @@
 import beast.base.inference.parameter.RealParameter;
-import beast.evolution.alignment.*;
+import gestalt.evolution.alignment.*;
 import beast.base.evolution.substitutionmodel.Frequencies;
-import beast.evolution.substitutionmodel.gestaltGeneral;
+import gestalt.evolution.substitutionmodel.gestaltGeneral;
 import org.jblas.DoubleMatrix;
 import org.junit.Test;
 

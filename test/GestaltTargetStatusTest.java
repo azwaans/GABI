@@ -1,7 +1,7 @@
-import beast.evolution.alignment.BarcodeMeta;
-import beast.evolution.alignment.IndelSet;
-import beast.evolution.alignment.TargetDeactTract;
-import beast.evolution.alignment.TargetStatus;
+import gestalt.evolution.alignment.BarcodeMeta;
+import gestalt.evolution.alignment.IndelSet;
+import gestalt.evolution.alignment.TargetDeactTract;
+import gestalt.evolution.alignment.TargetStatus;
 import org.junit.Test;
 
 import java.util.*;

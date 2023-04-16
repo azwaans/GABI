@@ -3,23 +3,22 @@
     <depends on='BEAST.app' atleast='2.7.0'/>
 
     <service type="beast.base.evolution.datatype.DataType">
-        <provider classname="gestalt.beast.evolution.datatype.gestaltData"/>
-
+        <provider classname="beast.base.evolution.datatype.gestaltData"/>
     </service>
     <service type="beast.base.core.BEASTInterface">
-        <provider classname="gestalt.beast.evolution.alignment.AncStates"/>
-        <provider classname="gestalt.beast.evolution.alignment.BarcodeMeta"/>
-        <provider classname="gestalt.beast.evolution.alignment.GestaltEvent"/>
-        <provider classname="gestalt.beast.evolution.alignment.IndelSet"/>
-        <provider classname="gestalt.beast.evolution.alignment.QueueObject"/>
-        <provider classname="gestalt.beast.evolution.alignment.SetOperations"/>
-        <provider classname="gestalt.beast.evolution.alignment.StateAlongPath"/>
-        <provider classname="gestalt.beast.evolution.alignment.TargetDeactTract"/>
-        <provider classname="gestalt.beast.evolution.alignment.TargetStatus"/>
-        <provider classname="gestalt.beast.evolution.alignment.TransitionWrap"/>
-        <provider classname="gestalt.beast.evolution.distributions.gestaltLikelihoodCore"/>
-        <provider classname="gestalt.beast.evolution.distributions.gestaltTreeLikelihood"/>
-        <provider classname="gestalt.beast.evolution.substitutionmodel.gestaltGeneral"/>
+        <provider classname="gestalt.evolution.alignment.AncStates"/>
+        <provider classname="gestalt.evolution.alignment.BarcodeMeta"/>
+        <provider classname="gestalt.evolution.alignment.GestaltEvent"/>
+        <provider classname="gestalt.evolution.alignment.IndelSet"/>
+        <provider classname="gestalt.evolution.alignment.QueueObject"/>
+        <provider classname="gestalt.evolution.alignment.SetOperations"/>
+        <provider classname="gestalt.evolution.alignment.StateAlongPath"/>
+        <provider classname="gestalt.evolution.alignment.TargetDeactTract"/>
+        <provider classname="gestalt.evolution.alignment.TargetStatus"/>
+        <provider classname="gestalt.evolution.alignment.TransitionWrap"/>
+        <provider classname="gestalt.evolution.likelihood.gestaltLikelihoodCore"/>
+        <provider classname="gestalt.evolution.likelihood.gestaltTreeLikelihood"/>
+        <provider classname="gestalt.evolution.substitutionmodel.gestaltGeneral"/>
     </service>
 
 </package>

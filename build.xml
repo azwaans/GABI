@@ -191,7 +191,7 @@
         </copy>
         <jar jarfile="${pack}/lib/${fullName}.jar">
             <fileset  dir="${build}">
-                <include name="bdsky/**/*.class"/>
+                <include name="gestalt/**/*.class"/>
             </fileset>
         </jar>
 

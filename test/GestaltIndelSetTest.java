@@ -1,5 +1,5 @@
-import beast.evolution.alignment.AncStates;
-import beast.evolution.alignment.IndelSet;
+import gestalt.evolution.alignment.AncStates;
+import gestalt.evolution.alignment.IndelSet;
 import org.junit.Test;
 
 import java.util.ArrayList;
