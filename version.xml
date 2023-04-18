@@ -19,6 +19,7 @@
         <provider classname="gestalt.evolution.likelihood.gestaltLikelihoodCore"/>
         <provider classname="gestalt.evolution.likelihood.gestaltTreeLikelihood"/>
         <provider classname="gestalt.evolution.substitutionmodel.gestaltGeneral"/>
+        <provider classname="gestalt.evolution.substitutionmodel.HK_why"/>
     </service>
 
 </package>
