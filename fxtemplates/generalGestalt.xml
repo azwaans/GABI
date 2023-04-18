@@ -1,0 +1,134 @@
+<beast version='2.0'
+       namespace='beast.app.beauti:beast.core:beast.evolution.branchratemodel:beast.evolution.speciation:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood:beast.evolution:beast.math.distributions:gestalt.evolution.substitutionmodel'>
+
+    <mergewith point='substModelTemplates'>
+        <!-- GAPML substitution model -->
+        <subtemplate id='generalGestalt' class='gestalt.evolution.substitutionmodel.gestaltGeneral' mainid='generalGestalt.s:$(n)'
+                     suppressInputs='gestalt.evolution.substitutionmodel.gestaltGeneral.frequencies
+                    '>
+            <![CDATA[
+
+            <plugin spec='gestalt.evolution.substitutionmodel.gestaltGeneral' id='generalGestalt.s:$(n)'>
+                 <parameter id="doubleCutWeight.s:$(n)" name='doubleCutWeight' value="0.5" estimate='true'/>
+                 <parameter id="cutRates.s:$(n)" name='cutRates' value="0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1" estimate='true'/>
+                 <parameter id="longTrimScalingFactors.s:$(n)" name='longTrimScalingFactors' value="0.5 0.5" estimate='true'/>
+                 <parameter id="trimZeroProbs.s:$(n)" name='trimZeroProbs' value="0.5 0.5" estimate='true'/>
+                 <parameter id="trimShortParams.s:$(n)" name='trimShortParams' value="0.5 0.5" estimate='true'/>
+                 <parameter id="trimLongParams.s:$(n)" name='trimLongParams' value="0.5 0.5" estimate='true'/>
+                 <parameter id="insertParams.s:$(n)" name='insertParams' value="0.5 0.5" estimate='true'/>
+
+            </plugin>
+
+            <operator id="doubleCutWeightScaler.s:$(n)" spec="beast.base.evolution.operator.AdaptableOperatorSampler" weight="0.05">
+                <parameter idref="doubleCutWeight.s:$(n)"/>
+                <operator idref="AVMNOperator.$(n)"/>
+                <operator id='doubleCutWeightScalerX.s:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.1" weight="0.1" parameter="@doubleCutWeight.s:$(n)"/>
+            </operator>
+
+             <prior id='doubleCutWeightPrior.s:$(n)' x='@doubleCutWeight.s:$(n)'>
+                <distr spec="LogNormalDistributionModel" meanInRealSpace='false'>
+                    <parameter name='M' value="1.0" estimate='false'/>
+                    <parameter name='S' value="1.25" estimate='false'/>
+                </distr>
+		    </prior>
+
+		    <operator id="longTrimScalingFactorsScaler.s:$(n)" spec="beast.base.evolution.operator.AdaptableOperatorSampler" weight="0.05">
+                <parameter idref="longTrimScalingFactors.s:$(n)"/>
+                <operator idref="AVMNOperator.$(n)"/>
+                <operator id='longTrimScalingFactorsScalerX.s:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.1" weight="0.1" parameter="@longTrimScalingFactors.s:$(n)"/>
+            </operator>
+
+             <prior id='longTrimScalingFactorsPrior.s:$(n)' x='@longTrimScalingFactors.s:$(n)'>
+                <distr spec="LogNormalDistributionModel" meanInRealSpace='false'>
+                    <parameter name='M' value="1.0" estimate='false'/>
+                    <parameter name='S' value="1.25" estimate='false'/>
+                </distr>
+		    </prior>
+
+		     <operator id="trimZeroProbsScaler.s:$(n)" spec="beast.base.evolution.operator.AdaptableOperatorSampler" weight="0.05">
+                <parameter idref="trimZeroProbs.s:$(n)"/>
+                <operator idref="AVMNOperator.$(n)"/>
+                <operator id='trimZeroProbsScalerX.s:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.1" weight="0.1" parameter="@trimZeroProbs.s:$(n)"/>
+            </operator>
+
+             <prior id='trimZeroProbsPrior.s:$(n)' x='@trimZeroProbs.s:$(n)'>
+                <distr spec="LogNormalDistributionModel" meanInRealSpace='false'>
+                    <parameter name='M' value="1.0" estimate='false'/>
+                    <parameter name='S' value="1.25" estimate='false'/>
+                </distr>
+		    </prior>
+
+              <operator id="trimShortParamsScaler.s:$(n)" spec="beast.base.evolution.operator.AdaptableOperatorSampler" weight="0.05">
+                <parameter idref="trimShortParams.s:$(n)"/>
+                <operator idref="AVMNOperator.$(n)"/>
+                <operator id='trimShortParamsScalerX.s:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.1" weight="0.1" parameter="@trimShortParams.s:$(n)"/>
+            </operator>
+
+             <prior id='trimShortParamsPrior.s:$(n)' x='@trimShortParams.s:$(n)'>
+                <distr spec="LogNormalDistributionModel" meanInRealSpace='false'>
+                    <parameter name='M' value="1.0" estimate='false'/>
+                    <parameter name='S' value="1.25" estimate='false'/>
+                </distr>
+		    </prior>
+
+		     <operator id="trimLongParamsScaler.s:$(n)" spec="beast.base.evolution.operator.AdaptableOperatorSampler" weight="0.05">
+                <parameter idref="trimLongParams.s:$(n)"/>
+                <operator idref="AVMNOperator.$(n)"/>
+                <operator id='trimLongParamsScalerX.s:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.1" weight="0.1" parameter="@trimLongParams.s:$(n)"/>
+            </operator>
+
+             <prior id='trimLongParamsPrior.s:$(n)' x='@trimLongParams.s:$(n)'>
+                <distr spec="LogNormalDistributionModel" meanInRealSpace='false'>
+                    <parameter name='M' value="1.0" estimate='false'/>
+                    <parameter name='S' value="1.25" estimate='false'/>
+                </distr>
+		    </prior>
+
+		    <operator id="insertParamsScaler.s:$(n)" spec="beast.base.evolution.operator.AdaptableOperatorSampler" weight="0.05">
+                <parameter idref="insertParams.s:$(n)"/>
+                <operator idref="AVMNOperator.$(n)"/>
+                <operator id='insertParamsScalerX.s:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.1" weight="0.1" parameter="@insertParams.s:$(n)"/>
+            </operator>
+
+             <prior id='insertParamsPrior.s:$(n)' x='@insertParams.s:$(n)'>
+                <distr spec="LogNormalDistributionModel" meanInRealSpace='false'>
+                    <parameter name='M' value="1.0" estimate='false'/>
+                    <parameter name='S' value="1.25" estimate='false'/>
+                </distr>
+		    </prior>
+
+		    <operator id="cutRatesScaler.s:$(n)" spec="beast.base.evolution.operator.AdaptableOperatorSampler" weight="0.05">
+                <parameter idref="cutRates.s:$(n)"/>
+                <operator idref="AVMNOperator.$(n)"/>
+                <operator id='cutRatesScalerX.s:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.1" weight="0.1" parameter="@cutRates.s:$(n)"/>
+            </operator>
+
+             <prior id='cutRatesPrior.s:$(n)' x='@cutRates.s:$(n)'>
+                <distr spec="LogNormalDistributionModel" meanInRealSpace='false'>
+                    <parameter name='M' value="1.0" estimate='false'/>
+                    <parameter name='S' value="1.25" estimate='false'/>
+                </distr>
+		    </prior>
+
+            ]]>
+
+            <connect srcID='doubleCutWeight.s:$(n)' targetID='state' inputName='stateNode'
+                     if='inlikelihood(doubleCutWeight.s:$(n)) and doubleCutWeight.s:$(n)/estimate=true'/>
+
+            <connect srcID='doubleCutWeight.s:$(n)' targetID='AVMNLogTransform.$(n)' inputName='f'
+                     if='inlikelihood(doubleCutWeight.s:$(n)) and doubleCutWeight.s:$(n)/estimate=true'/>
+
+            <connect srcID='doubleCutWeightScaler.s:$(n)' targetID='mcmc' inputName='operator'
+                     if='inlikelihood(doubleCutWeight.s:$(n)) and doubleCutWeight.s:$(n)/estimate=true'>Scale the weight on double cuts of partition s:$(n)
+            </connect>
+
+            <connect srcID='doubleCutWeight.s:$(n)' targetID='tracelog' inputName='log'
+                     if='inlikelihood(doubleCutWeight.s:$(n)) and doubleCutWeight.s:$(n)/estimate=true'/>
+
+            <connect srcID='doubleCutWeightPrior.s:$(n)' targetID='prior' inputName='distribution'
+                     if='inlikelihood(doubleCutWeight.s:$(n)) and doubleCutWeight.s:$(n)/estimate=true'>GAPML double cut weight parameter s:$(n)
+            </connect>
+        </subtemplate>
+
+    </mergewith>
+</beast>
