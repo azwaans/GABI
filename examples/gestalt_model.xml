@@ -149,14 +149,16 @@
                                     crucialPos="6 6"
                                     maxSumSteps= "20"
                                     maxExtraSteps="1"
-                                    cutRates="@cutRates"
-                                    longTrimScalingFactors="@longTrimScaling"
-                                    doubleCutWeight="@doubleCutWeight"
                                     insertZeroProb="0.5"
-                                    trimShortParams="@shortTrim"
+                                    cutRates="@cutRates"
+                                    trimZeroProbs="@trimZeroProbs"
                                     trimLongParams="@longTrim"
                                     insertParams="@insert"
-                                    trimZeroProbs="@trimZeroProbs"
+                                    longTrimScalingFactors="@longTrimScaling"
+                                    doubleCutWeight="@doubleCutWeight"
+                                    trimShortParams="@shortTrim"
+
+
                                     >
 
                             <frequencies id="freq" spec="beast.base.evolution.substitutionmodel.Frequencies" frequencies="1.0 0" estimate="false"/>
