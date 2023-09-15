@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 
 
 
-public class gestaltGeneralTest {
+public class GestaltGeneralTest {
 
     @Test
     public void test_hazard_1() {

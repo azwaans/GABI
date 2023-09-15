@@ -70,23 +70,23 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<2;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
             }
         }
 
-        assertEquals(2, transitionWrappers.size(), 1e-5);   // Reference GAPML python version
-        assertEquals(1, transitionWrappers.get(1).numStatuses, 1e-5);// Reference GAPML python version
-        assertTrue(transitionWrappers.get(1).transStatuses.contains(new TargetStatus()));
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus()));
+        assertEquals(2, TransitionWraps.size(), 1e-5);   // Reference GAPML python version
+        assertEquals(1, TransitionWraps.get(1).numStatuses, 1e-5);// Reference GAPML python version
+        assertTrue(TransitionWraps.get(1).transStatuses.contains(new TargetStatus()));
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus()));
 
     }
 
@@ -135,13 +135,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<2;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -149,12 +149,12 @@ public class GestaltPruningTest {
         }
         List<TargetDeactTract> attempt = new ArrayList<>();
         attempt.add(new TargetDeactTract(0,0));
-        assertEquals(2, transitionWrappers.size(), 1e-5);   // Reference GAPML python version
-        assertEquals(2, transitionWrappers.get(0).numStatuses, 1e-5);// Reference GAPML python version
-        assertEquals(1, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(1).transStatuses.contains(new TargetStatus()));
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus(attempt)));
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus()));
+        assertEquals(2, TransitionWraps.size(), 1e-5);   // Reference GAPML python version
+        assertEquals(2, TransitionWraps.get(0).numStatuses, 1e-5);// Reference GAPML python version
+        assertEquals(1, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(1).transStatuses.contains(new TargetStatus()));
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus(attempt)));
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus()));
 
     }
 
@@ -203,13 +203,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<2;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -217,11 +217,11 @@ public class GestaltPruningTest {
         }
         List<TargetDeactTract> attempt = new ArrayList<>();
         attempt.add(new TargetDeactTract(0,0));
-        assertEquals(2, transitionWrappers.size(), 1e-5);   // Reference GAPML python version
-        assertEquals(2, transitionWrappers.get(0).numStatuses, 1e-5);// Reference GAPML python version
-        assertTrue(transitionWrappers.get(1).transStatuses.contains(new TargetStatus()));
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus(attempt)));
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus()));
+        assertEquals(2, TransitionWraps.size(), 1e-5);   // Reference GAPML python version
+        assertEquals(2, TransitionWraps.get(0).numStatuses, 1e-5);// Reference GAPML python version
+        assertTrue(TransitionWraps.get(1).transStatuses.contains(new TargetStatus()));
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus(attempt)));
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus()));
 
     }
 
@@ -270,13 +270,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<2;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -289,14 +289,14 @@ public class GestaltPruningTest {
         List<TargetDeactTract> attempt3 = new ArrayList<>();
         attempt3.add(new TargetDeactTract(0,1));
 
-        assertEquals(2, transitionWrappers.size(), 1e-5);   // Reference GAPML python version
-        assertEquals(4, transitionWrappers.get(0).numStatuses, 1e-5);// Reference GAPML python version
-        assertEquals(1, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(1).transStatuses.contains(new TargetStatus()));
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus(attempt1)));
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus(attempt2)));
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus(attempt3)));
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus()));
+        assertEquals(2, TransitionWraps.size(), 1e-5);   // Reference GAPML python version
+        assertEquals(4, TransitionWraps.get(0).numStatuses, 1e-5);// Reference GAPML python version
+        assertEquals(1, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(1).transStatuses.contains(new TargetStatus()));
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus(attempt1)));
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus(attempt2)));
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus(attempt3)));
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus()));
 
     }
 
@@ -345,13 +345,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<2;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -364,14 +364,14 @@ public class GestaltPruningTest {
         List<TargetDeactTract> attempt3 = new ArrayList<>();
         attempt3.add(new TargetDeactTract(0,1));
 
-        assertEquals(2, transitionWrappers.size(), 1e-5);   // Reference GAPML python version
-        assertEquals(4, transitionWrappers.get(0).numStatuses, 1e-5);// Reference GAPML python version
-        assertEquals(1, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(1).transStatuses.contains(new TargetStatus()));
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus(attempt1)));
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus(attempt2)));
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus(attempt3)));
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus()));
+        assertEquals(2, TransitionWraps.size(), 1e-5);   // Reference GAPML python version
+        assertEquals(4, TransitionWraps.get(0).numStatuses, 1e-5);// Reference GAPML python version
+        assertEquals(1, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(1).transStatuses.contains(new TargetStatus()));
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus(attempt1)));
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus(attempt2)));
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus(attempt3)));
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus()));
 
     }
 
@@ -419,13 +419,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<2;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -434,13 +434,13 @@ public class GestaltPruningTest {
         List<TargetDeactTract> attempt1 = new ArrayList<>();
         attempt1.add(new TargetDeactTract(0,2));
 
-        assertEquals(2, transitionWrappers.size(), 1e-5);   // Reference GAPML python version
-        assertEquals(4, transitionWrappers.get(0).numStatuses, 1e-5);// Reference GAPML python version
-        assertEquals(1, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(1).transStatuses.get(0).equals(new TargetStatus()));
+        assertEquals(2, TransitionWraps.size(), 1e-5);   // Reference GAPML python version
+        assertEquals(4, TransitionWraps.get(0).numStatuses, 1e-5);// Reference GAPML python version
+        assertEquals(1, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(1).transStatuses.get(0).equals(new TargetStatus()));
 
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus(attempt1)));
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus()));
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus(attempt1)));
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus()));
 
     }
 
@@ -490,13 +490,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<2;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -505,10 +505,10 @@ public class GestaltPruningTest {
         List<TargetDeactTract> attempt1 = new ArrayList<>();
         attempt1.add(new TargetDeactTract(0,2));
 
-        assertEquals(2, transitionWrappers.size(), 1e-5);   // Reference GAPML python version
-        assertEquals(2, transitionWrappers.get(0).numStatuses, 1e-5);// Reference GAPML python version
-        assertEquals(1, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(1).transStatuses.get(0).equals(new TargetStatus()));
+        assertEquals(2, TransitionWraps.size(), 1e-5);   // Reference GAPML python version
+        assertEquals(2, TransitionWraps.get(0).numStatuses, 1e-5);// Reference GAPML python version
+        assertEquals(1, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(1).transStatuses.get(0).equals(new TargetStatus()));
 
     }
 
@@ -557,13 +557,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<2;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -572,11 +572,11 @@ public class GestaltPruningTest {
         List<TargetDeactTract> attempt1 = new ArrayList<>();
         attempt1.add(new TargetDeactTract(0,2));
 
-        assertEquals(2, transitionWrappers.size(), 1e-5);   // Reference GAPML python version
-        assertEquals(3, transitionWrappers.get(0).numStatuses, 1e-5);// Reference GAPML python version
-        assertEquals(3, transitionWrappers.get(0).ttTuple.size(), 1e-5);// Reference GAPML python version
-        assertEquals(1, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(1).transStatuses.get(0).equals(new TargetStatus()));
+        assertEquals(2, TransitionWraps.size(), 1e-5);   // Reference GAPML python version
+        assertEquals(3, TransitionWraps.get(0).numStatuses, 1e-5);// Reference GAPML python version
+        assertEquals(3, TransitionWraps.get(0).targetTractsTuples.size(), 1e-5);// Reference GAPML python version
+        assertEquals(1, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(1).transStatuses.get(0).equals(new TargetStatus()));
 
     }
 
@@ -625,13 +625,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<2;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -640,11 +640,11 @@ public class GestaltPruningTest {
         List<TargetDeactTract> attempt1 = new ArrayList<>();
         attempt1.add(new TargetDeactTract(0,2));
 
-        assertEquals(2, transitionWrappers.size(), 1e-5);   // Reference GAPML python version
-        assertEquals(3, transitionWrappers.get(0).numStatuses, 1e-5);// Reference GAPML python version
-        assertEquals(3, transitionWrappers.get(0).ttTuple.size(), 1e-5);// Reference GAPML python version
-        assertEquals(1, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(1).transStatuses.get(0).equals(new TargetStatus()));
+        assertEquals(2, TransitionWraps.size(), 1e-5);   // Reference GAPML python version
+        assertEquals(3, TransitionWraps.get(0).numStatuses, 1e-5);// Reference GAPML python version
+        assertEquals(3, TransitionWraps.get(0).targetTractsTuples.size(), 1e-5);// Reference GAPML python version
+        assertEquals(1, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(1).transStatuses.get(0).equals(new TargetStatus()));
 
 
     }
@@ -694,13 +694,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<2;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -709,10 +709,10 @@ public class GestaltPruningTest {
         List<TargetDeactTract> attempt1 = new ArrayList<>();
         attempt1.add(new TargetDeactTract(0,2));
 
-        assertEquals(2, transitionWrappers.size(), 1e-5);   // Reference GAPML python version
-        assertEquals(2, transitionWrappers.get(0).numStatuses, 1e-5);// Reference GAPML python version
-        assertEquals(1, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(1).transStatuses.get(0).equals(new TargetStatus()));
+        assertEquals(2, TransitionWraps.size(), 1e-5);   // Reference GAPML python version
+        assertEquals(2, TransitionWraps.get(0).numStatuses, 1e-5);// Reference GAPML python version
+        assertEquals(1, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(1).transStatuses.get(0).equals(new TargetStatus()));
 
 
     }
@@ -762,13 +762,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<2;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -777,11 +777,11 @@ public class GestaltPruningTest {
         List<TargetDeactTract> attempt1 = new ArrayList<>();
         attempt1.add(new TargetDeactTract(0,2));
 
-        assertEquals(2, transitionWrappers.size(), 1e-5);   // Reference GAPML python version
-        assertEquals(5, transitionWrappers.get(0).numStatuses, 1e-5);// Reference GAPML python version
-        assertEquals(7, transitionWrappers.get(0).ttTuple.size(), 1e-5);
-        assertEquals(1, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(1).transStatuses.get(0).equals(new TargetStatus()));
+        assertEquals(2, TransitionWraps.size(), 1e-5);   // Reference GAPML python version
+        assertEquals(5, TransitionWraps.get(0).numStatuses, 1e-5);// Reference GAPML python version
+        assertEquals(7, TransitionWraps.get(0).targetTractsTuples.size(), 1e-5);
+        assertEquals(1, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(1).transStatuses.get(0).equals(new TargetStatus()));
 
 
     }
@@ -830,13 +830,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<2;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -845,10 +845,10 @@ public class GestaltPruningTest {
         List<TargetDeactTract> attempt1 = new ArrayList<>();
         attempt1.add(new TargetDeactTract(0,2));
 
-        assertEquals(2, transitionWrappers.size(), 1e-5);   // Reference GAPML python version
-        assertEquals(5, transitionWrappers.get(0).numStatuses, 1e-5);// Reference GAPML python version
-        assertEquals(1, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(1).transStatuses.get(0).equals(new TargetStatus()));
+        assertEquals(2, TransitionWraps.size(), 1e-5);   // Reference GAPML python version
+        assertEquals(5, TransitionWraps.get(0).numStatuses, 1e-5);// Reference GAPML python version
+        assertEquals(1, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(1).transStatuses.get(0).equals(new TargetStatus()));
 
 
     }
@@ -898,13 +898,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<4;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -913,17 +913,17 @@ public class GestaltPruningTest {
         List<TargetDeactTract> attempt1 = new ArrayList<>();
         attempt1.add(new TargetDeactTract(0,0));
         //checking the internal node wrapper
-        assertEquals(2, transitionWrappers.get(2).numStatuses, 1e-5);
-        assertEquals(2, transitionWrappers.get(2).ttTuple.size(), 1e-5);
-        assertTrue(transitionWrappers.get(2).transStatuses.get(0).equals(new TargetStatus(attempt1)));
+        assertEquals(2, TransitionWraps.get(2).numStatuses, 1e-5);
+        assertEquals(2, TransitionWraps.get(2).targetTractsTuples.size(), 1e-5);
+        assertTrue(TransitionWraps.get(2).transStatuses.get(0).equals(new TargetStatus(attempt1)));
 
-        assertEquals(2, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertEquals(2, transitionWrappers.get(1).ttTuple.size(), 1e-5);
-        assertEquals(1, transitionWrappers.get(0).numStatuses, 1e-5);
+        assertEquals(2, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertEquals(2, TransitionWraps.get(1).targetTractsTuples.size(), 1e-5);
+        assertEquals(1, TransitionWraps.get(0).numStatuses, 1e-5);
 
 
 
-        assertTrue(transitionWrappers.get(3).transStatuses.get(0).equals(new TargetStatus()));
+        assertTrue(TransitionWraps.get(3).transStatuses.get(0).equals(new TargetStatus()));
 
 
     }
@@ -972,13 +972,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<4;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -996,23 +996,23 @@ public class GestaltPruningTest {
 
 
         //checking the internal node wrapper
-        assertEquals(2, transitionWrappers.get(2).numStatuses, 1e-5);
-        assertEquals(2, transitionWrappers.get(2).ttTuple.size(), 1e-5);
-        assertTrue(transitionWrappers.get(2).transStatuses.get(0).equals(new TargetStatus(attempt1)));
+        assertEquals(2, TransitionWraps.get(2).numStatuses, 1e-5);
+        assertEquals(2, TransitionWraps.get(2).targetTractsTuples.size(), 1e-5);
+        assertTrue(TransitionWraps.get(2).transStatuses.get(0).equals(new TargetStatus(attempt1)));
 
 
 
-        assertEquals(4, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(1).transStatuses.contains(new TargetStatus(attempt1)));
-        assertTrue(transitionWrappers.get(1).transStatuses.contains(new TargetStatus(attempt3)));
-        assertTrue(transitionWrappers.get(1).transStatuses.contains(new TargetStatus(attempt2)));
-        assertEquals(4, transitionWrappers.get(1).ttTuple.size(), 1e-5);
+        assertEquals(4, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(1).transStatuses.contains(new TargetStatus(attempt1)));
+        assertTrue(TransitionWraps.get(1).transStatuses.contains(new TargetStatus(attempt3)));
+        assertTrue(TransitionWraps.get(1).transStatuses.contains(new TargetStatus(attempt2)));
+        assertEquals(4, TransitionWraps.get(1).targetTractsTuples.size(), 1e-5);
 
-        assertEquals(2, transitionWrappers.get(0).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus(attempt1)));
+        assertEquals(2, TransitionWraps.get(0).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus(attempt1)));
 
 
-        assertTrue(transitionWrappers.get(3).transStatuses.get(0).equals(new TargetStatus()));
+        assertTrue(TransitionWraps.get(3).transStatuses.get(0).equals(new TargetStatus()));
 
 
     }
@@ -1060,13 +1060,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<4;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -1082,20 +1082,20 @@ public class GestaltPruningTest {
         attempt3.add(new TargetDeactTract(0,1));
 
 
-        assertTrue(transitionWrappers.get(3).transStatuses.get(0).equals(new TargetStatus()));
+        assertTrue(TransitionWraps.get(3).transStatuses.get(0).equals(new TargetStatus()));
 
 
-        assertEquals(2, transitionWrappers.get(2).numStatuses, 1e-5);
-        assertEquals(2, transitionWrappers.get(2).ttTuple.size(), 1e-5);
-        assertTrue(transitionWrappers.get(2).transStatuses.get(0).equals(new TargetStatus(attempt2)));
+        assertEquals(2, TransitionWraps.get(2).numStatuses, 1e-5);
+        assertEquals(2, TransitionWraps.get(2).targetTractsTuples.size(), 1e-5);
+        assertTrue(TransitionWraps.get(2).transStatuses.get(0).equals(new TargetStatus(attempt2)));
 
 
-        assertEquals(3, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(1).transStatuses.contains(new TargetStatus(attempt2)));
-        assertEquals(3, transitionWrappers.get(1).ttTuple.size(), 1e-5);
+        assertEquals(3, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(1).transStatuses.contains(new TargetStatus(attempt2)));
+        assertEquals(3, TransitionWraps.get(1).targetTractsTuples.size(), 1e-5);
 
-        assertEquals(3, transitionWrappers.get(0).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus(attempt2)));
+        assertEquals(3, TransitionWraps.get(0).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus(attempt2)));
 
 
 
@@ -1147,13 +1147,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<4;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -1169,20 +1169,20 @@ public class GestaltPruningTest {
         attempt3.add(new TargetDeactTract(0,1));
 
 
-        assertTrue(transitionWrappers.get(3).transStatuses.get(0).equals(new TargetStatus()));
+        assertTrue(TransitionWraps.get(3).transStatuses.get(0).equals(new TargetStatus()));
 
 
-        assertEquals(2, transitionWrappers.get(2).numStatuses, 1e-5);
-        assertEquals(2, transitionWrappers.get(2).ttTuple.size(), 1e-5);
-        assertTrue(transitionWrappers.get(2).transStatuses.get(0).equals(new TargetStatus(attempt2)));
+        assertEquals(2, TransitionWraps.get(2).numStatuses, 1e-5);
+        assertEquals(2, TransitionWraps.get(2).targetTractsTuples.size(), 1e-5);
+        assertTrue(TransitionWraps.get(2).transStatuses.get(0).equals(new TargetStatus(attempt2)));
 
 
-        assertEquals(1, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(1).transStatuses.contains(new TargetStatus(attempt2)));
-        assertEquals(1, transitionWrappers.get(1).ttTuple.size(), 1e-5);
+        assertEquals(1, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(1).transStatuses.contains(new TargetStatus(attempt2)));
+        assertEquals(1, TransitionWraps.get(1).targetTractsTuples.size(), 1e-5);
 
-        assertEquals(2, transitionWrappers.get(0).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(0).transStatuses.contains(new TargetStatus(attempt2)));
+        assertEquals(2, TransitionWraps.get(0).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(0).transStatuses.contains(new TargetStatus(attempt2)));
 
 
 
@@ -1233,13 +1233,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<4;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -1255,11 +1255,11 @@ public class GestaltPruningTest {
         attempt3.add(new TargetDeactTract(0,1));
 
 
-        assertTrue(transitionWrappers.get(3).transStatuses.get(0).equals(new TargetStatus()));
-        assertEquals(2, transitionWrappers.get(2).numStatuses, 1e-5);
-        assertTrue(transitionWrappers.get(2).transStatuses.contains(new TargetStatus()));
-        assertEquals(1, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertEquals(4, transitionWrappers.get(0).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(3).transStatuses.get(0).equals(new TargetStatus()));
+        assertEquals(2, TransitionWraps.get(2).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(2).transStatuses.contains(new TargetStatus()));
+        assertEquals(1, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertEquals(4, TransitionWraps.get(0).numStatuses, 1e-5);
 
 
 
@@ -1311,13 +1311,13 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<4;i++) {
             Log.info.println("non root wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println("non root wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in non root wrap" + Arrays.toString(stat.getBinaryStatus(10)));
@@ -1333,11 +1333,11 @@ public class GestaltPruningTest {
         attempt3.add(new TargetDeactTract(0,1));
 
 
-        assertTrue(transitionWrappers.get(3).transStatuses.get(0).equals(new TargetStatus()));
-        assertTrue(transitionWrappers.get(2).transStatuses.contains(new TargetStatus()));
-        assertEquals(2, transitionWrappers.get(2).numStatuses, 1e-5);
-        assertEquals(2, transitionWrappers.get(1).numStatuses, 1e-5);
-        assertEquals(1, transitionWrappers.get(0).numStatuses, 1e-5);
+        assertTrue(TransitionWraps.get(3).transStatuses.get(0).equals(new TargetStatus()));
+        assertTrue(TransitionWraps.get(2).transStatuses.contains(new TargetStatus()));
+        assertEquals(2, TransitionWraps.get(2).numStatuses, 1e-5);
+        assertEquals(2, TransitionWraps.get(1).numStatuses, 1e-5);
+        assertEquals(1, TransitionWraps.get(0).numStatuses, 1e-5);
 
 
     }
@@ -1392,22 +1392,22 @@ public class GestaltPruningTest {
 
         Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree1,alignment,gestaltModel.metaData.posSites,gestaltModel.metaData.nTargets);
 
-        Hashtable<Integer, TransitionWrap> transitionWrappers = TransitionWrap.createTransitionWrappers(tree1,alignment,gestaltModel.metaData,statesDict);
+        Hashtable<Integer, TransitionWrap> TransitionWraps = TransitionWrap.createTransitionWraps(tree1,gestaltModel.metaData,statesDict);
 
-        System.out.println("transitionWrappers size: " + transitionWrappers.size() + "\t- Test transition wrapper");
+        System.out.println("TransitionWraps size: " + TransitionWraps.size() + "\t- Test transition wrapper");
 
         for(int i=0;i<2;i++) {
             Log.info.println(" wrap ID, is LEAF? T/F:"+ tree1.getNode(i).isLeaf());
             Log.info.println(" wrap ID, is root? T/F:"+ tree1.getNode(i).isRoot());
-            TransitionWrap leafWrap = transitionWrappers.get(i);
+            TransitionWrap leafWrap = TransitionWraps.get(i);
             Log.info.println(" wrap size" + leafWrap.numStatuses);
             for (TargetStatus stat : leafWrap.transStatuses) {
                 Log.info.println("status in wrap" + Arrays.toString(stat.getBinaryStatus(10)));
             }
         }
 
-        assertEquals(2, transitionWrappers.size(), 1e-5);   // Reference GAPML python version
-        assertEquals(4, transitionWrappers.get(0).numStatuses, 1e-5);   // Reference GAPML python version
+        assertEquals(2, TransitionWraps.size(), 1e-5);   // Reference GAPML python version
+        assertEquals(4, TransitionWraps.get(0).numStatuses, 1e-5);   // Reference GAPML python version
 
     }
 

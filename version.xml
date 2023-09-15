@@ -6,6 +6,7 @@
         <provider classname="beast.base.evolution.datatype.gestaltData"/>
     </service>
     <service type="beast.base.core.BEASTInterface">
+        <provider classname="beast.base.evolution.datatype.gestaltData"/>
         <provider classname="gestalt.evolution.alignment.AncStates"/>
         <provider classname="gestalt.evolution.alignment.BarcodeMeta"/>
         <provider classname="gestalt.evolution.alignment.GestaltEvent"/>
