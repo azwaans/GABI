@@ -1,3 +1,5 @@
+package gestalt;
+
 import beast.base.inference.parameter.RealParameter;
 import beast.base.evolution.sitemodel.SiteModel;
 import beast.base.evolution.substitutionmodel.Frequencies;

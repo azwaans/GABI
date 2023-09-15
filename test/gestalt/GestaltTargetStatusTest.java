@@ -1,3 +1,5 @@
+package gestalt;
+
 import gestalt.evolution.alignment.BarcodeMeta;
 import gestalt.evolution.alignment.IndelSet;
 import gestalt.evolution.alignment.TargetDeactTract;

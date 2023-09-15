@@ -1,3 +1,5 @@
+package gestalt;
+
 import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.alignment.Sequence;
 

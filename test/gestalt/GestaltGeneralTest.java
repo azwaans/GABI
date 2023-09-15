@@ -1,3 +1,5 @@
+package gestalt;
+
 import beast.base.inference.parameter.RealParameter;
 import gestalt.evolution.alignment.*;
 import beast.base.evolution.substitutionmodel.Frequencies;

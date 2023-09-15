@@ -1,3 +1,5 @@
+package gestalt;
+
 import gestalt.evolution.alignment.AncStates;
 import gestalt.evolution.alignment.IndelSet;
 import org.junit.Test;
