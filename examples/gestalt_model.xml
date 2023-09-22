@@ -15,16 +15,30 @@
                         :gestalt.evolution.datatype.gestaltData'
     >
     <!-- dataType has to be set to gestaltData and the value must contain a ',' s.t. the class recognizes it as a comma separated string of integers-->
+<!--    <data  id="gestaltTest" spec="Alignment" name="alignment" >-->
+<!--        <userDataType spec="gestalt.evolution.datatype.gestaltData"/>-->
+<!--        <sequence id="6" spec="Sequence" taxon="6"  value="38_1_0_0_TGGAGTCGAGAGCGCGCTCGTCGa,115_144_3_8_,271_11_9_9_a,None,None,None,"/>-->
+<!--        <sequence id="1" spec="Sequence" taxon="1"  value="37_2_0_0_ATaa,64_3_1_1_,114_14_3_3_,141_53_4_5_,197_4_6_6_a,244_34_8_8_,"/>-->
+<!--        <sequence id="2" spec="Sequence" taxon="2"  value="29_10_0_0_aaa,101_204_3_9_,None,None,None,None,"/>-->
+<!--        <sequence id="7" spec="Sequence" taxon="7"  value="36_3_0_0_aaGTATa,66_130_1_5_,251_16_8_8_,None,None,None,"/>-->
+<!--        <sequence id="11" spec="Sequence" taxon="11"  value="33_7_0_0_,63_3_1_1_TATGGAaaa,116_4_3_3_TTATCaaaaTTATGTTATTTGa,144_6_4_4_,167_81_5_7_,253_2_8_8_Caa,"/>-->
+<!--        <sequence id="12" spec="Sequence" taxon="12"  value="33_7_0_0_,58_9_1_1_,118_5_3_3_,128_44_4_4_,179_101_6_8_aa,None,"/>-->
+<!--        <sequence id="4" spec="Sequence" taxon="4"  value="34_12_0_0_,55_46_1_2_,108_98_3_6_,253_5_8_8_,None,None,"/>-->
+<!--        <sequence id="5" spec="Sequence" taxon="5"  value="34_12_0_0_,55_46_1_2_,108_98_3_6_,229_27_8_8_,280_2_9_9_a,None,"/>-->
+<!--        <sequence id="8" spec="Sequence" taxon="8"  value="38_38_0_1_,82_47_2_3_,174_27_5_6_,250_5_8_8_,None,None,"/>-->
+<!--        <sequence id="9" spec="Sequence" taxon="9"  value="34_5_0_0_,61_5_1_1_aaaaa,120_7_3_3_,132_33_4_4_,173_80_5_7_a,None,"/>-->
+<!--    </data>-->
+
     <data  id="gestaltTest" spec="Alignment" name="alignment" >
         <userDataType spec="gestalt.evolution.datatype.gestaltData"/>
-        <sequence id="6" spec="Sequence" taxon="6"  value="38_1_0_0_TGGAGTCGAGAGCGCGCTCGTCGa,115_144_3_8_,271_11_9_9_a,None,None,None,"/>
+        <sequence id="0" spec="Sequence" taxon="0"  value="38_1_0_0_TGGAGTCGAGAGCGCGCTCGTCGa,115_144_3_8_,271_11_9_9_a,None,None,None,"/>
         <sequence id="1" spec="Sequence" taxon="1"  value="37_2_0_0_ATaa,64_3_1_1_,114_14_3_3_,141_53_4_5_,197_4_6_6_a,244_34_8_8_,"/>
         <sequence id="2" spec="Sequence" taxon="2"  value="29_10_0_0_aaa,101_204_3_9_,None,None,None,None,"/>
-        <sequence id="7" spec="Sequence" taxon="7"  value="36_3_0_0_aaGTATa,66_130_1_5_,251_16_8_8_,None,None,None,"/>
-        <sequence id="11" spec="Sequence" taxon="11"  value="33_7_0_0_,63_3_1_1_TATGGAaaa,116_4_3_3_TTATCaaaaTTATGTTATTTGa,144_6_4_4_,167_81_5_7_,253_2_8_8_Caa,"/>
-        <sequence id="12" spec="Sequence" taxon="12"  value="33_7_0_0_,58_9_1_1_,118_5_3_3_,128_44_4_4_,179_101_6_8_aa,None,"/>
-        <sequence id="4" spec="Sequence" taxon="4"  value="34_12_0_0_,55_46_1_2_,108_98_3_6_,253_5_8_8_,None,None,"/>
-        <sequence id="5" spec="Sequence" taxon="5"  value="34_12_0_0_,55_46_1_2_,108_98_3_6_,229_27_8_8_,280_2_9_9_a,None,"/>
+        <sequence id="3" spec="Sequence" taxon="3"  value="36_3_0_0_aaGTATa,66_130_1_5_,251_16_8_8_,None,None,None,"/>
+        <sequence id="4" spec="Sequence" taxon="4"  value="33_7_0_0_,63_3_1_1_TATGGAaaa,116_4_3_3_TTATCaaaaTTATGTTATTTGa,144_6_4_4_,167_81_5_7_,253_2_8_8_Caa,"/>
+        <sequence id="5" spec="Sequence" taxon="5"  value="33_7_0_0_,58_9_1_1_,118_5_3_3_,128_44_4_4_,179_101_6_8_aa,None,"/>
+        <sequence id="6" spec="Sequence" taxon="6"  value="34_12_0_0_,55_46_1_2_,108_98_3_6_,253_5_8_8_,None,None,"/>
+        <sequence id="7" spec="Sequence" taxon="7"  value="34_12_0_0_,55_46_1_2_,108_98_3_6_,229_27_8_8_,280_2_9_9_a,None,"/>
         <sequence id="8" spec="Sequence" taxon="8"  value="38_38_0_1_,82_47_2_3_,174_27_5_6_,250_5_8_8_,None,None,"/>
         <sequence id="9" spec="Sequence" taxon="9"  value="34_5_0_0_,61_5_1_1_aaaaa,120_7_3_3_,132_33_4_4_,173_80_5_7_a,None,"/>
     </data>
@@ -147,7 +161,7 @@
                                     barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA"
                                     cutSite="6"
                                     crucialPos="6 6"
-                                    maxSumSteps= "20"
+                                    maxSumSteps= "40"
                                     maxExtraSteps="1"
                                     insertZeroProb="0.5"
                                     cutRates="@cutRates"
@@ -182,13 +196,13 @@
        <operator id="ContempUniformOperator" spec="Uniform" tree="@Tree.t:gestaltTest" weight="30.0"/>
 
         <!--TODO check behaviour with this operator!-->
-<!--        <operator id="ContempSubtreeSlide" spec="SubtreeSlide" tree="@Tree.t:gestaltTest" weight="15.0"/>-->
+        <operator id="ContempSubtreeSlide" spec="SubtreeSlide" tree="@Tree.t:gestaltTest" weight="15.0"/>
 
-<!--        <operator id="ContempNarrow" spec="Exchange" tree="@Tree.t:gestaltTest" weight="15.0"/>-->
+        <operator id="ContempNarrow" spec="Exchange" tree="@Tree.t:gestaltTest" weight="15.0"/>
 
-<!--        <operator id="ContempWide" spec="Exchange" isNarrow="false" tree="@Tree.t:gestaltTest" weight="3.0"/>-->
+        <operator id="ContempWide" spec="Exchange" isNarrow="false" tree="@Tree.t:gestaltTest" weight="3.0"/>
 
-        <!-- phylogenetic operators -->
+<!--         phylogenetic operators-->
         <operator id="cutRatesScaler" spec="ScaleOperator" parameter="@cutRates" scaleFactor="0.8" weight="3.0"/>
         <operator id="doubleCutScaler" spec="ScaleOperator" parameter="@doubleCutWeight" scaleFactor="0.8" weight="3.0"/>
         <operator id="longTrimScalingScaler" spec="ScaleOperator" parameter="@longTrimScaling" scaleFactor="0.8" weight="3.0"/>
@@ -198,7 +212,7 @@
         <operator id="popSizeScaler" spec="ScaleOperator" parameter="@popsize" scaleFactor="0.8" weight="3.0"/>
         <operator id="growthRateScaler" spec="ScaleOperator" optimise="false" parameter="@growthRate" scaleAll="true" scaleFactor="0.9" weight="3.0"/>
 
-        <logger id="tracelog" spec="Logger" fileName="$(filebase).$(seed).log" logEvery="1">
+        <logger id="tracelog" spec="Logger" fileName="$(filebase).$(seed).log" logEvery="100">
             <log idref="posterior"/>
             <log idref="likelihood"/>
             <log idref="prior"/>
@@ -212,14 +226,14 @@
             <log idref="doubleCutWeight"/>
         </logger>
 
-        <logger id="screenlog" spec="Logger" logEvery="1">
+        <logger id="screenlog" spec="Logger" logEvery="100">
             <log idref="posterior"/>
             <log id="ESS.0" spec="util.ESS" arg="@posterior"/>
             <log idref="likelihood"/>
             <log idref="prior"/>
         </logger>
 
-        <logger id="treelog.t:gestaltTest" spec="Logger" fileName="$(filebase).$(tree).$(seed).trees" logEvery="1" mode="tree">
+        <logger id="treelog.t:gestaltTest" spec="Logger" fileName="$(filebase).$(tree).$(seed).trees" logEvery="100" mode="tree">
             <log idref="Tree.t:gestaltTest" printMetaData="true"/>
         </logger>
 

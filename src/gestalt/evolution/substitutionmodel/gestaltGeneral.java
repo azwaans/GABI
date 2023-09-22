@@ -610,28 +610,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
 
     }
 
-    /**
-     * get all possible singletons from the computed set of ancestral states  for a specific tree and leaf sequences
-     */
 
-    public static List<IndelSet.Singleton> getAllSingletons(beast.base.evolution.tree.TreeInterface tree, Hashtable<Integer, AncStates> statesDict) {
-        Set<IndelSet.Singleton> singletonSet = new HashSet();
-        for (Node node : tree.getExternalNodes()) {
-            if (node.isLeaf()) {
-                AncStates leaf_state = statesDict.get(node.getNr());
-                for (IndelSet sgwc : leaf_state.getSingletonWCs()) {
-                    IndelSet.Singleton sing = sgwc.getSingleton();
-                    singletonSet.add(sing);
-                }
-            }
-        }
-
-        List<IndelSet.Singleton> singletonList = new ArrayList<>();
-        singletonList.addAll(singletonSet);
-        return singletonList;
-
-
-    }
 
 
     /**

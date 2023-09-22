@@ -123,14 +123,18 @@ public class TransitionWrap extends BEASTObject {
                                                         List<List<IndelSet.TargetTract>> parentTuples,
                                                         Integer maxSumStates,
                                                         int maxExtraSteps,
-                                                        int nTargets) {
+                                                        int nTargets,
+                                                        int[] currentStatesDictIndex) {
 
         TransitionWrap wrap = new TransitionWrap();
-        AncStates nodeAncState = ancStatesDict.get(childNode.getNr());
-        List<IndelSet.Singleton> parentSingletonState = parsimonyStatesDict.get(parNode.getNr());
+        AncStates nodeAncState = ancStatesDict.get((childNode.getNr() +1) + currentStatesDictIndex[childNode.getNr()] * (childNode.getNr() + 1));
+        Log.info.print("keyset" + ancStatesDict.keySet());
+        Log.info.print("key asked" + childNode.getNr() );
+
+        List<IndelSet.Singleton> parentSingletonState = parsimonyStatesDict.get((parNode.getNr() +1) + currentStatesDictIndex[parNode.getNr()] * (parNode.getNr() + 1));
 
 
-        List<IndelSet.Singleton> childSingletonState = parsimonyStatesDict.get(childNode.getNr());
+        List<IndelSet.Singleton> childSingletonState = parsimonyStatesDict.get((childNode.getNr() +1) + currentStatesDictIndex[childNode.getNr()] * (childNode.getNr() + 1));
 
         //finding length of the set difference between child and parent to find to minimum number of steps:
         List<IndelSet.Singleton> differenceSteps = new ArrayList<>(childSingletonState);
@@ -193,52 +197,137 @@ public class TransitionWrap extends BEASTObject {
     /**
      * in original implementation: annotate_ancestral_states
      * finds all possible Ancestral States at internal nodes
+     * todo make this a recusrisive traversal + cache it
      */
-    public static Hashtable<Integer, AncStates> createStatesDict(beast.base.evolution.tree.TreeInterface tree,
-                                                                 Alignment alinmt,
-                                                                 List<Pair<Integer, Integer>> posSites,
-                                                                 int nTargets) {
-        Hashtable<Integer, AncStates> statesDict = new Hashtable<>();
-        for (Node node : tree.listNodesPostOrder(null, null)) {
+//    public static Hashtable<Integer, AncStates> createStatesDict(beast.base.evolution.tree.TreeInterface tree,
+//                                                                 Alignment alinmt,
+//                                                                 List<Pair<Integer, Integer>> posSites,
+//                                                                 int nTargets) {
+//        Hashtable<Integer, AncStates> statesDict = new Hashtable<>();
+//        for (Node node : tree.listNodesPostOrder(null, null)) {
+//
+//            if (node.isLeaf()) {
+//
+//
+//                String leafSeq = alinmt.sequenceInput.get().get(node.getNr()).toString();
+//                Log.info.println("leafSeq" + leafSeq);
+//                AncStates leafState = AncStates.createObservedAlleleSet(leafSeq, posSites, nTargets);
+//                statesDict.put(node.getNr(), leafState);
+//
+//                //create anc state set based on the observed allele
+//            } else if (node.isRoot()) {
+//                //root node: create an empty AncState, as the root has no ancestral states (unedited barcode)
+//                statesDict.put(node.getNr(), new AncStates());
+//
+//            } else {
+//                //it is an internal node. The node's ancestral state is the intersection of its children's ancestral states
+//                final Node child1 = node.getLeft();
+//                final Node child2 = node.getRight();
+//
+//                AncStates child1States = statesDict.get(child1.getNr());
+//                AncStates child2States = statesDict.get(child2.getNr());
+//
+//                AncStates parentStates = AncStates.intersect(child1States, child2States);
+//
+//                statesDict.put(node.getNr(), parentStates);
+//            }
+//
+//        }
+//        Log.info.println("states dict size"+statesDict.size());
+//        return statesDict;
+//    }
 
-            if (node.isLeaf()) {
+//    /**
+//     * get all possible singletons from the computed set of ancestral states  for a specific tree and leaf sequences
+//     * todo integrate in the states traersal OR even better
+//     */
+//
+//    public static List<IndelSet.Singleton> getAllSingletons(beast.base.evolution.tree.TreeInterface tree, Hashtable<Integer, AncStates> statesDict) {
+//        Set<IndelSet.Singleton> singletonSet = new HashSet();
+//        for (Node node : tree.getExternalNodes()) {
+//            if (node.isLeaf()) {
+//                AncStates leafState = statesDict.get(node.getNr());
+//                for (IndelSet sgwc : leafState.getSingletonWCs()) {
+//                    IndelSet.Singleton singleton = sgwc.getSingleton();
+//                    singletonSet.add(singleton);
+//                }
+//            }
+//        }
+//
+//        List<IndelSet.Singleton> singletonList = new ArrayList<>();
+//        singletonList.addAll(singletonSet);
+//        return singletonList;
+//
+//
+//    }
+//
+//    public static Hashtable<Integer, AncStates> createStatesDict(beast.base.evolution.tree.TreeInterface tree,
+//                                                                 Alignment alinmt,
+//                                                                 List<Pair<Integer, Integer>> posSites,
+//                                                                 int nTargets) {
+//        Hashtable<Integer, AncStates> statesDict = new Hashtable<>();
+//        Set<IndelSet.Singleton> singletonSet = new HashSet();
+//        populateStatesDict(statesDict,tree.getRoot(),tree,alinmt,posSites, nTargets);
+//        Log.info.println("states dict size"+statesDict.size());
+//        List<IndelSet.Singleton> singletonList = new ArrayList<>();
+//        singletonList.addAll(singletonSet);
+//        return statesDict;
+//    }
+//
+//    public static void populateStatesDict(Hashtable<Integer,AncStates> statesDict,
+//                                          Node node,
+//                                          beast.base.evolution.tree.TreeInterface tree,
+//                                          Alignment alinmt,
+//                                          List<Pair<Integer, Integer>> posSites,
+//                                          int nTargets) {
+//        if(node != null) {
+//            if (node.isLeaf()) {
+//
+//
+//                String leafSeq = alinmt.sequenceInput.get().get(node.getNr()).toString();
+//                Log.info.println("leafSeq" + leafSeq);
+//                AncStates leafState = AncStates.createObservedAlleleSet(leafSeq, posSites, nTargets);
+//                statesDict.put(node.getNr(), leafState);
+//                for (IndelSet sgwc : leafState.getSingletonWCs()) {
+//                    IndelSet.Singleton singleton = sgwc.getSingleton();
+//                    singletonSet.add(singleton);
+//                }
+//
+//                //create anc state set based on the observed allele
+//            } else {
+//                //it is an internal node. The node's ancestral state is the intersection of its children's ancestral states
+//                final Node child1 = node.getLeft();
+//                populateStatesDict(statesDict, child1, tree, alinmt, posSites, nTargets);
+//
+//                final Node child2 = node.getRight();
+//                populateStatesDict(statesDict, child2, tree, alinmt, posSites, nTargets);
+//
+//                if (node.isRoot()) {
+//                    //root node: create an empty AncState, as the root has no ancestral states (unedited barcode)
+//                    statesDict.put(node.getNr(), new AncStates());
+//
+//                } else {
+//                    AncStates child1States = statesDict.get(child1.getNr());
+//                    AncStates child2States = statesDict.get(child2.getNr());
+//                    AncStates parentStates = AncStates.intersect(child1States, child2States);
+//                    statesDict.put(node.getNr(), parentStates);
+//                }
+//
+//            }
+//        }
+//    }
 
 
-                String leafSeq = alinmt.sequenceInput.get().get(node.getNr()).toString();
-                Log.info.println("leafSeq" + leafSeq);
-                AncStates leafState = AncStates.createObservedAlleleSet(leafSeq, posSites, nTargets);
-                statesDict.put(node.getNr(), leafState);
-
-                //create anc state set based on the observed allele
-            } else if (node.isRoot()) {
-                //root node: create an empty AncState, as the root has no ancestral states (unedited barcode)
-                statesDict.put(node.getNr(), new AncStates());
-
-            } else {
-                //it is an internal node. The node's ancestral state is the intersection of its children's ancestral states
-                List<Node> childrn = node.getChildren();
-                AncStates parntStat = statesDict.get((childrn.get(0)).getNr());
-                for (int i = 1; i < childrn.size(); i++) {
-                    AncStates otherChild = statesDict.get((childrn.get(i)).getNr());
-                    parntStat = AncStates.intersect(parntStat, otherChild);
-                }
-
-                statesDict.put(node.getNr(), parntStat);
-
-            }
-
-        }
-        return statesDict;
-    }
 
     /**
      * Creates a transition wrap for all nodes in the tree
+     * todo cache that
      */
 
     public static Hashtable<Integer, TransitionWrap> createTransitionWraps(beast.base.evolution.tree.TreeInterface tree,
                                                                            BarcodeMeta metaData,
-                                                                           Hashtable<Integer,
-                                                                                   AncStates> statesDict) {
+                                                                           Hashtable<Integer, AncStates> statesDict,
+                                                                           int[] currentStatesDictIndex) {
 
         Hashtable<Integer, TransitionWrap> wrapDict = new Hashtable<>();
 
@@ -247,7 +336,7 @@ public class TransitionWrap extends BEASTObject {
             List<List<IndelSet.TargetTract>> initNull = new ArrayList<>();
             List<IndelSet.TargetTract> innerinitNull = new ArrayList<>();
             initNull.add(innerinitNull);
-            TransitionWrap temp = new TransitionWrap(initNull, statesDict.get(node.getNr()), node.isLeaf());
+            TransitionWrap temp = new TransitionWrap(initNull, statesDict.get((node.getNr() + 1) + currentStatesDictIndex[node.getNr()] * (node.getNr() + 1)), node.isLeaf());
             wrapDict.put(node.getNr(), temp);
         }
         //dictionary of all singleton states (not node assigned)
@@ -262,23 +351,23 @@ public class TransitionWrap extends BEASTObject {
             Node parentNode = preorderList.get(reverseIt);
 
             List<List<IndelSet.TargetTract>> parentNodeTuples = wrapDict.get(parentNode.getNr()).targetTractsTuples;
-            List<List<IndelSet.TargetTract>> filteredtargetTractsTupless = parentNodeTuples;
+            List<List<IndelSet.TargetTract>> filteredtargetTractsTuples = parentNodeTuples;
 
             for (Node childNode : parentNode.getChildren()) {
 
-                TransitionWrap filterWrap = getCloseTransitionWrap(parentNode, childNode, statesDict, parsimDict, parentNodeTuples, metaData.maxSumSteps, metaData.maxExtraSteps, metaData.nTargets);
-                filteredtargetTractsTupless = IndelSet.TargetTract.intersect(filteredtargetTractsTupless, filterWrap.targetTractsTuples);
+                TransitionWrap filterWrap = getCloseTransitionWrap(parentNode, childNode, statesDict, parsimDict, parentNodeTuples, metaData.maxSumSteps, metaData.maxExtraSteps, metaData.nTargets, currentStatesDictIndex);
+                filteredtargetTractsTuples = IndelSet.TargetTract.intersect(filteredtargetTractsTuples, filterWrap.targetTractsTuples);
                 //removing duplicates
                 Set noDup = new LinkedHashSet();
-                noDup.addAll(filteredtargetTractsTupless);
-                filteredtargetTractsTupless.clear();
-                filteredtargetTractsTupless.addAll(noDup);
+                noDup.addAll(filteredtargetTractsTuples);
+                filteredtargetTractsTuples.clear();
+                filteredtargetTractsTuples.addAll(noDup);
 
             }
 
             for (Node childNode : parentNode.getChildren()) {
 
-                TransitionWrap finalWrap = getCloseTransitionWrap(parentNode, childNode, statesDict, parsimDict, filteredtargetTractsTupless, metaData.maxSumSteps, metaData.maxExtraSteps, metaData.nTargets);
+                TransitionWrap finalWrap = getCloseTransitionWrap(parentNode, childNode, statesDict, parsimDict, filteredtargetTractsTuples, metaData.maxSumSteps, metaData.maxExtraSteps, metaData.nTargets, currentStatesDictIndex);
                 List<TargetStatus> cleanTTUPLES = finalWrap.transStatuses;
                 Collections.reverse(cleanTTUPLES);
                 finalWrap.transStatuses = cleanTTUPLES;

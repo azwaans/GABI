@@ -19,6 +19,7 @@ import gestalt.evolution.alignment.IndelSet;
 import gestalt.evolution.alignment.TargetStatus;
 import gestalt.evolution.alignment.TransitionWrap;
 import gestalt.evolution.substitutionmodel.gestaltGeneral;
+import org.apache.commons.math3.util.Pair;
 import org.jblas.DoubleMatrix;
 
 import java.util.*;
@@ -50,10 +51,17 @@ public class gestaltTreeLikelihood extends Distribution {
     protected BranchRateModel.Base branchRateModel;
 
     protected double[] m_branchLengths;
-
     protected double[] storedBranchLengths;
 
     protected List<IndelSet.Singleton> singletonList;
+
+    //AncStates are stored with key : (NodeNr + 1) + (current ? 0:1) * (NodeNr+1)
+    public Hashtable<Integer, AncStates> statesDict;
+
+    public int[] currentStatesDictIndex;
+    protected int[] storedStatesDictIndex;
+
+    int nodeCount;
 
 
     /**
@@ -83,7 +91,7 @@ public class gestaltTreeLikelihood extends Distribution {
     }
 
     public void initAndValidate() {
-        Log.info.println("initializing tree likelihood");
+        //Log.info.println("initializing tree likelihood");
         // sanity check: site model should be an instance of the base site model class
         if (!(siteModelInput.get() instanceof SiteModel.Base)) {
             throw new IllegalArgumentException("siteModel input should be of type SiteModel.Base");
@@ -91,7 +99,7 @@ public class gestaltTreeLikelihood extends Distribution {
         if (dataInput.get().getTaxonCount() != treeInput.get().getLeafNodeCount()) {
             throw new IllegalArgumentException("The number of nodes in the tree does not match the number of sequences");
         }
-        int nodeCount = treeInput.get().getNodeCount();
+        nodeCount = treeInput.get().getNodeCount();
 
         m_siteModel = (SiteModel.Base) siteModelInput.get();
         m_siteModel.setDataType(dataInput.get().getDataType());
@@ -108,7 +116,18 @@ public class gestaltTreeLikelihood extends Distribution {
 
         //CHANGE BLOCK
         likelihoodCore = new gestaltLikelihoodCore();
+        singletonList = new ArrayList<>();
+
+        currentStatesDictIndex = new int[nodeCount];
+        storedStatesDictIndex = new int[nodeCount];
+
         initCore();
+
+        statesDict = new Hashtable<>();
+        for (int i = 0; i < treeInput.get().getLeafNodeCount(); i++) {
+            initLeafAncestors(i);
+        }
+
 
 
     }
@@ -126,10 +145,74 @@ public class gestaltTreeLikelihood extends Distribution {
 
     }
 
+    /**
+     * Calculate the set of ancestral states for a given leaf node, and fill the corresponding AncestralStates hashmap
+     */
+    protected void initLeafAncestors(int nodeNr) {
+        Set<IndelSet.Singleton> singletonSet = new HashSet();
+        String leafSeq = dataInput.get().sequenceInput.get().get(nodeNr).toString();
+        AncStates leafState = AncStates.createObservedAlleleSet(leafSeq, substitutionModel.metaData.posSites, substitutionModel.metaData.nTargets);
+        statesDict.put(nodeNr + 1, leafState);
+        // originally done separately in getAllSingletons
+        for (IndelSet sgwc : leafState.getSingletonWCs()) {
+            IndelSet.Singleton singleton = sgwc.getSingleton();
+            singletonSet.add(singleton);
+        }
+        singletonList.addAll(singletonSet);
+    }
+
+
+
+
+    public int populateStatesDict(Node node) {
+
+
+        int update = Tree.IS_FILTHY;
+        if(node != null && !node.isLeaf()) {
+            update = node.isDirty();
+            int nodeNr = node.getNr();
+
+            // The node's ancestral state is the intersection of its children's ancestral states
+
+
+            final Node child1 = node.getLeft();
+            int update1 = populateStatesDict( child1);
+
+            final Node child2 = node.getRight();
+            int update2 = populateStatesDict( child2);
+
+
+
+            if (update1 == Tree.IS_FILTHY || update2 == Tree.IS_FILTHY) {
+
+                update |= (update1 | update2);
+
+                if (node.isRoot()) {
+                    //root node: create an empty AncState, as the root has no ancestral states (unedited barcode)
+                    statesDict.put(nodeNr + 1, new AncStates());
+
+                } else {
+                    int child1Nr = child1.getNr();
+                    int child2Nr = child2.getNr();
+
+                    AncStates child1States = statesDict.get((child1Nr + 1) + currentStatesDictIndex[child1Nr] * (child1Nr + 1));
+                    AncStates child2States = statesDict.get((child2Nr + 1) + currentStatesDictIndex[child2Nr] * (child2Nr + 1));
+
+                    AncStates parentStates = AncStates.intersect(child1States, child2States);
+                    setNodeStatesDictForUpdate(node.getNr());
+
+                    statesDict.put((nodeNr + 1) + currentStatesDictIndex[nodeNr] * (nodeNr + 1), parentStates);
+                }
+            }
+
+        }
+        return update;
+    }
+
     public double calculateLogP() {
 
         final TreeInterface tree = treeInput.get();
-        Log.info.println(tree.toString());
+        //Log.info.println(tree.toString());
         //recording time
         long start1 = System.nanoTime();
 
@@ -137,14 +220,13 @@ public class gestaltTreeLikelihood extends Distribution {
         if (hasDirt == Tree.IS_FILTHY | likelihoodCore.transitionWraps == null) {
 
             //finds the set of likely ancestral states at each internal node based on leaf sequences
-            Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree, dataInput.get(), substitutionModel.metaData.posSites, substitutionModel.metaData.nTargets);
-
-            //extract all single indel events from the possible ancestral states to compute conditional probabilities
-            singletonList = substitutionModel.getAllSingletons(tree, statesDict);
+            populateStatesDict(tree.getRoot());
 
             //each possible state at each node create a wrap of metadata
-            likelihoodCore.transitionWraps = TransitionWrap.createTransitionWraps(tree, substitutionModel.metaData, statesDict);
+            likelihoodCore.transitionWraps = TransitionWrap.createTransitionWraps(tree, substitutionModel.metaData, statesDict,currentStatesDictIndex);
         }
+
+
 
         //if there is dirt, only
         if (hasDirt >= Tree.IS_DIRTY) {
@@ -235,6 +317,57 @@ public class gestaltTreeLikelihood extends Distribution {
         return update;
     } // traverseWithBRM
 
+//    protected int traverseStates(final Node node) {
+//
+//        int update = hasDirt;
+//
+//        if (node != null) {
+//            update = (node.isDirty() | hasDirt);
+//            final int nodeIndex = node.getNr();
+//
+//
+//            // First update the transition probability matrix(ices) for this branch
+//            //if (!node.isRoot() && (update != Tree.IS_CLEAN || branchTime != m_StoredBranchLengths[nodeIndex])) {
+//            if (!node.isRoot() && (update != Tree.IS_CLEAN) ) {
+//
+//
+//                //likelihoodCore.setNodeMatrixForUpdate(nodeIndex);
+//                TransitionWrap nodeWrap = likelihoodCore.transitionWraps.get(node.getNr());
+//                DoubleMatrix ptMat = substitutionModel.getTransitionProbabilities(node.getParent(), nodeWrap, node.getLength());
+//                likelihoodCore.setNodeMatrix(nodeIndex, ptMat);
+//
+//
+//                update |= Tree.IS_DIRTY;
+//            }
+//
+//            // Only update the partial likelihoods if the node is a leaf
+//            if (node.isLeaf()) {
+//                likelihoodCore.setLeafPartials(node);
+//            } else {
+//
+//                // Traverse down the two child nodes
+//                final Node child1 = node.getLeft(); //Two children
+//                final int update1 = traverse(child1);
+//
+//                final Node child2 = node.getRight();
+//                final int update2 = traverse(child2);
+//
+//                // If either child node was updated then update this node too
+//                if (update1 != Tree.IS_CLEAN || update2 != Tree.IS_CLEAN) {
+//
+//
+//                    update |= (update1 | update2);
+//                    //likelihoodCore.setNodePartialsForUpdate(nodeIndex);
+//                    DoubleMatrix nodeLogPartials = likelihoodCore.calculatePartials(node);
+//                    likelihoodCore.setNodePartials(node.getNr(), nodeLogPartials);
+//
+//
+//                }
+//            }
+//        }
+//        return update;
+//    }
+
 
     void calcLogP() {
 
@@ -284,6 +417,10 @@ public class gestaltTreeLikelihood extends Distribution {
 //
 //    }
 
+    public void setNodeStatesDictForUpdate(int nodeIndex) {
+        currentStatesDictIndex[nodeIndex] = 1 - currentStatesDictIndex[nodeIndex];
+    }
+
 
     /**
      * check state for changed variables and update temp results if necessary *
@@ -307,5 +444,28 @@ public class gestaltTreeLikelihood extends Distribution {
         return treeInput.get().somethingIsDirty();
     }
 
+    @Override
+    public void store() {
+
+        super.store();
+        System.arraycopy(m_branchLengths, 0, storedBranchLengths, 0, m_branchLengths.length);
+        System.arraycopy(currentStatesDictIndex, 0, currentStatesDictIndex, 0, nodeCount );
+    }
+
+    //TODO do we need unstore??? We think we don't because when scaling is active, it is for the entire likelihood
+
+    @Override
+    public void restore() {
+
+        super.restore();
+        double[] tmp = m_branchLengths;
+        m_branchLengths = storedBranchLengths;
+        storedBranchLengths = tmp;
+
+        int[] tmp2 = currentStatesDictIndex;
+        currentStatesDictIndex = storedStatesDictIndex;
+        storedStatesDictIndex = tmp2;
+
+    }
 
 }

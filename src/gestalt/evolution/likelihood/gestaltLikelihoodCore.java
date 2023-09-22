@@ -1,6 +1,7 @@
 package gestalt.evolution.likelihood;
 
 
+import beast.base.core.Log;
 import beast.base.evolution.likelihood.LikelihoodCore;
 import beast.base.evolution.tree.Node;
 import gestalt.evolution.alignment.TargetStatus;
@@ -240,6 +241,7 @@ public class gestaltLikelihoodCore extends LikelihoodCore {
 
                 // the index is null:
                 Integer childUnmodifiedIndex = childNodeWrap.statusMap.get(new TargetStatus());
+                //Log.info.println(chOrderedDownProbs);
                 double downProb = chOrderedDownProbs.get(childUnmodifiedIndex);
                 downProb = max(downProb, 0.0);
                 downProbs = new DoubleMatrix(1, 1, downProb);
