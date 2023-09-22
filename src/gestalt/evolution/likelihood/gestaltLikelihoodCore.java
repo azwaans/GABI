@@ -65,17 +65,6 @@ public class gestaltLikelihoodCore extends LikelihoodCore {
      */
     @Override
     public void calculateLogLikelihoods(double[] partials, double[] frequencies, double[] outLogLikelihoods) {
-//        int v = 0;
-//        for (int k = 0; k < nrOfPatterns; k++) {
-//
-//            double sum = 0.0;
-//            for (int i = 0; i < nrOfStates; i++) {
-//
-//                sum += frequencies[i] * partials[v];
-//                v++;
-//            }
-//            outLogLikelihoods[k] = Math.log(sum) + getLogScalingFactor(k);
-//        }
     }
 
     @Override
@@ -135,18 +124,6 @@ public class gestaltLikelihoodCore extends LikelihoodCore {
     @Override
     public void setNodePartials(int nodeIndex, double[] partials) {
 
-//        if (this.partials[0][nodeIndex] == null) {
-//            createNodePartials(nodeIndex);
-//        }
-//        if (partials.length < partialsSize) {
-//            int k = 0;
-//            for (int i = 0; i < nrOfMatrices; i++) {
-//                System.arraycopy(partials, 0, this.partials[0][nodeIndex], k, partials.length);
-//                k += partials.length;
-//            }
-//        } else {
-        //       System.arraycopy(partials, 0, this.partials[0][nodeIndex], 0, partials.length);
-        //}
     }
 
     /**

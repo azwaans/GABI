@@ -129,7 +129,6 @@ public class gestaltTreeLikelihood extends Distribution {
         }
 
 
-
     }
 
     //CHANGE BLOCK
@@ -162,13 +161,11 @@ public class gestaltTreeLikelihood extends Distribution {
     }
 
 
-
-
     public int populateStatesDict(Node node) {
 
 
         int update = Tree.IS_FILTHY;
-        if(node != null && !node.isLeaf()) {
+        if (node != null && !node.isLeaf()) {
             update = node.isDirty();
             int nodeNr = node.getNr();
 
@@ -176,11 +173,10 @@ public class gestaltTreeLikelihood extends Distribution {
 
 
             final Node child1 = node.getLeft();
-            int update1 = populateStatesDict( child1);
+            int update1 = populateStatesDict(child1);
 
             final Node child2 = node.getRight();
-            int update2 = populateStatesDict( child2);
-
+            int update2 = populateStatesDict(child2);
 
 
             if (update1 == Tree.IS_FILTHY || update2 == Tree.IS_FILTHY) {
@@ -223,9 +219,8 @@ public class gestaltTreeLikelihood extends Distribution {
             populateStatesDict(tree.getRoot());
 
             //each possible state at each node create a wrap of metadata
-            likelihoodCore.transitionWraps = TransitionWrap.createTransitionWraps(tree, substitutionModel.metaData, statesDict,currentStatesDictIndex);
+            likelihoodCore.transitionWraps = TransitionWrap.createTransitionWraps(tree, substitutionModel.metaData, statesDict, currentStatesDictIndex);
         }
-
 
 
         //if there is dirt, only
@@ -317,57 +312,6 @@ public class gestaltTreeLikelihood extends Distribution {
         return update;
     } // traverseWithBRM
 
-//    protected int traverseStates(final Node node) {
-//
-//        int update = hasDirt;
-//
-//        if (node != null) {
-//            update = (node.isDirty() | hasDirt);
-//            final int nodeIndex = node.getNr();
-//
-//
-//            // First update the transition probability matrix(ices) for this branch
-//            //if (!node.isRoot() && (update != Tree.IS_CLEAN || branchTime != m_StoredBranchLengths[nodeIndex])) {
-//            if (!node.isRoot() && (update != Tree.IS_CLEAN) ) {
-//
-//
-//                //likelihoodCore.setNodeMatrixForUpdate(nodeIndex);
-//                TransitionWrap nodeWrap = likelihoodCore.transitionWraps.get(node.getNr());
-//                DoubleMatrix ptMat = substitutionModel.getTransitionProbabilities(node.getParent(), nodeWrap, node.getLength());
-//                likelihoodCore.setNodeMatrix(nodeIndex, ptMat);
-//
-//
-//                update |= Tree.IS_DIRTY;
-//            }
-//
-//            // Only update the partial likelihoods if the node is a leaf
-//            if (node.isLeaf()) {
-//                likelihoodCore.setLeafPartials(node);
-//            } else {
-//
-//                // Traverse down the two child nodes
-//                final Node child1 = node.getLeft(); //Two children
-//                final int update1 = traverse(child1);
-//
-//                final Node child2 = node.getRight();
-//                final int update2 = traverse(child2);
-//
-//                // If either child node was updated then update this node too
-//                if (update1 != Tree.IS_CLEAN || update2 != Tree.IS_CLEAN) {
-//
-//
-//                    update |= (update1 | update2);
-//                    //likelihoodCore.setNodePartialsForUpdate(nodeIndex);
-//                    DoubleMatrix nodeLogPartials = likelihoodCore.calculatePartials(node);
-//                    likelihoodCore.setNodePartials(node.getNr(), nodeLogPartials);
-//
-//
-//                }
-//            }
-//        }
-//        return update;
-//    }
-
 
     void calcLogP() {
 
@@ -390,6 +334,7 @@ public class gestaltTreeLikelihood extends Distribution {
 
     }
 
+//todo check if we want penalization
 
 //    protected double penalization() {
 //
@@ -449,7 +394,7 @@ public class gestaltTreeLikelihood extends Distribution {
 
         super.store();
         System.arraycopy(m_branchLengths, 0, storedBranchLengths, 0, m_branchLengths.length);
-        System.arraycopy(currentStatesDictIndex, 0, currentStatesDictIndex, 0, nodeCount );
+        System.arraycopy(currentStatesDictIndex, 0, currentStatesDictIndex, 0, nodeCount);
     }
 
     //TODO do we need unstore??? We think we don't because when scaling is active, it is for the entire likelihood

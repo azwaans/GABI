@@ -19,6 +19,7 @@ public class GestaltLikelihoodTest {
 
     /**
      * Basic test for the likelihood calculation with nothing sequenced
+     *
      * @throws Exception
      */
     @Test
@@ -29,13 +30,13 @@ public class GestaltLikelihoodTest {
 
         Sequence a = new Sequence("CHILD1", "None,");
         Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"dataType", "user defined");
+        alignment.initByName("sequence", a, "dataType", "user defined");
 
-        String barcodeSequence="AA ATCGATCG ACTG ATCGATCG ACTG TGACTAGC TT";
-        String cutSite="3";
-        String crucialPos="3 3";
-        String maxSumSteps= "3000";
-        String maxExtraSteps="1";
+        String barcodeSequence = "AA ATCGATCG ACTG ATCGATCG ACTG TGACTAGC TT";
+        String cutSite = "3";
+        String crucialPos = "3 3";
+        String maxSumSteps = "3000";
+        String maxExtraSteps = "1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685");
         RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
@@ -43,7 +44,7 @@ public class GestaltLikelihoodTest {
         RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
         RealParameter insertParams = new RealParameter("2.0");
-        String doubleCutWeight="0.3";
+        String doubleCutWeight = "0.3";
 
         Tree tree1 = new TreeParser();
         tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
@@ -58,14 +59,14 @@ public class GestaltLikelihoodTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps, "cutRates", cutRates, "longTrimScalingFactors", longTrimScaling, "doubleCutWeight", doubleCutWeight, "frequencies", frequencies, "insertZeroProb", insertZeroProb, "trimZeroProbs", trimZeroProbs, "trimShortParams", trimShortParams, "trimLongParams", trimLongParams, "insertParams", insertParams);
 
         SiteModel siteM = new SiteModel();
-        siteM.initByName( "gammaCategoryCount", 0, "substModel", gestaltModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", gestaltModel);
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
-        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM);
+
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -77,23 +78,24 @@ public class GestaltLikelihoodTest {
 
     /**
      * Basic test for the likelihood calculation with a single indel
+     *
      * @throws Exception
      */
     @Test
-    public void  testBranchLikelihood() {
+    public void testBranchLikelihood() {
 
         // Test for a single branch
         String newick = "(CHILD1:10):0.0;";
 
         Sequence a = new Sequence("CHILD1", "6_3_0_0_,");
         Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"dataType", "user defined");
+        alignment.initByName("sequence", a, "dataType", "user defined");
 
-        String barcodeSequence="AA ATCGATCG ACTG ATCGATCG ACTG TGACTAGC TT";
-        String cutSite="3";
-        String crucialPos="3 3";
-        String maxSumSteps= "3000";
-        String maxExtraSteps="1";
+        String barcodeSequence = "AA ATCGATCG ACTG ATCGATCG ACTG TGACTAGC TT";
+        String cutSite = "3";
+        String crucialPos = "3 3";
+        String maxSumSteps = "3000";
+        String maxExtraSteps = "1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685");
         RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
@@ -101,7 +103,7 @@ public class GestaltLikelihoodTest {
         RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
         RealParameter insertParams = new RealParameter("2.0");
-        String doubleCutWeight="0.3";
+        String doubleCutWeight = "0.3";
 
         Tree tree1 = new TreeParser();
         tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
@@ -116,14 +118,14 @@ public class GestaltLikelihoodTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps, "cutRates", cutRates, "longTrimScalingFactors", longTrimScaling, "doubleCutWeight", doubleCutWeight, "frequencies", frequencies, "insertZeroProb", insertZeroProb, "trimZeroProbs", trimZeroProbs, "trimShortParams", trimShortParams, "trimLongParams", trimLongParams, "insertParams", insertParams);
 
         SiteModel siteM = new SiteModel();
-        siteM.initByName( "gammaCategoryCount", 0, "substModel", gestaltModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", gestaltModel);
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
-        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM);
+
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -136,6 +138,7 @@ public class GestaltLikelihoodTest {
 
     /**
      * Basic test for the likelihood calculation with a single indel
+     *
      * @throws Exception
      */
     @Test
@@ -146,13 +149,13 @@ public class GestaltLikelihoodTest {
 
         Sequence a = new Sequence("CHILD1", "6_28_0_2_ATC,");
         Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"dataType", "user defined");
+        alignment.initByName("sequence", a, "dataType", "user defined");
 
-        String barcodeSequence="AA ATCGATCG ACTG ATCGATCG ACTG TGACTAGC TT";
-        String cutSite="3";
-        String crucialPos="3 3";
-        String maxSumSteps= "3000";
-        String maxExtraSteps="1";
+        String barcodeSequence = "AA ATCGATCG ACTG ATCGATCG ACTG TGACTAGC TT";
+        String cutSite = "3";
+        String crucialPos = "3 3";
+        String maxSumSteps = "3000";
+        String maxExtraSteps = "1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685");
         RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
@@ -160,7 +163,7 @@ public class GestaltLikelihoodTest {
         RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
         RealParameter insertParams = new RealParameter("2.0");
-        String doubleCutWeight="0.3";
+        String doubleCutWeight = "0.3";
 
         Tree tree1 = new TreeParser();
         tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
@@ -175,14 +178,14 @@ public class GestaltLikelihoodTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps, "cutRates", cutRates, "longTrimScalingFactors", longTrimScaling, "doubleCutWeight", doubleCutWeight, "frequencies", frequencies, "insertZeroProb", insertZeroProb, "trimZeroProbs", trimZeroProbs, "trimShortParams", trimShortParams, "trimLongParams", trimLongParams, "insertParams", insertParams);
 
         SiteModel siteM = new SiteModel();
-        siteM.initByName( "gammaCategoryCount", 0, "substModel", gestaltModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", gestaltModel);
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
-        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM);
+
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -195,6 +198,7 @@ public class GestaltLikelihoodTest {
 
     /**
      * Basic test for the likelihood calculation with a single indel, 2 branches
+     *
      * @throws Exception
      */
     @Test
@@ -205,13 +209,13 @@ public class GestaltLikelihoodTest {
 
         Sequence a = new Sequence("CHILD2", "6_28_0_2_ATC,");
         Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"dataType", "user defined");
+        alignment.initByName("sequence", a, "dataType", "user defined");
 
-        String barcodeSequence="AA ATCGATCG ACTG ATCGATCG ACTG TGACTAGC TT";
-        String cutSite="3";
-        String crucialPos="3 3";
-        String maxSumSteps= "3000";
-        String maxExtraSteps="1";
+        String barcodeSequence = "AA ATCGATCG ACTG ATCGATCG ACTG TGACTAGC TT";
+        String cutSite = "3";
+        String crucialPos = "3 3";
+        String maxSumSteps = "3000";
+        String maxExtraSteps = "1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685");
         RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
@@ -219,7 +223,7 @@ public class GestaltLikelihoodTest {
         RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
         RealParameter insertParams = new RealParameter("2.0");
-        String doubleCutWeight="0.3";
+        String doubleCutWeight = "0.3";
 
         Tree tree1 = new TreeParser();
         tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
@@ -234,14 +238,14 @@ public class GestaltLikelihoodTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps, "cutRates", cutRates, "longTrimScalingFactors", longTrimScaling, "doubleCutWeight", doubleCutWeight, "frequencies", frequencies, "insertZeroProb", insertZeroProb, "trimZeroProbs", trimZeroProbs, "trimShortParams", trimShortParams, "trimLongParams", trimLongParams, "insertParams", insertParams);
 
         SiteModel siteM = new SiteModel();
-        siteM.initByName( "gammaCategoryCount", 0, "substModel", gestaltModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", gestaltModel);
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
-        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM);
+
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -254,6 +258,7 @@ public class GestaltLikelihoodTest {
 
     /**
      * Basic test for the likelihood calculation with for 3 leaves
+     *
      * @throws Exception
      */
     @Test
@@ -266,13 +271,13 @@ public class GestaltLikelihoodTest {
         Sequence b = new Sequence("CHILD3", "6_10_0_0_,");
         Sequence c = new Sequence("CHILD2", "6_3_0_0_,");
         Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"sequence", b,"sequence", c,"dataType", "user defined");
+        alignment.initByName("sequence", a, "sequence", b, "sequence", c, "dataType", "user defined");
 
-        String barcodeSequence="AA ATCGATCG ACTG ATCGATCG ACTG TGACTAGC TT";
-        String cutSite="3";
-        String crucialPos="3 3";
-        String maxSumSteps= "3000";
-        String maxExtraSteps="1";
+        String barcodeSequence = "AA ATCGATCG ACTG ATCGATCG ACTG TGACTAGC TT";
+        String cutSite = "3";
+        String crucialPos = "3 3";
+        String maxSumSteps = "3000";
+        String maxExtraSteps = "1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685");
         RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
@@ -280,7 +285,7 @@ public class GestaltLikelihoodTest {
         RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
         RealParameter insertParams = new RealParameter("2.0");
-        String doubleCutWeight="0.3";
+        String doubleCutWeight = "0.3";
 
         Tree tree1 = new TreeParser();
         tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
@@ -295,14 +300,14 @@ public class GestaltLikelihoodTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps, "cutRates", cutRates, "longTrimScalingFactors", longTrimScaling, "doubleCutWeight", doubleCutWeight, "frequencies", frequencies, "insertZeroProb", insertZeroProb, "trimZeroProbs", trimZeroProbs, "trimShortParams", trimShortParams, "trimLongParams", trimLongParams, "insertParams", insertParams);
 
         SiteModel siteM = new SiteModel();
-        siteM.initByName( "gammaCategoryCount", 0, "substModel", gestaltModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", gestaltModel);
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
-        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM);
+
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -314,6 +319,7 @@ public class GestaltLikelihoodTest {
 
     /**
      * Basic test for the likelihood calculation with a single indel, test_multifurcation_vs_bifurcation
+     *
      * @throws Exception
      */
     @Test
@@ -326,13 +332,13 @@ public class GestaltLikelihoodTest {
         Sequence c = new Sequence("CHILD4", "16_3_1_1_,6_10_0_0_,");
         Sequence d = new Sequence("COPY01", "16_3_1_1_,None,");
         Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"sequence", b,"sequence", c,"sequence", d,"dataType", "user defined");
+        alignment.initByName("sequence", a, "sequence", b, "sequence", c, "sequence", d, "dataType", "user defined");
 
-        String barcodeSequence="AA ATCGATCG ACTG ATCGATCG ACTG TGACTAGC TT";
-        String cutSite="3";
-        String crucialPos="3 3";
-        String maxSumSteps= "3000";
-        String maxExtraSteps="1";
+        String barcodeSequence = "AA ATCGATCG ACTG ATCGATCG ACTG TGACTAGC TT";
+        String cutSite = "3";
+        String crucialPos = "3 3";
+        String maxSumSteps = "3000";
+        String maxExtraSteps = "1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685");
         RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
@@ -340,7 +346,7 @@ public class GestaltLikelihoodTest {
         RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
         RealParameter insertParams = new RealParameter("2.0");
-        String doubleCutWeight="0.3";
+        String doubleCutWeight = "0.3";
 
         Tree tree1 = new TreeParser();
         tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
@@ -355,14 +361,14 @@ public class GestaltLikelihoodTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps, "cutRates", cutRates, "longTrimScalingFactors", longTrimScaling, "doubleCutWeight", doubleCutWeight, "frequencies", frequencies, "insertZeroProb", insertZeroProb, "trimZeroProbs", trimZeroProbs, "trimShortParams", trimShortParams, "trimLongParams", trimLongParams, "insertParams", insertParams);
 
         SiteModel siteM = new SiteModel();
-        siteM.initByName( "gammaCategoryCount", 0, "substModel", gestaltModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", gestaltModel);
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
-        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM);
+
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -373,10 +379,9 @@ public class GestaltLikelihoodTest {
     }
 
 
-
-
     /**
      * Basic test for the likelihood calculation with a single indel, 2 branches
+     *
      * @throws Exception
      */
     @Test
@@ -392,13 +397,13 @@ public class GestaltLikelihoodTest {
         Sequence c = new Sequence("4", "38_1_0_0_,");*/
 
         Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"dataType", "user defined");
+        alignment.initByName("sequence", a, "dataType", "user defined");
 
-        String barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
-        String cutSite="6";
-        String crucialPos="6 6";
-        String maxSumSteps= "3000";
-        String maxExtraSteps="1";
+        String barcodeSequence = "CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
+        String cutSite = "6";
+        String crucialPos = "6 6";
+        String maxSumSteps = "3000";
+        String maxExtraSteps = "1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
         RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
@@ -406,7 +411,7 @@ public class GestaltLikelihoodTest {
         RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
         RealParameter insertParams = new RealParameter("2.0");
-        String doubleCutWeight="0.3";
+        String doubleCutWeight = "0.3";
 
         Tree tree1 = new TreeParser();
         tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
@@ -421,14 +426,14 @@ public class GestaltLikelihoodTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps, "cutRates", cutRates, "longTrimScalingFactors", longTrimScaling, "doubleCutWeight", doubleCutWeight, "frequencies", frequencies, "insertZeroProb", insertZeroProb, "trimZeroProbs", trimZeroProbs, "trimShortParams", trimShortParams, "trimLongParams", trimLongParams, "insertParams", insertParams);
 
         SiteModel siteM = new SiteModel();
-        siteM.initByName( "gammaCategoryCount", 0, "substModel", gestaltModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", gestaltModel);
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
-        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM);
+
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -439,7 +444,7 @@ public class GestaltLikelihoodTest {
     }
 
     @Test
-    public void  testLikelihoodRealDataSingleBranch2() {
+    public void testLikelihoodRealDataSingleBranch2() {
 
 
         // Test for a single branch
@@ -450,13 +455,13 @@ public class GestaltLikelihoodTest {
         Sequence c = new Sequence("4", ",");*/
 
         Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"dataType", "user defined");
+        alignment.initByName("sequence", a, "dataType", "user defined");
 
-        String barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
-        String cutSite="6";
-        String crucialPos="6 6";
-        String maxSumSteps= "3000";
-        String maxExtraSteps="1";
+        String barcodeSequence = "CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
+        String cutSite = "6";
+        String crucialPos = "6 6";
+        String maxSumSteps = "3000";
+        String maxExtraSteps = "1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
         RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
@@ -464,7 +469,7 @@ public class GestaltLikelihoodTest {
         RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
         RealParameter insertParams = new RealParameter("2.0");
-        String doubleCutWeight="0.3";
+        String doubleCutWeight = "0.3";
 
         Tree tree1 = new TreeParser();
         tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
@@ -479,14 +484,14 @@ public class GestaltLikelihoodTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps, "cutRates", cutRates, "longTrimScalingFactors", longTrimScaling, "doubleCutWeight", doubleCutWeight, "frequencies", frequencies, "insertZeroProb", insertZeroProb, "trimZeroProbs", trimZeroProbs, "trimShortParams", trimShortParams, "trimLongParams", trimLongParams, "insertParams", insertParams);
 
         SiteModel siteM = new SiteModel();
-        siteM.initByName( "gammaCategoryCount", 0, "substModel", gestaltModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", gestaltModel);
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
-        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM);
+
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -508,13 +513,13 @@ public class GestaltLikelihoodTest {
         Sequence c = new Sequence("4", ",");*/
 
         Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"dataType", "user defined");
+        alignment.initByName("sequence", a, "dataType", "user defined");
 
-        String barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
-        String cutSite="6";
-        String crucialPos="6 6";
-        String maxSumSteps= "3000";
-        String maxExtraSteps="1";
+        String barcodeSequence = "CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
+        String cutSite = "6";
+        String crucialPos = "6 6";
+        String maxSumSteps = "3000";
+        String maxExtraSteps = "1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
         RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
@@ -522,7 +527,7 @@ public class GestaltLikelihoodTest {
         RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
         RealParameter insertParams = new RealParameter("2.0");
-        String doubleCutWeight="0.3";
+        String doubleCutWeight = "0.3";
 
         Tree tree1 = new TreeParser();
         tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
@@ -537,14 +542,14 @@ public class GestaltLikelihoodTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps, "cutRates", cutRates, "longTrimScalingFactors", longTrimScaling, "doubleCutWeight", doubleCutWeight, "frequencies", frequencies, "insertZeroProb", insertZeroProb, "trimZeroProbs", trimZeroProbs, "trimShortParams", trimShortParams, "trimLongParams", trimLongParams, "insertParams", insertParams);
 
         SiteModel siteM = new SiteModel();
-        siteM.initByName( "gammaCategoryCount", 0, "substModel", gestaltModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", gestaltModel);
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
-        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM);
+
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -567,13 +572,13 @@ public class GestaltLikelihoodTest {
         Sequence c = new Sequence("4", ",");*/
 
         Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"dataType", "user defined");
+        alignment.initByName("sequence", a, "dataType", "user defined");
 
-        String barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
-        String cutSite="6";
-        String crucialPos="6 6";
-        String maxSumSteps= "3000";
-        String maxExtraSteps="1";
+        String barcodeSequence = "CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
+        String cutSite = "6";
+        String crucialPos = "6 6";
+        String maxSumSteps = "3000";
+        String maxExtraSteps = "1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
         RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
@@ -581,7 +586,7 @@ public class GestaltLikelihoodTest {
         RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
         RealParameter insertParams = new RealParameter("2.0");
-        String doubleCutWeight="0.3";
+        String doubleCutWeight = "0.3";
 
         Tree tree1 = new TreeParser();
         tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
@@ -596,14 +601,14 @@ public class GestaltLikelihoodTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps, "cutRates", cutRates, "longTrimScalingFactors", longTrimScaling, "doubleCutWeight", doubleCutWeight, "frequencies", frequencies, "insertZeroProb", insertZeroProb, "trimZeroProbs", trimZeroProbs, "trimShortParams", trimShortParams, "trimLongParams", trimLongParams, "insertParams", insertParams);
 
         SiteModel siteM = new SiteModel();
-        siteM.initByName( "gammaCategoryCount", 0, "substModel", gestaltModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", gestaltModel);
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
-        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM);
+
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -614,7 +619,7 @@ public class GestaltLikelihoodTest {
     }
 
     @Test
-    public void testLikelihoodRealDataSingleBranch5 () {
+    public void testLikelihoodRealDataSingleBranch5() {
 
 
         // Test for a single branch
@@ -626,13 +631,13 @@ public class GestaltLikelihoodTest {
         Sequence c = new Sequence("4", ",");*/
 
         Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"dataType", "user defined");
+        alignment.initByName("sequence", a, "dataType", "user defined");
 
-        String barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
-        String cutSite="6";
-        String crucialPos="6 6";
-        String maxSumSteps= "3000";
-        String maxExtraSteps="1";
+        String barcodeSequence = "CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
+        String cutSite = "6";
+        String crucialPos = "6 6";
+        String maxSumSteps = "3000";
+        String maxExtraSteps = "1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
         RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
@@ -640,7 +645,7 @@ public class GestaltLikelihoodTest {
         RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
         RealParameter insertParams = new RealParameter("2.0");
-        String doubleCutWeight="0.3";
+        String doubleCutWeight = "0.3";
 
         Tree tree1 = new TreeParser();
         tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
@@ -655,14 +660,14 @@ public class GestaltLikelihoodTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps, "cutRates", cutRates, "longTrimScalingFactors", longTrimScaling, "doubleCutWeight", doubleCutWeight, "frequencies", frequencies, "insertZeroProb", insertZeroProb, "trimZeroProbs", trimZeroProbs, "trimShortParams", trimShortParams, "trimLongParams", trimLongParams, "insertParams", insertParams);
 
         SiteModel siteM = new SiteModel();
-        siteM.initByName( "gammaCategoryCount", 0, "substModel", gestaltModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", gestaltModel);
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
-        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM);
+
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -688,6 +693,7 @@ public class GestaltLikelihoodTest {
 
     /**
      * Basic test for the likelihood calculation with a single indel, 2 branches
+     *
      * @throws Exception
      */
     @Test
@@ -701,13 +707,13 @@ public class GestaltLikelihoodTest {
         Sequence c = new Sequence("4", "38_1_0_0_,");*/
 
         Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"dataType", "user defined");
+        alignment.initByName("sequence", a, "dataType", "user defined");
 
-        String barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
-        String cutSite="6";
-        String crucialPos="6 6";
-        String maxSumSteps= "3000";
-        String maxExtraSteps="1";
+        String barcodeSequence = "CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
+        String cutSite = "6";
+        String crucialPos = "6 6";
+        String maxSumSteps = "3000";
+        String maxExtraSteps = "1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
         RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
@@ -715,7 +721,7 @@ public class GestaltLikelihoodTest {
         RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
         RealParameter insertParams = new RealParameter("2.0");
-        String doubleCutWeight="0.3";
+        String doubleCutWeight = "0.3";
 
         Tree tree1 = new TreeParser();
         tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
@@ -730,14 +736,14 @@ public class GestaltLikelihoodTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps, "cutRates", cutRates, "longTrimScalingFactors", longTrimScaling, "doubleCutWeight", doubleCutWeight, "frequencies", frequencies, "insertZeroProb", insertZeroProb, "trimZeroProbs", trimZeroProbs, "trimShortParams", trimShortParams, "trimLongParams", trimLongParams, "insertParams", insertParams);
 
         SiteModel siteM = new SiteModel();
-        siteM.initByName( "gammaCategoryCount", 0, "substModel", gestaltModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", gestaltModel);
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
-        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM);
+
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -758,13 +764,13 @@ public class GestaltLikelihoodTest {
         Sequence c = new Sequence("4", "38_1_0_0_,");*/
 
         Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"dataType", "user defined");
+        alignment.initByName("sequence", a, "dataType", "user defined");
 
-        String barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
-        String cutSite="6";
-        String crucialPos="6 6";
-        String maxSumSteps= "3000";
-        String maxExtraSteps="1";
+        String barcodeSequence = "CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
+        String cutSite = "6";
+        String crucialPos = "6 6";
+        String maxSumSteps = "3000";
+        String maxExtraSteps = "1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
         RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
@@ -772,7 +778,7 @@ public class GestaltLikelihoodTest {
         RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
         RealParameter insertParams = new RealParameter("2.0");
-        String doubleCutWeight="0.3";
+        String doubleCutWeight = "0.3";
 
         Tree tree1 = new TreeParser();
         tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
@@ -787,14 +793,14 @@ public class GestaltLikelihoodTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps, "cutRates", cutRates, "longTrimScalingFactors", longTrimScaling, "doubleCutWeight", doubleCutWeight, "frequencies", frequencies, "insertZeroProb", insertZeroProb, "trimZeroProbs", trimZeroProbs, "trimShortParams", trimShortParams, "trimLongParams", trimLongParams, "insertParams", insertParams);
 
         SiteModel siteM = new SiteModel();
-        siteM.initByName( "gammaCategoryCount", 0, "substModel", gestaltModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", gestaltModel);
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
-        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM);
+
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
@@ -807,6 +813,7 @@ public class GestaltLikelihoodTest {
 
     /**
      * Basic test for the likelihood calculation with a single indel, 2 branches
+     *
      * @throws Exception
      */
     @Test
@@ -820,13 +827,13 @@ public class GestaltLikelihoodTest {
         Sequence c = new Sequence("4", "38_1_0_0_,67_7_1_1_,115_144_3_8_,None,None,");
         //271_11_9_9_a from 4
         Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"sequence", b,"sequence", c,"dataType", "user defined");
+        alignment.initByName("sequence", a, "sequence", b, "sequence", c, "dataType", "user defined");
 
-        String barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
-        String cutSite="6";
-        String crucialPos="6 6";
-        String maxSumSteps= "3000";
-        String maxExtraSteps="1";
+        String barcodeSequence = "CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
+        String cutSite = "6";
+        String crucialPos = "6 6";
+        String maxSumSteps = "3000";
+        String maxExtraSteps = "1";
         RealParameter cutRates = new RealParameter("1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452 1.03371947 1.02624685 1.09459452");
         RealParameter longTrimScaling = new RealParameter("0.1 0.1");
         RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
@@ -834,7 +841,7 @@ public class GestaltLikelihoodTest {
         RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
         RealParameter insertParams = new RealParameter("2.0");
-        String doubleCutWeight="0.3";
+        String doubleCutWeight = "0.3";
 
         Tree tree1 = new TreeParser();
         tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
@@ -849,14 +856,14 @@ public class GestaltLikelihoodTest {
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
-                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps, "cutRates", cutRates, "longTrimScalingFactors", longTrimScaling, "doubleCutWeight", doubleCutWeight, "frequencies", frequencies, "insertZeroProb", insertZeroProb, "trimZeroProbs", trimZeroProbs, "trimShortParams", trimShortParams, "trimLongParams", trimLongParams, "insertParams", insertParams);
 
         SiteModel siteM = new SiteModel();
-        siteM.initByName( "gammaCategoryCount", 0, "substModel", gestaltModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", gestaltModel);
 
         gestaltTreeLikelihood likelihood = new gestaltTreeLikelihood();
-        likelihood.initByName("data",alignment,"tree",tree1,"siteModel",siteM);
-        
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM);
+
         double logL = likelihood.calculateLogP();
 
         System.out.println("gestaltLikelihood: " + logL + "\t- Test LikelihoodNothingHappens");
