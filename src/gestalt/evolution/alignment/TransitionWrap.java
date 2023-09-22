@@ -128,8 +128,6 @@ public class TransitionWrap extends BEASTObject {
 
         TransitionWrap wrap = new TransitionWrap();
         AncStates nodeAncState = ancStatesDict.get((childNode.getNr() + 1) + currentStatesDictIndex[childNode.getNr()] * (childNode.getNr() + 1));
-        Log.info.print("keyset" + ancStatesDict.keySet());
-        Log.info.print("key asked" + childNode.getNr());
 
         List<IndelSet.Singleton> parentSingletonState = parsimonyStatesDict.get((parNode.getNr() + 1) + currentStatesDictIndex[parNode.getNr()] * (parNode.getNr() + 1));
 
