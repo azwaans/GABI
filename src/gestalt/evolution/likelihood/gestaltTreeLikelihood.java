@@ -7,6 +7,7 @@ import beast.base.core.Log;
 import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.branchratemodel.BranchRateModel;
 import beast.base.evolution.branchratemodel.StrictClockModel;
+import beast.base.evolution.likelihood.GenericTreeLikelihood;
 import beast.base.evolution.sitemodel.SiteModel;
 import beast.base.evolution.sitemodel.SiteModelInterface;
 import beast.base.evolution.tree.Node;
@@ -83,7 +84,6 @@ public class gestaltTreeLikelihood extends Distribution {
     }
 
     public void initAndValidate() {
-        Log.info.println("initializing tree likelihood");
         // sanity check: site model should be an instance of the base site model class
         if (!(siteModelInput.get() instanceof SiteModel.Base)) {
             throw new IllegalArgumentException("siteModel input should be of type SiteModel.Base");
@@ -129,12 +129,16 @@ public class gestaltTreeLikelihood extends Distribution {
     public double calculateLogP() {
 
         final TreeInterface tree = treeInput.get();
-        Log.info.println(tree.toString());
+        //Log.info.println(tree.toString());
         //recording time
         long start1 = System.nanoTime();
+        hasDirt=Tree.IS_FILTHY;
 
 
-        if (hasDirt == Tree.IS_FILTHY | likelihoodCore.transitionWraps == null) {
+
+        //if the tree has changed, update everything
+        //todo make this a traversal/part of the traversal
+        if (tree.somethingIsDirty() || likelihoodCore.transitionWraps == null) {
 
             //finds the set of likely ancestral states at each internal node based on leaf sequences
             Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree, dataInput.get(), substitutionModel.metaData.posSites, substitutionModel.metaData.nTargets);
@@ -144,14 +148,10 @@ public class gestaltTreeLikelihood extends Distribution {
 
             //each possible state at each node create a wrap of metadata
             likelihoodCore.transitionWraps = TransitionWrap.createTransitionWraps(tree, substitutionModel.metaData, statesDict);
-        }
 
-        //if there is dirt, only
-        if (hasDirt >= Tree.IS_DIRTY) {
-            //update conditional probabilities
             substitutionModel.initSingletonProbs(singletonList);
 
-            //update target status rates
+            //update target status rates: this depends only on mutation parameters
             substitutionModel.hazardAwayDict = substitutionModel.createHazardAwayDict();
 
             //empty targStatTransitionHazardsDict
@@ -161,6 +161,24 @@ public class gestaltTreeLikelihood extends Distribution {
                 Hashtable<TargetStatus, DoubleMatrix> empty = new Hashtable<>();
                 substitutionModel.targStatTransitionHazardsDict.put(stat, empty);
             }
+        }
+
+       //update combined parameters of the substitution model. This should only happen if a parameter of substitutionModel changes
+        else if (m_siteModel.isDirtyCalculation()) {
+
+            substitutionModel.initSingletonProbs(singletonList);
+
+            //update target status rates: this depends only on mutation parameters
+            substitutionModel.hazardAwayDict = substitutionModel.createHazardAwayDict();
+
+            //empty targStatTransitionHazardsDict
+            substitutionModel.targStatTransitionHazardsDict = new Hashtable<>();
+
+            for (TargetStatus stat : substitutionModel.targStatTransitionsDict.keySet()) {
+                Hashtable<TargetStatus, DoubleMatrix> empty = new Hashtable<>();
+                substitutionModel.targStatTransitionHazardsDict.put(stat, empty);
+            }
+
         }
 
         long end1 = System.nanoTime();
@@ -290,6 +308,7 @@ public class gestaltTreeLikelihood extends Distribution {
      */
     @Override
     protected boolean requiresRecalculation() {
+
         hasDirt = Tree.IS_CLEAN;
 
         if (dataInput.get().isDirtyCalculation()) {

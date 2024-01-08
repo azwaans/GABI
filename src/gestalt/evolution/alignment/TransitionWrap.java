@@ -205,7 +205,6 @@ public class TransitionWrap extends BEASTObject {
 
 
                 String leafSeq = alinmt.sequenceInput.get().get(node.getNr()).toString();
-                Log.info.println("leafSeq" + leafSeq);
                 AncStates leafState = AncStates.createObservedAlleleSet(leafSeq, posSites, nTargets);
                 statesDict.put(node.getNr(), leafState);
 
