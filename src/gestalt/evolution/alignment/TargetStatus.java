@@ -242,10 +242,11 @@ public class TargetStatus extends BEASTObject implements Comparable<TargetStatus
     }
 
     /**
-     * given a specific target tract, returns all possible target tracts that could have generated it.
-     * Do this by enumerating the start position and end positioon of the tt tract,
+     * Given a specific target status, returns all possible target tracts that can still be added to it.
+     * Based on remaining active target positions, do this by enumerating the start position and end position of the position,
      * there are 2 edit types on each side of the deletion: short or long trim
-     * the "basic" entry is a short trim
+     * the "basic" entry is a short trim.
+     * Parameter activeAny can be used to manually specify which are active (instead of taking the status itself)
      */
     public List<IndelSet.TargetTract> getPossibleTargetTracts(List<Integer> activeAny, int nTargets) {
 
