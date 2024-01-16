@@ -101,11 +101,11 @@ public class gestaltGeneral extends SubstitutionModel.Base {
     public List<RealParameter> trimLongParams;
 
     //Double insertZeroProb = 0.5;
-    RealParameter insertZeroProb;
+    public RealParameter insertZeroProb;
 
 
     //Double[] insertParams = {2.0};
-    List<RealParameter> insertParams;
+    public List<RealParameter> insertParams;
 
     //toy example clt_calc: Double[] insertParams = {2.0};
     //tune_topology: Double[] insertParams = {1.0};
@@ -120,10 +120,10 @@ public class gestaltGeneral extends SubstitutionModel.Base {
     static Hashtable<IndelSet.Singleton, Integer> singletonIndexDict = new Hashtable<>();
 
 
-    DoubleMatrix trimZeroProbsDict = DoubleMatrix.zeros(2, 2);
-    Poisson insertDist;
-    List<AbstractDiscreteDistribution> delShortDist;
-    List<AbstractDiscreteDistribution> delLongDist;
+    public DoubleMatrix trimZeroProbsDict = DoubleMatrix.zeros(2, 2);
+    public Poisson insertDist;
+    public List<AbstractDiscreteDistribution> delShortDist;
+    public List<AbstractDiscreteDistribution> delLongDist;
 
     //conditional probabilities of the trims, this needs to be updated for each move involving parameter changes
     static DoubleMatrix singletonCondProb;
@@ -131,12 +131,13 @@ public class gestaltGeneral extends SubstitutionModel.Base {
     //dictionary for storing hazards between target statuses -- assuming all moves are possible
     public static Hashtable<TargetStatus, Hashtable<TargetStatus, List<IndelSet.TargetTract>>> targStatTransitionsDict;
 
-    // precalculcated hazards for all the target tracts to speed up overall calculation
-    public static DoubleMatrix targetTractHazards;
-    public static Hashtable<IndelSet.TargetTract, Integer> targetTractDict;
+    //  hazards for all the target tracts need to be updated for each move involving parameter changes
+    public DoubleMatrix targetTractHazards;
+    // precalculcated hazards dictionary for all the target tracts to speed up overall calculation
+    public Hashtable<IndelSet.TargetTract, Integer> targetTractDict;
 
     //this is to store hazards to potentially avoid recalculation
-    public static Hashtable<TargetStatus, Hashtable<TargetStatus, DoubleMatrix>> targStatTransitionHazardsDict;
+    public Hashtable<TargetStatus, Hashtable<TargetStatus, DoubleMatrix>> targStatTransitionHazardsDict;
 
 
     @Override
@@ -682,6 +683,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
 
     }
 
+
     /**
      * Creates a basic trim helper distribution
      */
@@ -703,6 +705,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
         return delDistList;
 
     }
+
 
 
     /**
