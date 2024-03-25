@@ -2,25 +2,27 @@ package gestalt.evolution.simulation;
 
 import beast.base.core.Description;
 import beast.base.core.Input;
+import beast.base.core.Log;
 import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.datatype.DataType;
 import beast.base.evolution.sitemodel.SiteModel;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.Tree;
+import beast.base.inference.operator.kernel.Transform;
 import beast.base.inference.parameter.RealParameter;
 import beast.base.util.Randomizer;
 import beast.pkgmgmt.BEASTClassLoader;
 import beast.pkgmgmt.PackageManager;
+import gestalt.evolution.alignment.GestaltEvent;
 import gestalt.evolution.alignment.IndelSet;
 import gestalt.evolution.alignment.TargetStatus;
 import gestalt.evolution.substitutionmodel.gestaltGeneral;
 import org.apache.commons.math3.util.Pair;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
+import static gestalt.evolution.alignment.GestaltEvent.intersect;
 import static java.lang.Math.max;
 import static java.lang.Math.random;
 
@@ -120,6 +122,7 @@ public class SimulatedGestaltAlignment extends Alignment {
         Node root = tree.getRoot();
 
         TargetStatus rootStatus = new TargetStatus();
+        List<IndelSet.TargetTract> rootTargetTracts = new ArrayList();
         String rootAllele = "";
 
         if (originHeight != 0) {
@@ -127,30 +130,50 @@ public class SimulatedGestaltAlignment extends Alignment {
             double deltaT = originHeight - root.getHeight();
             double clockRate = siteModel.getRateForCategory(0, root);
             while (deltaT > 0) {
+
+                //Draw a cut and a time at which it happens
                 Pair<Double, IndelSet.TargetTract> outcome = this.raceTargetTracts(rootStatus, clockRate * deltaT);
-                Double eventTime = outcome.getFirst();
-                if (eventTime < deltaT) {
-                    //there is a cut, we update the remaining time, allowing for potentially more cuts
-                    deltaT -= eventTime;
-                    //we update the target status with the cut
-                    //draw a repair event
-                    String event = this.doRepair(outcome.getSecond());
-                    if (rootAllele == "") {
-                        rootAllele = event;
 
-                    } else {
-                        rootAllele = rootAllele + "," + event;
-                    }
-                    rootStatus.addTarget(outcome.getSecond());
-
-                }
-                if (eventTime >= deltaT) {
+                //if the barcode is already saturated (outcome == null)
+                //end simulation on that branch
+                if (outcome == null) {
                     deltaT = 0;
-                    //there is no cut on that branch.
+
+                } else {
+
+                    //time of that next cut
+                    Double eventTime = outcome.getFirst();
+
+                    //if the time drawn for the next barcode cut event exceeds the branch length
+                    //end the simulation
+                    if (eventTime >= deltaT) {
+                        deltaT = 0;
+                    }
+
+                    //if (eventTime < deltaT) there is a viable cut on the branch.
+                    else  {
+                        //we update the remaining time, allowing for potentially more cuts
+                        deltaT -= eventTime;
+                        //we update the target status with the cut
+                        //draw a repair event
+                        String event = this.doRepair(outcome.getSecond());
+                        if (rootAllele == "") {
+                            rootAllele = event;
+
+                        } else {
+                            rootAllele = rootAllele + "," + event;
+                        }
+                        rootStatus.addTarget(outcome.getSecond());
+                        rootTargetTracts.add(outcome.getSecond());
+
+                    }
+
+
                 }
             }
         }
-        traverse(root, rootStatus, rootAllele);
+
+        traverse(root, rootStatus, rootAllele, rootTargetTracts);
 
     }
 
@@ -161,7 +184,7 @@ public class SimulatedGestaltAlignment extends Alignment {
      * @param parentStatus Sequence at the parent node in the tree
      */
     private void traverse(Node node,
-                          TargetStatus parentStatus, String parentAllele) {
+                          TargetStatus parentStatus, String parentAllele, List<IndelSet.TargetTract> parentTracts) {
 
         for (Node child : node.getChildren()) {
 
@@ -171,6 +194,7 @@ public class SimulatedGestaltAlignment extends Alignment {
             // Draw characters on child sequence
             TargetStatus childStatus = parentStatus;
             String childAllele = parentAllele;
+            List<IndelSet.TargetTract> childTracts = parentTracts;
 
             while (deltaT > 0) {
                 Pair<Double, IndelSet.TargetTract> outcome = this.raceTargetTracts(childStatus, clockRate * deltaT);
@@ -184,6 +208,8 @@ public class SimulatedGestaltAlignment extends Alignment {
                     deltaT -= eventTime;
                     //we update the target status with the cut
                     childStatus.addTarget(outcome.getSecond());
+                    childTracts.add(outcome.getSecond());
+                    //here, we want to check wether there is any overlap
                     String event = this.doRepair(outcome.getSecond());
                     if (childAllele == "") {
                         childAllele = event;
@@ -199,11 +225,89 @@ public class SimulatedGestaltAlignment extends Alignment {
 
             }
             if (child.isLeaf()) {
+                //make a function that observes allele: this function will merge events that are contiguous together.
+                //String correctedAllele = observeAllele(childAllele);
                 alignment[child.getNr()] = childAllele;
             } else {
-                traverse(child, childStatus, childAllele);
+                traverse(child, childStatus, childAllele, childTracts);
             }
         }
+    }
+
+    //this function is here to postprocess a simulated allele into an "observed" allele.
+    //Simulated alleles can contain contiguous indels/masked indels. masked events must be removed. In real data, contiguous/overlapping indels are observed as
+    // single indels meaning if evt1 and evt2 are contiguous, we sequence a single indel: evt1+2 (intersection of both)
+    String observeAllele(String simulatedAllele) {
+        //extract events
+        String[] stringInput = simulatedAllele.split(",");
+        List<GestaltEvent> rawEvents = new ArrayList<>();
+        for(String i : stringInput) {
+            rawEvents.add(new GestaltEvent(i));
+        }
+        List<GestaltEvent> correctedEvents = new ArrayList<>();
+        List<GestaltEvent> preEvents = rawEvents;
+
+        //intersect list with itself until stable:
+//        while(preEvents != correctedEvents ) {
+//            preEvents = correctedEvents;
+//            correctedEvents = intersectList(correctedEvents,correctedEvents);
+//
+//        }
+        //postprocess
+        List<GestaltEvent> processed = processSet(rawEvents);
+        String finalAllele ="";
+        for(GestaltEvent i : processed) {
+            finalAllele = finalAllele + i.toString() + ",";
+
+        }
+
+        return finalAllele;
+
+
+
+
+    }
+
+    //process longitudinally the allele to clean up potential overlaps
+    private List<GestaltEvent> processSet(List<GestaltEvent> correctedEvents) {
+        List<GestaltEvent> processed = new ArrayList<>();
+        for ( int i = 0; i < correctedEvents.size();++i) {
+            GestaltEvent eventi = correctedEvents.get(i);
+            GestaltEvent intersectioni_j = null;
+            for (int j = i + 1; j < correctedEvents.size();++j) {
+                intersectioni_j = intersect(eventi,correctedEvents.get(j));
+
+            }
+            if(intersectioni_j != null && (! processed.contains(intersectioni_j))) {
+                processed.add(intersectioni_j);
+            }
+            else {
+                processed.add(eventi);
+            }
+        }
+        return processed;
+
+
+    }
+
+    //intersection of 2 lists of GESTALT events to create an Event set with all possible intersections
+    public static List<GestaltEvent> intersectList(List<GestaltEvent> first, List<GestaltEvent> second) {
+        List<GestaltEvent> intersectionList = new ArrayList<>();
+        if(first.size()==0 && second.size()==0) {
+            return intersectionList;
+        }
+        else if (first.size()==0 && second.size()!=0 || first.size()!=0 && second.size()==0) {
+            return null;
+        }
+        for ( GestaltEvent event1: first) {
+            for (GestaltEvent event2: second) {
+                GestaltEvent inter = intersect(event1,event2);
+                if(inter != null && (! intersectionList.contains(inter))) {
+                    intersectionList.add(inter);
+                }
+            }
+        }
+        return intersectionList;
     }
 
     /**
@@ -241,12 +345,14 @@ public class SimulatedGestaltAlignment extends Alignment {
     /**
      * Repairs allele per the target_tract
      * todo: handle overlapping deletions
-     * todo: handle alignment 
+     * todo: handle alignment
      *
      * @return a String of the indel, in the following format startPos_DelLen_MinTarg_MaxTarg_InsertSequence
      */
     public String doRepair(IndelSet.TargetTract targetTract) {
+        //left cut site
         int target1 = targetTract.getminTarg();
+        //right cut site
         int target2 = targetTract.getmaxTarg();
         boolean isIntertarg = (target1 != target2);
 
@@ -286,13 +392,13 @@ public class SimulatedGestaltAlignment extends Alignment {
         for (int i = 0; i < insertNucleotides.length; i++) {
             int key = Randomizer.randomChoicePDF(frequencies);
             if (key == 0)
-                insertNucleotides[i] = "A";
+                insertNucleotides[i] = "a";
             if (key == 1)
-                insertNucleotides[i] = "C";
+                insertNucleotides[i] = "c";
             if (key == 2)
-                insertNucleotides[i] = "G";
+                insertNucleotides[i] = "g";
             if (key == 3)
-                insertNucleotides[i] = "T";
+                insertNucleotides[i] = "t";
         }
         String insertSequence = String.join("" +
                 "", insertNucleotides);
@@ -303,6 +409,7 @@ public class SimulatedGestaltAlignment extends Alignment {
             //the deletion distribution must be bounded (upper bound) such that it doesn't affect the previous target.
             // there are nTrimTypes which is why there are several delLongDists, They correspond to the trimShortParams_reshaped[] and trimLongParams_reshaped
             // they correspond to the means of  deletion length distribution, left [0] and right [1] of the cut
+            //todo check that these length distributions/parameters are correctely bounded
             if (leftLong) {
                 leftDelLen = substModel.delLongDist.get(0).nextInt() + substModel.metaData.leftLongTrimMin.get(target1);
                 while (leftDelLen > substModel.metaData.leftMaxTrim.get(target1)) {
@@ -344,6 +451,10 @@ public class SimulatedGestaltAlignment extends Alignment {
         String minDeac = Integer.toString(targetTract.getminTargDeac());
         String maxDeac = Integer.toString(targetTract.getmaxTargDeac());
         String eventInput = StartPos + "_" + DelLen + "_" + minDeac + "_" + maxDeac + "_" + insertSequence;
+
+
+        //note changing the event input to simulate alleles (vs the above)
+        eventInput = leftDelLen + "_" + target1 + "_" + insertSequence + "_" + target2 + "_" + rightDelLen;
         return eventInput;
     }
 
@@ -352,6 +463,7 @@ public class SimulatedGestaltAlignment extends Alignment {
 
         List<Integer> activeTargets = startTS.getActiveTargets(10);
         int numActive = activeTargets.size();
+        //if the barcode is fully edited out, cannot edit anymore, return null
         if (numActive == 0) {
             return null;
         } else {
@@ -373,7 +485,9 @@ public class SimulatedGestaltAlignment extends Alignment {
             Double minTime = Randomizer.nextExponential(hazardSum);
             int chosenIndex = Randomizer.randomChoicePDF(normalizedHazards);
             IndelSet.TargetTract chosenTt = targetTracts.get(chosenIndex);
-
+            Log.info.println(chosenIndex);
+            Log.info.println(minTime);
+            Log.info.println(chosenTt.hashCode());
             return new Pair(minTime, chosenTt);
         }
 
