@@ -18,7 +18,7 @@ public class BarcodeMeta extends BEASTObject {
      */
 
     /**
-     * unedited barcode sequence, as a list of target sequences
+     * unedited barcode sequence, as a list of target sequences. Positions are indexed starting from 0.
      */
     protected List<String> uneditedBarcode;
 
@@ -33,7 +33,7 @@ public class BarcodeMeta extends BEASTObject {
      * such that the inserted seq is 6 nucleotides from
      * the 3' end of the target
      */
-    protected int barcodeCutSite;
+    public int barcodeCutSite;
 
 
     /**
