@@ -5,6 +5,7 @@ import beast.base.evolution.substitutionmodel.Frequencies;
 import beast.base.evolution.tree.Tree;
 import beast.base.evolution.tree.TreeParser;
 import beast.base.inference.parameter.RealParameter;
+import gestalt.evolution.alignment.BarcodeMeta;
 import gestalt.evolution.alignment.GestaltEvent;
 import gestalt.evolution.alignment.IndelSet;
 import gestalt.evolution.alignment.TargetStatus;
@@ -13,7 +14,10 @@ import org.junit.Test;
 import gestalt.evolution.simulation.SimulatedGestaltAlignment;
 import gestalt.evolution.substitutionmodel.gestaltGeneral;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -719,6 +723,138 @@ public class SimulatedAlignmentTest {
         String expected="CG GATACGATACGCGCA--tcgagtaa--ATGG AGTC GACACGACTCGCG---------- ---- ----------------------- ---- ----------------------- ---- ----------------------- ---- ----------------------- ---- ----------------------- ---- ----------------------- ---- ----------------------- ---- ---------------------GG GAAAAAAAAAAAAAAA";
         assertEquals(expected,finalAllele);
 
+    }
+    @Test
+    public void testAlleleObserve() {
+
+        //initialise a substitution model
+        String barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
+        String cutSite="6";
+        String crucialPos="6 6";
+        String maxSumSteps= "3000";
+        String maxExtraSteps="1";
+        RealParameter cutRates = new RealParameter("0.1 1.1 2.1 3.1 4.1 5.1 6.1 7.1 8.1 9.1");
+        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+        RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
+        String insertZeroProb = "0.5";
+        RealParameter insertParams = new RealParameter("2.0");
+        String doubleCutWeight="0.3";
+
+        gestaltGeneral gestaltModel = new gestaltGeneral();
+        RealParameter freqs = new RealParameter("1.0 0 0");
+        Frequencies frequencies = new Frequencies();
+        frequencies.initByName("frequencies", freqs,
+                "estimate", false);
+        gestaltModel.initByName("barcodeSequence", barcodeSequence,
+                "cutSite", cutSite,
+                "crucialPos", crucialPos,
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+
+        gestaltModel.initAndValidate();
+        gestaltModel.createTrimInsertDistributions(10);
+        //initialise the site model with subst model
+        SiteModel siteM = new SiteModel();
+        RealParameter mutationRate = new RealParameter("10.0");
+        siteM.initByName("gammaCategoryCount", 0,
+                "substModel", gestaltModel, "mutationRate", mutationRate);
+        //            0           1                 2            3       4         5          6         7          8          9         10         11         12        13          14        15        16          17        18         19         20        21          22        23        24          25        26        27        28
+        //////////////01 23456789012345678        901234 5678 90123456789012345678901 2345678901234567890123456789 0123 45678901234567890123456 7890 12345678901234567890123 4567 89012345678901234567890 1234 56789012345678901234567 8901 23456789012345678901234 5678 90123456789012345678901 2345 67890123456789012345678901234567890123456789
+        String start="CG GATACGATACGCGCA--tcgagtaa--ATGG AGTC GACACGACTCGCG---------- ---- ----------------------- ---- ----------------------- ---- ----------------------- ---- ----------------------- ---- ----------------------- ---- ----------------------- ---- ----------------------- ---- ---------------------GG GAAAAAAAAAAAAAAA";
+        List<String> AlleleEvents = processAllele(start);
+        String evt1 = AlleleEvents.get(0);
+        String evt2 = AlleleEvents.get(1);
+        assertEquals("17_21_4_tcgagtaa",evt1);
+        assertEquals("42_266_224_",evt2);
+
+
+
+        Log.info.println(AlleleEvents);
+        Log.info.println(processEvents(AlleleEvents,gestaltModel.metaData));
+
+    }
+
+    List<String> processEvents(List<String> processedAllele, BarcodeMeta meta) {
+        List<String> processedEvents = new ArrayList<>();
+        for(String rawEvent : processedAllele) {
+            String processedEvent = "";
+            List<Integer> matchingTargets = new ArrayList<>();
+            String[] splitevent = rawEvent.split("_");
+            for(int targetindex= 0; targetindex < meta.absCutSites.length; ++targetindex) {
+                double event0 = Double.parseDouble(splitevent[0]);
+                double event1 = Double.parseDouble(splitevent[1]);
+                if (event0 <=  meta.absCutSites.get(targetindex) && event1 >= meta.absCutSites.get(targetindex)) {
+                    Log.info.println("Condition met");
+                    matchingTargets.add(targetindex) ;
+                }
+
+            }
+            //there is an insertion
+            if(splitevent.length == 4) {
+                processedEvent = splitevent[0] + "_" + splitevent[2] + "_" + matchingTargets.stream().mapToInt(v -> v).min().orElseThrow(NoSuchElementException::new) + "_" + matchingTargets.stream().mapToInt(v -> v).max().orElseThrow(NoSuchElementException::new) + "_" + splitevent[3];
+                processedEvents.add(processedEvent);
+            }
+            //there is no insertion
+            else {
+                processedEvent = splitevent[0] + "_" + splitevent[2] + "_" + matchingTargets.stream().mapToInt(v -> v).min().orElseThrow(NoSuchElementException::new) + "_" + matchingTargets.stream().mapToInt(v -> v).max().orElseThrow(NoSuchElementException::new) ;
+                processedEvents.add(processedEvent);
+            }
+
+        }
+
+return processedEvents;
+
+    }
+
+    List<String> processAllele(String Allele) {
+
+        List<String> indelEvents = new ArrayList<>();
+        char[] allele = Allele.toCharArray();
+        int unedited_index = 0;
+        int edited_index = 0;
+        while(edited_index != allele.length -1) {
+            //spacer position
+            if (allele[edited_index] == ' ') {
+                edited_index += 1;
+            }
+            //unedited postion
+            if (allele[edited_index] == 'A' || allele[edited_index] == 'T' || allele[edited_index] == 'G' || allele[edited_index] == 'C') {
+                edited_index += 1;
+                unedited_index +=1;
+            }
+
+            //edited position, create an indel
+            if (allele[edited_index] == '-') {
+                //the start position is inclusive
+                int startPos = unedited_index;
+                int delLen = 0;
+                String insert = "";
+                //iterate until end of indel
+                while (allele[edited_index] != 'A' && allele[edited_index] != 'T' && allele[edited_index] != 'G' && allele[edited_index] != 'C') {
+                    if (allele[edited_index] == '-') {
+                        delLen += 1;
+                        unedited_index += 1;
+                        edited_index += 1;
+                    }
+                    if (allele[edited_index] == ' ') {
+                        edited_index += 1;
+                    }
+                    if (allele[edited_index] == 'a' || allele[edited_index] == 'c' || allele[edited_index] == 'g' || allele[edited_index] == 't') {
+                        insert = insert + allele[edited_index];
+                        edited_index += 1;
+
+                    }
+                }
+                //the end pos is exclusive
+                int endPos = unedited_index ;
+                String indelEvent = startPos + "_" + endPos + "_" + delLen + "_" + insert;
+                indelEvents.add(indelEvent);
+            }
+        }
+
+        //String eventInput = StartPos + "_" + DelLen + "_" + minDeac + "_" + maxDeac + "_" + insertSequence;
+        return indelEvents;
     }
 
 }
