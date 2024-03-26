@@ -13,6 +13,7 @@ import beast.base.inference.parameter.RealParameter;
 import beast.base.util.Randomizer;
 import beast.pkgmgmt.BEASTClassLoader;
 import beast.pkgmgmt.PackageManager;
+import gestalt.evolution.alignment.BarcodeMeta;
 import gestalt.evolution.alignment.GestaltEvent;
 import gestalt.evolution.alignment.IndelSet;
 import gestalt.evolution.alignment.TargetStatus;
@@ -123,7 +124,7 @@ public class SimulatedGestaltAlignment extends Alignment {
 
         TargetStatus rootStatus = new TargetStatus();
         List<IndelSet.TargetTract> rootTargetTracts = new ArrayList();
-        String rootAllele = "";
+        String rootAllele = substModel.uneditedBarcodeInput.get();
 
         if (originHeight != 0) {
             // then parent sequence is sequence at origin and we evolve sequence first down to the root
@@ -155,16 +156,15 @@ public class SimulatedGestaltAlignment extends Alignment {
                         //we update the remaining time, allowing for potentially more cuts
                         deltaT -= eventTime;
                         //we update the target status with the cut
-                        //draw a repair event
-                        String event = this.doRepair(outcome.getSecond());
-                        if (rootAllele == "") {
-                            rootAllele = event;
-
-                        } else {
-                            rootAllele = rootAllele + "," + event;
-                        }
                         rootStatus.addTarget(outcome.getSecond());
                         rootTargetTracts.add(outcome.getSecond());
+
+                        //draw a repair event
+                        String indel = this.doRepair(outcome.getSecond());
+                        //apply it to the allele
+                        rootAllele = applyIndel(rootAllele,indel);
+
+
 
                     }
 
@@ -174,6 +174,92 @@ public class SimulatedGestaltAlignment extends Alignment {
         }
 
         traverse(root, rootStatus, rootAllele, rootTargetTracts);
+
+    }
+
+
+    //apply an indel to the barcode sequence
+    String applyIndel(String barcodeSequence,String indel) {
+
+        String[] strs = indel.split("_");
+        int leftLen = Integer.parseInt(strs[0]);
+        int leftCut = Integer.parseInt(strs[1]);
+        String insSeq = strs[2];
+        int rightCut = Integer.parseInt(strs[3]);
+        int rightLen = Integer.parseInt(strs[4]);
+
+
+        //first, split into left and right BARCODE strings (no regards to the cutsite
+        int cutoffset = substModel.metaData.barcodeCutSite;
+        String[] allele = barcodeSequence.split(" ");
+
+        //left of the cut
+        String[] alleleleft = Arrays.copyOfRange(allele, 0, leftCut * 2  +2);
+        String leftStrings =  String.join(" ",alleleleft);
+
+        //right of the cut
+        String[] alleleright = Arrays.copyOfRange(allele, rightCut * 2 + 1, allele.length );
+        String rightStrings = String.join(" ", alleleright);
+
+        //from this, remove the offset for the left side to obtain a string until the cut
+        String left_of_left_cut = leftStrings.substring(0,leftStrings.length() - cutoffset);
+
+        //same to the right
+        int length_cut_barcode = alleleright[0].length();
+        String left_of_right_cut = rightStrings.substring(0, length_cut_barcode - cutoffset);
+        String right_of_right_cut  = rightStrings.substring(length_cut_barcode - cutoffset,rightStrings.length());
+
+        //if it is an intertarget deletion, there is also a central sequence
+        String central = "";
+        if (rightCut != leftCut) {
+            String right_of_left_cut = leftStrings.substring(leftStrings.length() - cutoffset,leftStrings.length() );
+            String[] allelecenter = Arrays.copyOfRange(allele, leftCut * 2 + 2, rightCut * 2 + 1);
+            String centerStrings = String.join(" ", allelecenter);
+            central = right_of_left_cut + " " + centerStrings + " " + left_of_right_cut;
+        }
+
+        //now create the deletions to the left:
+        int deleted_left = 0;
+        int index = left_of_left_cut.length();
+        while(deleted_left != leftLen) {
+            if(! left_of_left_cut.substring(index-1,index).equals(" ") ) {
+                left_of_left_cut = left_of_left_cut.substring(0, index - 1) + "-" + left_of_left_cut.substring(index, left_of_left_cut.length());
+                deleted_left += 1;
+                index -= 1;
+            }
+            else {
+                index -=1;
+            }
+        }
+        Log.info.println(left_of_left_cut);
+
+        int deleted_right = 0;
+        index = 0;
+        while(deleted_right != rightLen) {
+            if(!right_of_right_cut.substring(index,index+1).equals(" ")) {
+                right_of_right_cut = right_of_right_cut.substring(0, index) + "-" + right_of_right_cut.substring(index +1, right_of_right_cut.length());
+                deleted_right += 1;
+                index += 1;
+            }
+            else {
+                index +=1;
+            }
+        }
+
+
+        if(central != "") {
+            central = central.replace("a", "");
+            central = central.replace("c", "");
+            central = central.replace("g", "");
+            central = central.replace("t", "");
+            central = central.replace("A", "-");
+            central = central.replace("T", "-");
+            central = central.replace("G", "-");
+            central = central.replace("C", "-");
+        }
+
+        return left_of_left_cut + insSeq + central + right_of_right_cut;
+
 
     }
 
@@ -209,14 +295,11 @@ public class SimulatedGestaltAlignment extends Alignment {
                     //we update the target status with the cut
                     childStatus.addTarget(outcome.getSecond());
                     childTracts.add(outcome.getSecond());
-                    //here, we want to check wether there is any overlap
-                    String event = this.doRepair(outcome.getSecond());
-                    if (childAllele == "") {
-                        childAllele = event;
 
-                    } else {
-                        childAllele = childAllele + "," + event;
-                    }
+                    String indel = this.doRepair(outcome.getSecond());
+
+                    childAllele = applyIndel(childAllele,indel);
+
                 }
                 if (eventTime >= deltaT) {
                     deltaT = 0;
@@ -227,7 +310,7 @@ public class SimulatedGestaltAlignment extends Alignment {
             if (child.isLeaf()) {
                 //make a function that observes allele: this function will merge events that are contiguous together.
                 //String correctedAllele = observeAllele(childAllele);
-                alignment[child.getNr()] = childAllele;
+                alignment[child.getNr()] = observeAllele(childAllele);
             } else {
                 traverse(child, childStatus, childAllele, childTracts);
             }
@@ -238,34 +321,93 @@ public class SimulatedGestaltAlignment extends Alignment {
     //Simulated alleles can contain contiguous indels/masked indels. masked events must be removed. In real data, contiguous/overlapping indels are observed as
     // single indels meaning if evt1 and evt2 are contiguous, we sequence a single indel: evt1+2 (intersection of both)
     String observeAllele(String simulatedAllele) {
-        //extract events
-        String[] stringInput = simulatedAllele.split(",");
-        List<GestaltEvent> rawEvents = new ArrayList<>();
-        for(String i : stringInput) {
-            rawEvents.add(new GestaltEvent(i));
+
+        List<String> alleleIndelFormat = processAllele(simulatedAllele);
+        List<String> alleleEventFormat = processEvents(alleleIndelFormat);
+        return String.join(",", alleleEventFormat);
+
+
+    }
+
+    List<String> processEvents(List<String> processedAllele) {
+        List<String> processedEvents = new ArrayList<>();
+        for(String rawEvent : processedAllele) {
+            String processedEvent = "";
+            List<Integer> matchingTargets = new ArrayList<>();
+            String[] splitevent = rawEvent.split("_");
+            for(int targetindex= 0; targetindex < substModel.metaData.absCutSites.length; ++targetindex) {
+                double event0 = Double.parseDouble(splitevent[0]);
+                double event1 = Double.parseDouble(splitevent[1]);
+                if (event0 <=  substModel.metaData.absCutSites.get(targetindex) && event1 >= substModel.metaData.absCutSites.get(targetindex)) {
+                    matchingTargets.add(targetindex) ;
+                }
+
+            }
+            //there is an insertion
+            if(splitevent.length == 4) {
+                processedEvent = splitevent[0] + "_" + splitevent[2] + "_" + matchingTargets.stream().mapToInt(v -> v).min().orElseThrow(NoSuchElementException::new) + "_" + matchingTargets.stream().mapToInt(v -> v).max().orElseThrow(NoSuchElementException::new) + "_" + splitevent[3];
+                processedEvents.add(processedEvent);
+            }
+            //there is no insertion
+            else {
+                processedEvent = splitevent[0] + "_" + splitevent[2] + "_" + matchingTargets.stream().mapToInt(v -> v).min().orElseThrow(NoSuchElementException::new) + "_" + matchingTargets.stream().mapToInt(v -> v).max().orElseThrow(NoSuchElementException::new) + "_" ;
+                processedEvents.add(processedEvent);
+            }
+
         }
-        List<GestaltEvent> correctedEvents = new ArrayList<>();
-        List<GestaltEvent> preEvents = rawEvents;
 
-        //intersect list with itself until stable:
-//        while(preEvents != correctedEvents ) {
-//            preEvents = correctedEvents;
-//            correctedEvents = intersectList(correctedEvents,correctedEvents);
-//
-//        }
-        //postprocess
-        List<GestaltEvent> processed = processSet(rawEvents);
-        String finalAllele ="";
-        for(GestaltEvent i : processed) {
-            finalAllele = finalAllele + i.toString() + ",";
+        return processedEvents;
 
+    }
+
+    List<String> processAllele(String Allele) {
+
+        List<String> indelEvents = new ArrayList<>();
+        char[] allele = Allele.toCharArray();
+        int unedited_index = 0;
+        int edited_index = 0;
+        while(edited_index != allele.length -1) {
+            //spacer position
+            if (allele[edited_index] == ' ') {
+                edited_index += 1;
+            }
+            //unedited postion
+            if (allele[edited_index] == 'A' || allele[edited_index] == 'T' || allele[edited_index] == 'G' || allele[edited_index] == 'C') {
+                edited_index += 1;
+                unedited_index +=1;
+            }
+
+            //edited position, create an indel
+            if (allele[edited_index] == '-') {
+                //the start position is inclusive
+                int startPos = unedited_index;
+                int delLen = 0;
+                String insert = "";
+                //iterate until end of indel
+                while (allele[edited_index] != 'A' && allele[edited_index] != 'T' && allele[edited_index] != 'G' && allele[edited_index] != 'C') {
+                    if (allele[edited_index] == '-') {
+                        delLen += 1;
+                        unedited_index += 1;
+                        edited_index += 1;
+                    }
+                    if (allele[edited_index] == ' ') {
+                        edited_index += 1;
+                    }
+                    if (allele[edited_index] == 'a' || allele[edited_index] == 'c' || allele[edited_index] == 'g' || allele[edited_index] == 't') {
+                        insert = insert + allele[edited_index];
+                        edited_index += 1;
+
+                    }
+                }
+                //the end pos is exclusive
+                int endPos = unedited_index ;
+                String indelEvent = startPos + "_" + endPos + "_" + delLen + "_" + insert;
+                indelEvents.add(indelEvent);
+            }
         }
 
-        return finalAllele;
-
-
-
-
+        //String eventInput = StartPos + "_" + DelLen + "_" + minDeac + "_" + maxDeac + "_" + insertSequence;
+        return indelEvents;
     }
 
     //process longitudinally the allele to clean up potential overlaps
@@ -447,15 +589,9 @@ public class SimulatedGestaltAlignment extends Alignment {
         //todo check the intertarget effect (if there is a +1 shift or not!, this might be wrong by +/-2 length)
         int interTargLen = (int) ((int) substModel.metaData.absCutSites.get(target2) - substModel.metaData.absCutSites.get(target1));
 
-        String DelLen = Integer.toString(leftDelLen + rightDelLen + interTargLen);
-        String minDeac = Integer.toString(targetTract.getminTargDeac());
-        String maxDeac = Integer.toString(targetTract.getmaxTargDeac());
-        String eventInput = StartPos + "_" + DelLen + "_" + minDeac + "_" + maxDeac + "_" + insertSequence;
-
-
         //note changing the event input to simulate alleles (vs the above)
-        eventInput = leftDelLen + "_" + target1 + "_" + insertSequence + "_" + target2 + "_" + rightDelLen;
-        return eventInput;
+        String indelInput = leftDelLen + "_" + target1 + "_" + insertSequence + "_" + target2 + "_" + rightDelLen;
+        return indelInput;
     }
 
 

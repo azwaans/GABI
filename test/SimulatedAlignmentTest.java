@@ -123,7 +123,7 @@ public class SimulatedAlignmentTest {
 
     // set up
     @Test
-    public void testSimulationTargetStatuses() {
+    public void testSimulationCherry() {
 
         //initialise a tree
         Integer sequenceLength = 1;
@@ -701,15 +701,6 @@ public class SimulatedAlignmentTest {
         siteM.initByName("gammaCategoryCount", 0,
                 "substModel", gestaltModel, "mutationRate", mutationRate);
 
-        Log.info.println(gestaltModel.metaData.absCutSites);
-        double[] cutsites = gestaltModel.metaData.absCutSites.toArray();
-        int[] stringSites = new int[cutsites.length];
-        stringSites[0] = (int) cutsites[0] + 1;
-        for(int index=1;index<cutsites.length;index++) {
-            stringSites[index] = (int) cutsites[index] + 1 + index*2;
-        }
-        Log.info.println(Arrays.toString(stringSites));
-
         //apply an indel to the allele:
         String AlleleIndels = "4_4__8_4,4_1__9_4,2_0_tcgagtaa_0_2";
         //iteratively apply indels:
@@ -768,10 +759,10 @@ public class SimulatedAlignmentTest {
         assertEquals("17_21_4_tcgagtaa",evt1);
         assertEquals("42_266_224_",evt2);
 
-
-
         Log.info.println(AlleleEvents);
-        Log.info.println(processEvents(AlleleEvents,gestaltModel.metaData));
+        List<String> processed = processEvents(AlleleEvents,gestaltModel.metaData);
+        assertEquals("17_4_0_0_tcgagtaa",processed.get(0));
+        assertEquals("42_224_1_9_",processed.get(1));
 
     }
 
@@ -797,7 +788,7 @@ public class SimulatedAlignmentTest {
             }
             //there is no insertion
             else {
-                processedEvent = splitevent[0] + "_" + splitevent[2] + "_" + matchingTargets.stream().mapToInt(v -> v).min().orElseThrow(NoSuchElementException::new) + "_" + matchingTargets.stream().mapToInt(v -> v).max().orElseThrow(NoSuchElementException::new) ;
+                processedEvent = splitevent[0] + "_" + splitevent[2] + "_" + matchingTargets.stream().mapToInt(v -> v).min().orElseThrow(NoSuchElementException::new) + "_" + matchingTargets.stream().mapToInt(v -> v).max().orElseThrow(NoSuchElementException::new) + "_" ;
                 processedEvents.add(processedEvent);
             }
 
