@@ -1,4 +1,5 @@
 import beast.base.core.Log;
+import beast.base.evolution.branchratemodel.StrictClockModel;
 import beast.base.evolution.datatype.*;
 import beast.base.evolution.sitemodel.SiteModel;
 import beast.base.evolution.substitutionmodel.Frequencies;
@@ -128,7 +129,7 @@ public class SimulatedAlignmentTest {
         //initialise a tree
         Integer sequenceLength = 1;
         String outputFileName = "test/simAlGESTALT.nexus";
-        String newick = "((CHILD1:5,CHILD2:5)INTERNAL:0.0):0.0";
+        String newick = "(CHILD1:5,CHILD2:5)";
 
         Tree tree = new TreeParser();
         tree.initByName(
@@ -149,13 +150,18 @@ public class SimulatedAlignmentTest {
         RealParameter trimLongParams = new RealParameter("1.0 1.0");
         String insertZeroProb = "0.5";
         RealParameter insertParams = new RealParameter("2.0");
-        String doubleCutWeight="0.3";
+        String doubleCutWeight="0.03";
 
         gestaltGeneral gestaltModel = new gestaltGeneral();
         RealParameter freqs = new RealParameter("1.0 0 0");
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", freqs,
                 "estimate", false);
+        //likelihood class
+        RealParameter meanRate = new RealParameter("0.5");
+        StrictClockModel clockModel = new StrictClockModel();
+        clockModel.initByName("clock.rate", meanRate);
+
         gestaltModel.initByName("barcodeSequence", barcodeSequence,
                 "cutSite", cutSite,
                 "crucialPos", crucialPos,
@@ -165,7 +171,7 @@ public class SimulatedAlignmentTest {
         gestaltModel.createTrimInsertDistributions(10);
         //initialise the site model with subst model
         SiteModel siteM = new SiteModel();
-        RealParameter mutationRate = new RealParameter("10.0");
+        RealParameter mutationRate = new RealParameter("1.5");
         siteM.initByName("gammaCategoryCount", 0,
                 "substModel", gestaltModel, "mutationRate", mutationRate);
 
@@ -176,7 +182,7 @@ public class SimulatedAlignmentTest {
 
         //initialise alignment
         SimulatedGestaltAlignment simAlignment = new SimulatedGestaltAlignment();
-        RealParameter originTime = new RealParameter("6");
+        RealParameter originTime = new RealParameter("5.05");
         simAlignment.initByName("tree", tree,
                 "siteModel", siteM,
                 "outputFileName", outputFileName,

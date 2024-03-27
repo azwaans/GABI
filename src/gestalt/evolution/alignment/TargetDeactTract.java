@@ -12,13 +12,19 @@ public class TargetDeactTract extends BEASTObject {
      * This class represents realisations of a deactivating event of a specific range of targets
      */
 
-    protected int minTargDeac;
-    protected int maxTargDeac;
+    public int minTargDeac;
+    public int maxTargDeac;
 
     public TargetDeactTract(int minTrgtDeac, int maxTrgtDeac) {
         minTargDeac = minTrgtDeac;
         maxTargDeac = maxTrgtDeac;
         initAndValidate();
+    }
+
+    public TargetDeactTract(TargetDeactTract deactTract) {
+        this.minTargDeac = deactTract.minTargDeac;
+        this.maxTargDeac = deactTract.minTargDeac;
+
     }
 
     public void initAndValidate() {

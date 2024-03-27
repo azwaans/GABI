@@ -22,6 +22,7 @@ import org.apache.commons.math3.util.Pair;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static gestalt.evolution.alignment.GestaltEvent.intersect;
 import static java.lang.Math.max;
@@ -129,10 +130,12 @@ public class SimulatedGestaltAlignment extends Alignment {
         if (originHeight != 0) {
             // then parent sequence is sequence at origin and we evolve sequence first down to the root
             double deltaT = originHeight - root.getHeight();
+            Log.info.println("LENGTH of STEM:" + deltaT);
             double clockRate = siteModel.getRateForCategory(0, root);
             while (deltaT > 0) {
 
                 //Draw a cut and a time at which it happens
+                Log.info.println("CLOCK rate" + clockRate);
                 Pair<Double, IndelSet.TargetTract> outcome = this.raceTargetTracts(rootStatus, clockRate * deltaT);
 
                 //if the barcode is already saturated (outcome == null)
@@ -144,6 +147,7 @@ public class SimulatedGestaltAlignment extends Alignment {
 
                     //time of that next cut
                     Double eventTime = outcome.getFirst();
+                    Log.info.println("Event time" + eventTime);
 
                     //if the time drawn for the next barcode cut event exceeds the branch length
                     //end the simulation
@@ -162,6 +166,7 @@ public class SimulatedGestaltAlignment extends Alignment {
                         //draw a repair event
                         String indel = this.doRepair(outcome.getSecond());
                         //apply it to the allele
+                        Log.info.print("indel applied on stem edge" + indel);
                         rootAllele = applyIndel(rootAllele,indel);
 
 
@@ -231,7 +236,7 @@ public class SimulatedGestaltAlignment extends Alignment {
                 index -=1;
             }
         }
-        Log.info.println(left_of_left_cut);
+       // Log.info.println(left_of_left_cut);
 
         int deleted_right = 0;
         index = 0;
@@ -274,13 +279,24 @@ public class SimulatedGestaltAlignment extends Alignment {
 
         for (Node child : node.getChildren()) {
 
+
             double deltaT = node.getHeight() - child.getHeight();
+            Log.info.println("LENGTH of normal edge:" + deltaT);
+
             double clockRate = siteModel.getRateForCategory(0, child);
+            Log.info.println("clockRate" + clockRate);
 
             // Draw characters on child sequence
-            TargetStatus childStatus = parentStatus;
+            TargetStatus childStatus = new TargetStatus(parentStatus);
             String childAllele = parentAllele;
-            List<IndelSet.TargetTract> childTracts = parentTracts;
+            Log.info.println("ParentAllele" + parentAllele);
+            Log.info.println("ParentTracts");
+            Log.info.println(parentTracts);
+            Log.info.println("ParentStatus");
+            Log.info.println(Arrays.toString(parentStatus.getBinaryStatus(10)));
+            Log.info.println("childStatus");
+            Log.info.println(Arrays.toString(childStatus.getBinaryStatus(10)));
+            List<IndelSet.TargetTract> childTracts = parentTracts.stream().map(IndelSet.TargetTract::new).collect(Collectors.toList());
 
             while (deltaT > 0) {
                 Pair<Double, IndelSet.TargetTract> outcome = this.raceTargetTracts(childStatus, clockRate * deltaT);
@@ -289,6 +305,8 @@ public class SimulatedGestaltAlignment extends Alignment {
                     break;
                 }
                 Double eventTime = outcome.getFirst();
+                Log.info.println("eventTime" + eventTime);
+
                 if (eventTime < deltaT) {
                     //there is a cut, we update the remaining time, allowing for potentially more cuts
                     deltaT -= eventTime;
@@ -297,7 +315,7 @@ public class SimulatedGestaltAlignment extends Alignment {
                     childTracts.add(outcome.getSecond());
 
                     String indel = this.doRepair(outcome.getSecond());
-
+                    Log.info.print("indel applied on normal edge" + indel);
                     childAllele = applyIndel(childAllele,indel);
 
                 }
@@ -621,9 +639,9 @@ public class SimulatedGestaltAlignment extends Alignment {
             Double minTime = Randomizer.nextExponential(hazardSum);
             int chosenIndex = Randomizer.randomChoicePDF(normalizedHazards);
             IndelSet.TargetTract chosenTt = targetTracts.get(chosenIndex);
-            Log.info.println(chosenIndex);
-            Log.info.println(minTime);
-            Log.info.println(chosenTt.hashCode());
+            //Log.info.println(chosenIndex);
+            //Log.info.println(minTime);
+           // Log.info.println(chosenTt.hashCode());
             return new Pair(minTime, chosenTt);
         }
 

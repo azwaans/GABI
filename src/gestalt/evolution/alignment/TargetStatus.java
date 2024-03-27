@@ -19,7 +19,7 @@ public class TargetStatus extends BEASTObject implements Comparable<TargetStatus
     /**
      * The list of Target Deactivation Tracts applied to the barcode
      */
-    protected List<TargetDeactTract> targetDeacList;
+    public List<TargetDeactTract> targetDeacList;
 
     //no argument constructor
     public TargetStatus() {
@@ -30,6 +30,11 @@ public class TargetStatus extends BEASTObject implements Comparable<TargetStatus
     //constructor
     public TargetStatus(List<TargetDeactTract> list) {
         targetDeacList = list;
+        initAndValidate();
+    }
+
+    public TargetStatus(TargetStatus targetStatus) {
+        targetDeacList = targetStatus.targetDeacList.stream().map(TargetDeactTract::new).collect(Collectors.toList());
         initAndValidate();
     }
 

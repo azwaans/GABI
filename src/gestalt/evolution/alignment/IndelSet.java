@@ -210,6 +210,13 @@ public abstract class IndelSet extends BEASTObject {
 
         }
 
+        public TargetTract(TargetTract tract) {
+            this.minTarg = tract.minTarg;
+            this.maxTarg = tract.minTarg;
+            this.minTargDeac = tract.minTargDeac;
+            this.maxTargDeac = tract.maxTargDeac;
+        }
+
         public void initAndValidate() {
 
         }
