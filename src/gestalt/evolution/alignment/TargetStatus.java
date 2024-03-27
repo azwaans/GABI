@@ -1,6 +1,7 @@
 package gestalt.evolution.alignment;
 
 import beast.base.core.BEASTObject;
+import beast.base.core.Log;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.*;
@@ -34,9 +35,15 @@ public class TargetStatus extends BEASTObject implements Comparable<TargetStatus
     }
 
     public TargetStatus(TargetStatus targetStatus) {
-        targetDeacList = targetStatus.targetDeacList.stream().map(TargetDeactTract::new).collect(Collectors.toList());
-        initAndValidate();
+
+        this.targetDeacList = new ArrayList<>();
+        for (TargetDeactTract tdt : targetStatus.targetDeacList)
+        {
+            this.targetDeacList.add(new TargetDeactTract(tdt));
+        }
     }
+
+
 
     public void initAndValidate() {
     }

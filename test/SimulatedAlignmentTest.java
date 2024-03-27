@@ -11,6 +11,7 @@ import gestalt.evolution.alignment.GestaltEvent;
 import gestalt.evolution.alignment.IndelSet;
 import gestalt.evolution.alignment.TargetStatus;
 import org.apache.commons.math3.util.Pair;
+import org.junit.Before;
 import org.junit.Test;
 import gestalt.evolution.simulation.SimulatedGestaltAlignment;
 import gestalt.evolution.substitutionmodel.gestaltGeneral;
@@ -23,6 +24,49 @@ import java.util.NoSuchElementException;
 import static junit.framework.TestCase.assertEquals;
 
 public class SimulatedAlignmentTest {
+
+        gestaltGeneral gestaltModel;
+
+
+    @Before
+    public void setUp() {
+
+        //initialise a substitution model
+        String barcodeSequence="CG GATACGATACGCGCACGCTATGG AGTC GACACGACTCGCGCATACGATGG AGTC GATAGTATGCGTATACGCTATGG AGTC GATATGCATAGCGCATGCTATGG AGTC GAGTCGAGACGCTGACGATATGG AGTC GCTACGATACACTCTGACTATGG AGTC GCGACTGTACGCACACGCGATGG AGTC GATACGTAGCACGCAGACTATGG AGTC GACACAGTACTCTCACTCTATGG AGTC GATATGAGACTCGCATGTGATGG GAAAAAAAAAAAAAAA";
+        String cutSite="6";
+        String crucialPos="6 6";
+        String maxSumSteps= "3000";
+        String maxExtraSteps="1";
+        RealParameter cutRates = new RealParameter("0.1 1.1 2.1 3.1 4.1 5.1 6.1 7.1 8.1 9.1");
+        RealParameter longTrimScaling = new RealParameter("0.1 0.1");
+        RealParameter trimZeroProbs = new RealParameter("0.5 0.5 0.5 0.5 0.5");
+        RealParameter trimShortParams = new RealParameter("1.0 1.0");
+        RealParameter trimLongParams = new RealParameter("1.0 1.0");
+        String insertZeroProb = "0.5";
+        RealParameter insertParams = new RealParameter("2.0");
+        String doubleCutWeight="0.03";
+
+        gestaltModel = new gestaltGeneral();
+        RealParameter freqs = new RealParameter("1.0 0 0");
+        Frequencies frequencies = new Frequencies();
+        frequencies.initByName("frequencies", freqs,
+                "estimate", false);
+        //likelihood class
+        RealParameter meanRate = new RealParameter("0.5");
+        StrictClockModel clockModel = new StrictClockModel();
+        clockModel.initByName("clock.rate", meanRate);
+
+        gestaltModel.initByName("barcodeSequence", barcodeSequence,
+                "cutSite", cutSite,
+                "crucialPos", crucialPos,
+                "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
+
+        gestaltModel.initAndValidate();
+
+
+    }
+
+
 
     // set up
     @Test
@@ -104,10 +148,6 @@ public class SimulatedAlignmentTest {
         Log.info.println("After adding one TT on an empty GESTALT barcode" + Arrays.toString(empty.getBinaryStatus(10)));
         String event = simAlignment.doRepair(outcome.getSecond());
 
-
-
-
-
         //AlignmentFromNexus expectedAlignment = new AlignmentFromNexus();
         //expectedAlignment.initByName("fileName",
         //        "test/sciphy/expectedAlignment.nexus",
@@ -129,7 +169,7 @@ public class SimulatedAlignmentTest {
         //initialise a tree
         Integer sequenceLength = 1;
         String outputFileName = "test/simAlGESTALT.nexus";
-        String newick = "(CHILD1:5,CHILD2:5)";
+        String newick = "(CHILD0:3,((CHILD4:1,COPY01:1)CHILD2:1,CHILD3:2)CHILD1:1)";
 
         Tree tree = new TreeParser();
         tree.initByName(
@@ -178,9 +218,8 @@ public class SimulatedAlignmentTest {
         DataType Data = new UserDataType();
 
         // simulate
-
-
         //initialise alignment
+        Log.info.println(gestaltModel.metaData.absCutSites);
         SimulatedGestaltAlignment simAlignment = new SimulatedGestaltAlignment();
         RealParameter originTime = new RealParameter("5.05");
         simAlignment.initByName("tree", tree,
@@ -188,121 +227,6 @@ public class SimulatedAlignmentTest {
                 "outputFileName", outputFileName,
                 "userDataType", Data, "origin", originTime
         );
-
-        Log.info.println("absCutSites");
-        Log.info.println(gestaltModel.metaData.absCutSites);
-        //Take care of origin vs root!!
-
-
-        //call function:
-        //1 Create an empty target status
-        //AlignmentFromNexus expectedAlignment = new AlignmentFromNexus();
-        //expectedAlignment.initByName("fileName",
-        //        "test/sciphy/expectedAlignment.nexus",
-        //        "userDataType", integerData);
-
-
-        // assertEquals(expectedAlignment.getSequenceAsString("CHILD1"),
-        //         simAlignment.getSequenceAsString("CHILD1"));
-
-        // assertEquals(expectedAlignment.getSequenceAsString("CHILD2"),
-        //         simAlignment.getSequenceAsString("CHILD2"));
-
-    }
-    @Test
-    public void testGestaltEventIntersection() {
-
-
-        //simplest case, test for equality.
-        GestaltEvent event1 = new GestaltEvent("38_1_0_0_TGGAGTCGAGAGCGCGCTCGTCGa");
-        GestaltEvent event2 = new GestaltEvent("38_1_0_0_TGGAGTCGAGAGCGCGCTCGTCGa");
-
-        GestaltEvent intersection = GestaltEvent.intersect(event1,event2);
-        Log.info.println("ev1: + " + "38_1_0_0_TGGAGTCGAGAGCGCGCTCGTCGa");
-        Log.info.println("ev2: + " + "38_1_0_0_TGGAGTCGAGAGCGCGCTCGTCGa");
-        Log.info.println("intersection of ev1 and ev2");
-        Log.info.println("START"+intersection.startPos);
-        Log.info.println("MINTARGET"+intersection.minTarg);
-        Log.info.println("DELLEN"+intersection.delLen);
-        Log.info.println("MAXTARG"+intersection.maxTarg);
-        Log.info.println("INSSEQ"+intersection.insSeq);
-
-
-        //contiguous (this is theoretically not possible consecutively because it would require cutting at the same site)
-        event1 = new GestaltEvent("38_1_0_0_TGGAGTCGAG");
-        event2 = new GestaltEvent("40_3_0_0_AGCGCGCTCGTCGa");
-
-        intersection = GestaltEvent.intersect(event1,event2);
-        Log.info.println("ev1: + " + "38_1_0_0_TGGAGTCGAG");
-        Log.info.println("ev2: + " + "40_3_0_0_AGCGCGCTCGTCGa");
-        Log.info.println("intersection of ev1 and ev2");
-        Log.info.println("START"+intersection.startPos);
-        Log.info.println("MINTARGET"+intersection.minTarg);
-        Log.info.println("DELLEN"+intersection.delLen);
-        Log.info.println("MAXTARG"+intersection.maxTarg);
-        Log.info.println("INSSEQ"+intersection.insSeq);
-
-        //overlapping
-        event1 = new GestaltEvent("38_1_0_0_TGGAGTCGAGAGCGCGCTCGTCGa");
-        event2 = new GestaltEvent("37_2_0_0_ATaa");
-
-        intersection = GestaltEvent.intersect(event1,event2);
-        Log.info.println("ev1: + " + "38_1_0_0_TGGAGTCGAGAGCGCGCTCGTCGa");
-        Log.info.println("ev2: + " + "37_2_0_0_ATaa");
-        Log.info.println("intersection of ev1 and ev2");
-        Log.info.println("START"+intersection.startPos);
-        Log.info.println("MINTARGET"+intersection.minTarg);
-        Log.info.println("DELLEN"+intersection.delLen);
-        Log.info.println("MAXTARG"+intersection.maxTarg);
-        Log.info.println("INSSEQ"+intersection.insSeq);
-
-
-
-
-        // masking indels : we expect the outcome to be evt 2
-        //151_6_5_5_GAGTTAA,125_85_4_7_TCTGAG,
-        event1 = new GestaltEvent("151_6_5_5_GAGTTAA");
-        event2 = new GestaltEvent("125_85_4_7_TCTGAG");
-
-        intersection = GestaltEvent.intersect(event1,event2);
-        Log.info.println("ev1: + " + "151_6_5_5_GAGTTAA");
-        Log.info.println("ev2: + " + "125_85_4_7_TCTGAG");
-        Log.info.println("intersection of ev1 and ev2");
-        Log.info.println("START"+intersection.startPos);
-        Log.info.println("MINTARGET"+intersection.minTarg);
-        Log.info.println("DELLEN"+intersection.delLen);
-        Log.info.println("MAXTARG"+intersection.maxTarg);
-        Log.info.println("INSSEQ"+intersection.insSeq);
-
-        //totest
-        // overlapping contiguous indels
-        //97_162_3_9_,71_25_2_3_,
-        event1 = new GestaltEvent("97_162_3_9_");
-        event2 = new GestaltEvent("71_25_2_3_");
-
-        intersection = GestaltEvent.intersect(event1,event2);
-        Log.info.println("ev1: + " + "97_162_3_9_");
-        Log.info.println("ev2: + " + "71_25_2_3_");
-        Log.info.println("intersection of ev1 and ev2");
-        Log.info.println("START"+intersection.startPos);
-        Log.info.println("MINTARGET"+intersection.minTarg);
-        Log.info.println("DELLEN"+intersection.delLen);
-        Log.info.println("MAXTARG"+intersection.maxTarg);
-        Log.info.println("INSSEQ"+intersection.insSeq);
-
-        //178_6_6_6_,149_31_5_6_TGCCAC
-        event1 = new GestaltEvent("178_6_6_6_");
-        event2 = new GestaltEvent("149_31_5_6_TGCCAC");
-
-        intersection = GestaltEvent.intersect(event1,event2);
-        Log.info.println("ev1: + " + "178_6_6_6_");
-        Log.info.println("ev2: + " + "149_31_5_6_TGCCAC");
-        Log.info.println("intersection of ev1 and ev2");
-        Log.info.println("START"+intersection.startPos);
-        Log.info.println("MINTARGET"+intersection.minTarg);
-        Log.info.println("DELLEN"+intersection.delLen);
-        Log.info.println("MAXTARG"+intersection.maxTarg);
-        Log.info.println("INSSEQ"+intersection.insSeq);
 
 
 
@@ -804,6 +728,63 @@ return processedEvents;
 
     }
 
+
+    @Test
+    public void TestWeirdBehavior() {
+        //initialise a tree
+        String StartAllele = "CG GATACGATACGCG----tgaggg----GG AGTC GACACGACTCGCGC------TGG AGTC GATAGTATGCGTATA----ATGG AGTC GATATGCATAGCG----tagctag------ ---- ----------------------- AGTC GCTACGATACACT--------GG AGTC GCGACTGTACGCA--------GG AGTC GATACGTAGCACGC---aaactact------ ---- --------------ACTCTATGG AGTC GATATGAGACTC----------G GAAAAAAAAAAAAAAA";
+        String finalAllele = StartAllele;
+        String indel = "3_9_tggtgcat_9_5";
+        finalAllele = applyIndel(finalAllele,indel);
+        String observed = observeAllele(finalAllele);
+
+
+    }
+
+
+    public String observeAllele(String simulatedAllele) {
+
+        List<String> alleleIndelFormat = processAllele(simulatedAllele);
+        List<String> alleleEventFormat = processEvents(alleleIndelFormat);
+        return String.join(",", alleleEventFormat);
+
+
+    }
+
+    List<String> processEvents(List<String> processedAllele) {
+        List<String> processedEvents = new ArrayList<>();
+        for(String rawEvent : processedAllele) {
+            String processedEvent = "";
+            List<Integer> matchingTargets = new ArrayList<>();
+            String[] splitevent = rawEvent.split("_");
+            Log.info.println("raw event" + rawEvent);
+
+            for(int targetindex= 0; targetindex < gestaltModel.metaData.absCutSites.length; ++targetindex) {
+                double event0 = Double.parseDouble(splitevent[0]);
+                double event1 = Double.parseDouble(splitevent[1]);
+                if (event0 <=  gestaltModel.metaData.absCutSites.get(targetindex) && event1 >= gestaltModel.metaData.absCutSites.get(targetindex)) {
+                    matchingTargets.add(targetindex) ;
+                }
+
+            }
+            //there is an insertion
+            Log.info.println("matching target" + matchingTargets);
+            if(splitevent.length == 4) {
+                processedEvent = splitevent[0] + "_" + splitevent[2] + "_" + matchingTargets.stream().mapToInt(v -> v).min().orElseThrow(NoSuchElementException::new) + "_" + matchingTargets.stream().mapToInt(v -> v).max().orElseThrow(NoSuchElementException::new) + "_" + splitevent[3];
+                processedEvents.add(processedEvent);
+            }
+            //there is no insertion
+            else {
+                processedEvent = splitevent[0] + "_" + splitevent[2] + "_" + matchingTargets.stream().mapToInt(v -> v).min().orElseThrow(NoSuchElementException::new) + "_" + matchingTargets.stream().mapToInt(v -> v).max().orElseThrow(NoSuchElementException::new) + "_" ;
+                processedEvents.add(processedEvent);
+            }
+
+        }
+
+        return processedEvents;
+
+    }
+
     List<String> processAllele(String Allele) {
 
         List<String> indelEvents = new ArrayList<>();
@@ -853,5 +834,4 @@ return processedEvents;
         //String eventInput = StartPos + "_" + DelLen + "_" + minDeac + "_" + maxDeac + "_" + insertSequence;
         return indelEvents;
     }
-
 }

@@ -23,7 +23,7 @@ public class TargetDeactTract extends BEASTObject {
 
     public TargetDeactTract(TargetDeactTract deactTract) {
         this.minTargDeac = deactTract.minTargDeac;
-        this.maxTargDeac = deactTract.minTargDeac;
+        this.maxTargDeac = deactTract.maxTargDeac;
 
     }
 

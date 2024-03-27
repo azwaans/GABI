@@ -13,8 +13,6 @@ import beast.base.inference.parameter.RealParameter;
 import beast.base.util.Randomizer;
 import beast.pkgmgmt.BEASTClassLoader;
 import beast.pkgmgmt.PackageManager;
-import gestalt.evolution.alignment.BarcodeMeta;
-import gestalt.evolution.alignment.GestaltEvent;
 import gestalt.evolution.alignment.IndelSet;
 import gestalt.evolution.alignment.TargetStatus;
 import gestalt.evolution.substitutionmodel.gestaltGeneral;
@@ -24,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static gestalt.evolution.alignment.GestaltEvent.intersect;
 import static java.lang.Math.max;
 import static java.lang.Math.random;
 
@@ -130,12 +127,10 @@ public class SimulatedGestaltAlignment extends Alignment {
         if (originHeight != 0) {
             // then parent sequence is sequence at origin and we evolve sequence first down to the root
             double deltaT = originHeight - root.getHeight();
-            Log.info.println("LENGTH of STEM:" + deltaT);
             double clockRate = siteModel.getRateForCategory(0, root);
             while (deltaT > 0) {
 
                 //Draw a cut and a time at which it happens
-                Log.info.println("CLOCK rate" + clockRate);
                 Pair<Double, IndelSet.TargetTract> outcome = this.raceTargetTracts(rootStatus, clockRate * deltaT);
 
                 //if the barcode is already saturated (outcome == null)
@@ -147,7 +142,6 @@ public class SimulatedGestaltAlignment extends Alignment {
 
                     //time of that next cut
                     Double eventTime = outcome.getFirst();
-                    Log.info.println("Event time" + eventTime);
 
                     //if the time drawn for the next barcode cut event exceeds the branch length
                     //end the simulation
@@ -166,7 +160,6 @@ public class SimulatedGestaltAlignment extends Alignment {
                         //draw a repair event
                         String indel = this.doRepair(outcome.getSecond());
                         //apply it to the allele
-                        Log.info.print("indel applied on stem edge" + indel);
                         rootAllele = applyIndel(rootAllele,indel);
 
 
@@ -236,7 +229,6 @@ public class SimulatedGestaltAlignment extends Alignment {
                 index -=1;
             }
         }
-       // Log.info.println(left_of_left_cut);
 
         int deleted_right = 0;
         index = 0;
@@ -281,21 +273,13 @@ public class SimulatedGestaltAlignment extends Alignment {
 
 
             double deltaT = node.getHeight() - child.getHeight();
-            Log.info.println("LENGTH of normal edge:" + deltaT);
 
             double clockRate = siteModel.getRateForCategory(0, child);
-            Log.info.println("clockRate" + clockRate);
-
             // Draw characters on child sequence
             TargetStatus childStatus = new TargetStatus(parentStatus);
+
             String childAllele = parentAllele;
-            Log.info.println("ParentAllele" + parentAllele);
-            Log.info.println("ParentTracts");
-            Log.info.println(parentTracts);
-            Log.info.println("ParentStatus");
-            Log.info.println(Arrays.toString(parentStatus.getBinaryStatus(10)));
-            Log.info.println("childStatus");
-            Log.info.println(Arrays.toString(childStatus.getBinaryStatus(10)));
+
             List<IndelSet.TargetTract> childTracts = parentTracts.stream().map(IndelSet.TargetTract::new).collect(Collectors.toList());
 
             while (deltaT > 0) {
@@ -305,7 +289,6 @@ public class SimulatedGestaltAlignment extends Alignment {
                     break;
                 }
                 Double eventTime = outcome.getFirst();
-                Log.info.println("eventTime" + eventTime);
 
                 if (eventTime < deltaT) {
                     //there is a cut, we update the remaining time, allowing for potentially more cuts
@@ -315,7 +298,6 @@ public class SimulatedGestaltAlignment extends Alignment {
                     childTracts.add(outcome.getSecond());
 
                     String indel = this.doRepair(outcome.getSecond());
-                    Log.info.print("indel applied on normal edge" + indel);
                     childAllele = applyIndel(childAllele,indel);
 
                 }
@@ -338,7 +320,7 @@ public class SimulatedGestaltAlignment extends Alignment {
     //this function is here to postprocess a simulated allele into an "observed" allele.
     //Simulated alleles can contain contiguous indels/masked indels. masked events must be removed. In real data, contiguous/overlapping indels are observed as
     // single indels meaning if evt1 and evt2 are contiguous, we sequence a single indel: evt1+2 (intersection of both)
-    String observeAllele(String simulatedAllele) {
+    public String observeAllele(String simulatedAllele) {
 
         List<String> alleleIndelFormat = processAllele(simulatedAllele);
         List<String> alleleEventFormat = processEvents(alleleIndelFormat);
@@ -347,12 +329,13 @@ public class SimulatedGestaltAlignment extends Alignment {
 
     }
 
-    List<String> processEvents(List<String> processedAllele) {
+     List<String> processEvents(List<String> processedAllele) {
         List<String> processedEvents = new ArrayList<>();
         for(String rawEvent : processedAllele) {
             String processedEvent = "";
             List<Integer> matchingTargets = new ArrayList<>();
             String[] splitevent = rawEvent.split("_");
+
             for(int targetindex= 0; targetindex < substModel.metaData.absCutSites.length; ++targetindex) {
                 double event0 = Double.parseDouble(splitevent[0]);
                 double event1 = Double.parseDouble(splitevent[1]);
@@ -378,7 +361,7 @@ public class SimulatedGestaltAlignment extends Alignment {
 
     }
 
-    List<String> processAllele(String Allele) {
+     List<String> processAllele(String Allele) {
 
         List<String> indelEvents = new ArrayList<>();
         char[] allele = Allele.toCharArray();
@@ -428,47 +411,6 @@ public class SimulatedGestaltAlignment extends Alignment {
         return indelEvents;
     }
 
-    //process longitudinally the allele to clean up potential overlaps
-    private List<GestaltEvent> processSet(List<GestaltEvent> correctedEvents) {
-        List<GestaltEvent> processed = new ArrayList<>();
-        for ( int i = 0; i < correctedEvents.size();++i) {
-            GestaltEvent eventi = correctedEvents.get(i);
-            GestaltEvent intersectioni_j = null;
-            for (int j = i + 1; j < correctedEvents.size();++j) {
-                intersectioni_j = intersect(eventi,correctedEvents.get(j));
-
-            }
-            if(intersectioni_j != null && (! processed.contains(intersectioni_j))) {
-                processed.add(intersectioni_j);
-            }
-            else {
-                processed.add(eventi);
-            }
-        }
-        return processed;
-
-
-    }
-
-    //intersection of 2 lists of GESTALT events to create an Event set with all possible intersections
-    public static List<GestaltEvent> intersectList(List<GestaltEvent> first, List<GestaltEvent> second) {
-        List<GestaltEvent> intersectionList = new ArrayList<>();
-        if(first.size()==0 && second.size()==0) {
-            return intersectionList;
-        }
-        else if (first.size()==0 && second.size()!=0 || first.size()!=0 && second.size()==0) {
-            return null;
-        }
-        for ( GestaltEvent event1: first) {
-            for (GestaltEvent event2: second) {
-                GestaltEvent inter = intersect(event1,event2);
-                if(inter != null && (! intersectionList.contains(inter))) {
-                    intersectionList.add(inter);
-                }
-            }
-        }
-        return intersectionList;
-    }
 
     /**
      * HORRIBLE function to identify data type from given description.
@@ -639,9 +581,6 @@ public class SimulatedGestaltAlignment extends Alignment {
             Double minTime = Randomizer.nextExponential(hazardSum);
             int chosenIndex = Randomizer.randomChoicePDF(normalizedHazards);
             IndelSet.TargetTract chosenTt = targetTracts.get(chosenIndex);
-            //Log.info.println(chosenIndex);
-            //Log.info.println(minTime);
-           // Log.info.println(chosenTt.hashCode());
             return new Pair(minTime, chosenTt);
         }
 
