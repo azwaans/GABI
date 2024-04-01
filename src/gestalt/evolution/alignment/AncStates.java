@@ -2,6 +2,7 @@ package gestalt.evolution.alignment;
 
 import beast.base.core.BEASTObject;
 import beast.base.core.Input;
+import beast.base.core.Log;
 import org.apache.commons.math3.util.Pair;
 
 import java.util.*;
@@ -275,8 +276,9 @@ public class AncStates extends BEASTObject {
 
     static public AncStates createObservedAlleleSet(String sequenceInput, List<Pair<Integer, Integer>> posSites, Integer nTargets) {
         //create an ancestral state set for observed sequences at leaves
+        //todo check if this split with ":" is necessary.
         String[] strings = sequenceInput.split(":");
-        List<String> event_strings = new LinkedList<String>(Arrays.asList(strings[1].split(",")));
+        List<String> event_strings = new LinkedList<String>(Arrays.asList(strings[0].split(",")));
         event_strings.removeAll(Collections.singleton("None"));
         //create a SGWC list.
         List<GestaltEvent> eventList = new ArrayList<>();
