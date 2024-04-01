@@ -37,9 +37,10 @@ public class TargetStatus extends BEASTObject implements Comparable<TargetStatus
     public TargetStatus(TargetStatus targetStatus) {
 
         this.targetDeacList = new ArrayList<>();
-        for (TargetDeactTract tdt : targetStatus.targetDeacList)
-        {
-            this.targetDeacList.add(new TargetDeactTract(tdt));
+        if(targetStatus.targetDeacList != null){
+            for (TargetDeactTract tdt : targetStatus.targetDeacList) {
+                this.targetDeacList.add(new TargetDeactTract(tdt));
+            }
         }
     }
 
