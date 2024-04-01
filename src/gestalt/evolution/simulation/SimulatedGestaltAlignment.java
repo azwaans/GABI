@@ -4,6 +4,8 @@ import beast.base.core.Description;
 import beast.base.core.Input;
 import beast.base.core.Log;
 import beast.base.evolution.alignment.Alignment;
+import beast.base.evolution.alignment.Sequence;
+import beast.base.evolution.alignment.TaxonSet;
 import beast.base.evolution.datatype.DataType;
 import beast.base.evolution.sitemodel.SiteModel;
 import beast.base.evolution.tree.Node;
@@ -13,6 +15,9 @@ import beast.base.inference.parameter.RealParameter;
 import beast.base.util.Randomizer;
 import beast.pkgmgmt.BEASTClassLoader;
 import beast.pkgmgmt.PackageManager;
+import feast.nexus.CharactersBlock;
+import feast.nexus.NexusBuilder;
+import feast.nexus.TaxaBlock;
 import gestalt.evolution.alignment.IndelSet;
 import gestalt.evolution.alignment.TargetStatus;
 import gestalt.evolution.substitutionmodel.gestaltGeneral;
@@ -60,10 +65,11 @@ public class SimulatedGestaltAlignment extends Alignment {
 
     @Override
     public void initAndValidate() {
-
         tree = treeInput.get();
         siteModel = siteModelInput.get();
         substModel = (gestaltGeneral) siteModel.getSubstitutionModel();
+
+
         sequences.clear();
 
         if (originInput.get() != null) {
@@ -71,9 +77,10 @@ public class SimulatedGestaltAlignment extends Alignment {
         }
 
         grabDataType();
+
         simulate();
 
-        //find out length of longest sequence to adjust such that all are the same length
+        //adjust sequence length to be sure all match
         int maxEdits = 0;
         for (int i = 0; i < tree.getLeafNodeCount(); ++i) {
             if (alignment[i] == "") {
@@ -84,31 +91,42 @@ public class SimulatedGestaltAlignment extends Alignment {
         }
         //append the shorter sequences with "None"
         for (int i = 0; i < tree.getLeafNodeCount(); ++i) {
+            if (alignment[i].equals("")) {
+                alignment[i] = "None";}
             while (alignment[i].split(",").length < maxEdits) {
-                if (alignment[i] == "") {
-                    alignment[i] = "None";
-                } else {
-                    alignment[i] = alignment[i] + "," + "None";
-                }
+                 alignment[i] = alignment[i] + "," + "None";
             }
         }
-        //write alignment to file
-        PrintWriter writer = null;
-        try {
-            writer = new PrintWriter(outputFileNameInput.get(), StandardCharsets.UTF_8);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        for (int leafIdx = 0; leafIdx < tree.getLeafNodeCount(); leafIdx++) {
+            String seqString = alignment[leafIdx];
+            String taxonName;
+            if (tree.getNode(leafIdx).getID() != null)
+                taxonName = tree.getNode(leafIdx).getID();
+            else
+                taxonName = "t" + leafIdx;
+
+            sequenceInput.setValue(new Sequence(taxonName, seqString), this);
         }
-        for (int i = 0; i < tree.getLeafNodeCount(); ++i) {
-            writer.println("<sequence id=\"" + tree.getTaxaNames()[i] + "\"" + " spec=\"Sequence\" taxon=\"" + tree.getTaxaNames()[i] + "\"  value=" + alignment[i] + ",\"/>");
+
+        super.initAndValidate();
+
+        // Write simulated alignment to disk if required
+        if (outputFileNameInput.get() != null) {
+            try (PrintStream pstream = new PrintStream(outputFileNameInput.get())) {
+                NexusBuilder nb = new NexusBuilder();
+                nb.append(new TaxaBlock(new TaxonSet(this)));
+                nb.append(new CharactersBlock(this));
+                nb.write(pstream);
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException("Error writing to file "
+                        + outputFileNameInput.get() + ".");
+            }
         }
-        writer.close();
 
     }
+
+
 
     /**
      * Perform actual sequence simulation.
@@ -172,6 +190,7 @@ public class SimulatedGestaltAlignment extends Alignment {
         }
 
         traverse(root, rootStatus, rootAllele, rootTargetTracts);
+
 
     }
 
@@ -309,12 +328,20 @@ public class SimulatedGestaltAlignment extends Alignment {
             }
             if (child.isLeaf()) {
                 //make a function that observes allele: this function will merge events that are contiguous together.
-                //String correctedAllele = observeAllele(childAllele);
-                alignment[child.getNr()] = observeAllele(childAllele);
+                String correctedAllele = observeAllele(childAllele);
+                alignment[child.getNr()] = correctedAllele;
+
             } else {
                 traverse(child, childStatus, childAllele, childTracts);
+
+
             }
+
+
         }
+
+
+
     }
 
     //this function is here to postprocess a simulated allele into an "observed" allele.
