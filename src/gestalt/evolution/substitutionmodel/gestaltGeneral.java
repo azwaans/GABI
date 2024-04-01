@@ -3,6 +3,7 @@ package gestalt.evolution.substitutionmodel;
 import beast.base.core.Citation;
 import beast.base.core.Description;
 import beast.base.core.Input;
+import beast.base.core.Log;
 import beast.base.evolution.datatype.DataType;
 import beast.base.evolution.datatype.Nucleotide;
 import beast.base.evolution.substitutionmodel.EigenDecomposition;
@@ -154,13 +155,16 @@ public class gestaltGeneral extends SubstitutionModel.Base {
         //target cut parameters
         //cutRates = cutRatesInput.get().get(0);
         cutRates = cutRatesInput.get();
+        Log.info.println("cutRates" + cutRates);
 
         //doubleCutWeight = doubleCutWeightInput.get().getValue();
         doubleCutWeight = doubleCutWeightInput.get();
+        Log.info.println("doubleCutWeight" + doubleCutWeight);
 
         //indel parameters
         //longTrimFactors = longTrimFactorsInput.get().get(0).getValues();
         longTrimFactors = longTrimFactorsInput.get();
+        Log.info.println("long trim factors" + longTrimFactors);
 
         //insertZeroProb = insertZeroProbInput.get().getValue();
         insertZeroProb = insertZeroProbInput.get();
@@ -198,7 +202,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
             }
 
         }
-        if (doubleCutWeight.getValue() <= 0) {
+        if (doubleCutWeight.getValue() < 0) {
             throw new RuntimeException("Double cut weight must be positive!");
         }
 
@@ -221,6 +225,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
             targStatTransitionHazardsDict.put(stat, empty);
         }
 
+        createTrimInsertDistributions(10);
 
     }
 
@@ -279,6 +284,10 @@ public class gestaltGeneral extends SubstitutionModel.Base {
         DoubleMatrix logLeftTrimFactor = new DoubleMatrix(longLeftStatuses.length);
         DoubleMatrix logRightTrimFactor = new DoubleMatrix(longRightStatuses.length);
         int length = longLeftStatuses.length;
+
+        //we operate in log space to apply (multiplicative) factors to the base cut rates
+
+        //if there are deletions, add corresponding factors to the right and left
         for (int i = 0; i < length; i++) {
             if (longLeftStatuses.get(i) == 1.0) {
                 logLeftTrimFactor.put(i, log(longTrimFactors.get(0).getValue(0)));
@@ -296,6 +305,8 @@ public class gestaltGeneral extends SubstitutionModel.Base {
         DoubleMatrix gatheredTargetLamMin = new DoubleMatrix(minTargets.length);
         DoubleMatrix gatheredTargetLamMax = new DoubleMatrix(minTargets.length);
         length = minTargets.length;
+
+        //collect the base cut rates for each target tract, where the cut occurs left and right
         for (int i = 0; i < length; i++) {
             gatheredTargetLamMin.put(i, cutRates.get(0).getValue((int) minTargets.get(i)));
             gatheredTargetLamMax.put(i, cutRates.get(0).getValue((int) maxTargets.get(i)));
@@ -304,19 +315,25 @@ public class gestaltGeneral extends SubstitutionModel.Base {
 
 
         DoubleMatrix gatherMinandMax = DoubleMatrix.zeros(minTargets.length);
+
+        //combine the left and right cut rate: rate left cut + rate right cut
         gatherMinandMax.addi(gatheredTargetLamMax);
         gatherMinandMax.addi(gatheredTargetLamMin);
+
+        //add the factor for the deletion types to the left and right
         DoubleMatrix logFocalLambdaPart = DoubleMatrix.zeros(minTargets.length);
         logFocalLambdaPart.addi(logLeftTrimFactor);
         logFocalLambdaPart.addi(logRightTrimFactor);
         logFocalLambdaPart.addi(logi(gatheredTargetLamMin));
-        DoubleMatrix logDoubleLambdaPart = DoubleMatrix.zeros(minTargets.length);
 
+        //if there is a double cut, add the cut weight
+        DoubleMatrix logDoubleLambdaPart = DoubleMatrix.zeros(minTargets.length);
         logDoubleLambdaPart.addi(logLeftTrimFactor);
         logDoubleLambdaPart.addi(logRightTrimFactor);
         logDoubleLambdaPart.addi(logi(gatherMinandMax));
         logDoubleLambdaPart.addi(log(doubleCutWeight.getValue()));
 
+        //hazard is (cut_rate_left + cut_rate_right)*double_cut_factor*long_cut_factors)
         DoubleMatrix hazard = new DoubleMatrix(minTargets.length);
         length = minTargets.length;
         for (int i = 0; i < length; i++) {
@@ -328,6 +345,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
 
         }
 
+        //exit log space
         expi(hazard);
         return hazard;
 
