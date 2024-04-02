@@ -65,9 +65,72 @@ public class SimulatedGestaltAlignment extends Alignment {
 
     @Override
     public void initAndValidate() {
+//        Log.info.println("INIT SIMULATOR");
+//        tree = treeInput.get();
+//        siteModel = siteModelInput.get();
+//        substModel = (gestaltGeneral) siteModel.getSubstitutionModel();
+//        sequences.clear();
+//
+//        if (originInput.get() != null) {
+//            originHeight = originInput.get().getValue();
+//        }
+//
+//        grabDataType();
+//        simulate();
+//
+//        //find out length of longest sequence to adjust such that all are the same length
+//        int maxEdits = 0;
+//        for (int i = 0; i < tree.getLeafNodeCount(); ++i) {
+//            if (alignment[i] == "") {
+//                maxEdits = max(maxEdits, 0);
+//            } else {
+//                maxEdits = max(maxEdits, alignment[i].split(",").length);
+//            }
+//        }
+//        //append the shorter sequences with "None"
+//        for (int i = 0; i < tree.getLeafNodeCount(); ++i) {
+//            while (alignment[i].split(",").length < maxEdits) {
+//                if (alignment[i] == "") {
+//                    alignment[i] = "None";
+//                } else {
+//                    alignment[i] = alignment[i] + "," + "None";
+//                }
+//            }
+//        }
+//
+//        super.initAndValidate();
+//        //write alignment to file
+////        PrintWriter writer = null;
+////        try {
+////            writer = new PrintWriter(outputFileNameInput.get(), StandardCharsets.UTF_8);
+////        } catch (FileNotFoundException e) {
+////            e.printStackTrace();
+////        } catch (UnsupportedEncodingException e) {
+////            e.printStackTrace();
+////        } catch (IOException e) {
+////            e.printStackTrace();
+////        }
+////        for (int i = 0; i < tree.getLeafNodeCount(); ++i) {
+////            writer.println("<sequence id=\"" + tree.getTaxaNames()[i] + "\"" + " spec=\"Sequence\" taxon=\"" + tree.getTaxaNames()[i] + "\"  value=\"" + alignment[i] + ",\"/>");
+////        }
+////        writer.close();
+//        if (outputFileNameInput.get() != null) {
+//            try (PrintStream pstream = new PrintStream(outputFileNameInput.get())) {
+//                NexusBuilder nb = new NexusBuilder();
+//                nb.append(new TaxaBlock(new TaxonSet(this)));
+//                nb.append(new CharactersBlock(this));
+//                nb.write(pstream);
+//            } catch (FileNotFoundException ex) {
+//                throw new RuntimeException("Error writing to file "
+//                        + outputFileNameInput.get() + ".");
+//            }
+
+ //   }
+
         tree = treeInput.get();
         siteModel = siteModelInput.get();
         substModel = (gestaltGeneral) siteModel.getSubstitutionModel();
+        Log.info.println("category rates: " + Arrays.toString(siteModel.getCategoryRates(tree.getRoot())));
 
 
         sequences.clear();
@@ -90,6 +153,18 @@ public class SimulatedGestaltAlignment extends Alignment {
             }
         }
         //append the shorter sequences with "None"
+
+        //todo check case where maxedits =1
+        if(maxEdits == 1 ) {
+            for (int i = 0; i < tree.getLeafNodeCount(); ++i) {
+                if (alignment[i].equals("")) {
+                    alignment[i] = "None,";}
+                else {
+                    alignment[i] = alignment[i] + ",";
+                }
+            }
+
+        }
         for (int i = 0; i < tree.getLeafNodeCount(); ++i) {
             if (alignment[i].equals("")) {
                 alignment[i] = "None";}
@@ -100,6 +175,7 @@ public class SimulatedGestaltAlignment extends Alignment {
 
         for (int leafIdx = 0; leafIdx < tree.getLeafNodeCount(); leafIdx++) {
             String seqString = alignment[leafIdx];
+            Log.info.println(seqString);
             String taxonName;
             if (tree.getNode(leafIdx).getID() != null)
                 taxonName = tree.getNode(leafIdx).getID();
@@ -329,6 +405,7 @@ public class SimulatedGestaltAlignment extends Alignment {
             if (child.isLeaf()) {
                 //make a function that observes allele: this function will merge events that are contiguous together.
                 String correctedAllele = observeAllele(childAllele);
+                Log.info.println("adding a sequence for nide number" + child.getNr());
                 alignment[child.getNr()] = correctedAllele;
 
             } else {
