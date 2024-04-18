@@ -65,73 +65,9 @@ public class SimulatedGestaltAlignment extends Alignment {
 
     @Override
     public void initAndValidate() {
-//        Log.info.println("INIT SIMULATOR");
-//        tree = treeInput.get();
-//        siteModel = siteModelInput.get();
-//        substModel = (gestaltGeneral) siteModel.getSubstitutionModel();
-//        sequences.clear();
-//
-//        if (originInput.get() != null) {
-//            originHeight = originInput.get().getValue();
-//        }
-//
-//        grabDataType();
-//        simulate();
-//
-//        //find out length of longest sequence to adjust such that all are the same length
-//        int maxEdits = 0;
-//        for (int i = 0; i < tree.getLeafNodeCount(); ++i) {
-//            if (alignment[i] == "") {
-//                maxEdits = max(maxEdits, 0);
-//            } else {
-//                maxEdits = max(maxEdits, alignment[i].split(",").length);
-//            }
-//        }
-//        //append the shorter sequences with "None"
-//        for (int i = 0; i < tree.getLeafNodeCount(); ++i) {
-//            while (alignment[i].split(",").length < maxEdits) {
-//                if (alignment[i] == "") {
-//                    alignment[i] = "None";
-//                } else {
-//                    alignment[i] = alignment[i] + "," + "None";
-//                }
-//            }
-//        }
-//
-//        super.initAndValidate();
-//        //write alignment to file
-////        PrintWriter writer = null;
-////        try {
-////            writer = new PrintWriter(outputFileNameInput.get(), StandardCharsets.UTF_8);
-////        } catch (FileNotFoundException e) {
-////            e.printStackTrace();
-////        } catch (UnsupportedEncodingException e) {
-////            e.printStackTrace();
-////        } catch (IOException e) {
-////            e.printStackTrace();
-////        }
-////        for (int i = 0; i < tree.getLeafNodeCount(); ++i) {
-////            writer.println("<sequence id=\"" + tree.getTaxaNames()[i] + "\"" + " spec=\"Sequence\" taxon=\"" + tree.getTaxaNames()[i] + "\"  value=\"" + alignment[i] + ",\"/>");
-////        }
-////        writer.close();
-//        if (outputFileNameInput.get() != null) {
-//            try (PrintStream pstream = new PrintStream(outputFileNameInput.get())) {
-//                NexusBuilder nb = new NexusBuilder();
-//                nb.append(new TaxaBlock(new TaxonSet(this)));
-//                nb.append(new CharactersBlock(this));
-//                nb.write(pstream);
-//            } catch (FileNotFoundException ex) {
-//                throw new RuntimeException("Error writing to file "
-//                        + outputFileNameInput.get() + ".");
-//            }
-
- //   }
-
         tree = treeInput.get();
         siteModel = siteModelInput.get();
         substModel = (gestaltGeneral) siteModel.getSubstitutionModel();
-        Log.info.println("category rates: " + Arrays.toString(siteModel.getCategoryRates(tree.getRoot())));
-
 
         sequences.clear();
 
@@ -209,6 +145,7 @@ public class SimulatedGestaltAlignment extends Alignment {
      */
     private void simulate() {
         int nTaxa = tree.getLeafNodeCount();
+
 
         alignment = new String[nTaxa];
 
@@ -378,7 +315,7 @@ public class SimulatedGestaltAlignment extends Alignment {
             List<IndelSet.TargetTract> childTracts = parentTracts.stream().map(IndelSet.TargetTract::new).collect(Collectors.toList());
 
             while (deltaT > 0) {
-                Pair<Double, IndelSet.TargetTract> outcome = this.raceTargetTracts(childStatus, clockRate * deltaT);
+                Pair<Double, IndelSet.TargetTract> outcome = this.raceTargetTracts(childStatus, clockRate );
                 if (outcome == null) {
                     //outcome is null when the target gets fully edited
                     break;
@@ -405,7 +342,7 @@ public class SimulatedGestaltAlignment extends Alignment {
             if (child.isLeaf()) {
                 //make a function that observes allele: this function will merge events that are contiguous together.
                 String correctedAllele = observeAllele(childAllele);
-                Log.info.println("adding a sequence for nide number" + child.getNr());
+                Log.info.println("adding a sequence for node number" + child.getNr());
                 alignment[child.getNr()] = correctedAllele;
 
             } else {
@@ -661,7 +598,7 @@ public class SimulatedGestaltAlignment extends Alignment {
 
     public Pair<Double, IndelSet.TargetTract> raceTargetTracts(TargetStatus startTS, double scaleHazard) {
 
-        List<Integer> activeTargets = startTS.getActiveTargets(10);
+        List<Integer> activeTargets = startTS.getActiveTargets( substModel.metaData.nTargets);
         int numActive = activeTargets.size();
         //if the barcode is fully edited out, cannot edit anymore, return null
         if (numActive == 0) {
@@ -669,17 +606,17 @@ public class SimulatedGestaltAlignment extends Alignment {
         } else {
             //dummy activeAny parameter:
             List<Integer> activeAny = new ArrayList<>();
-            List<IndelSet.TargetTract> targetTracts = startTS.getPossibleTargetTracts(activeAny, 10);
+            List<IndelSet.TargetTract> targetTracts = startTS.getPossibleTargetTracts(activeAny, substModel.metaData.nTargets);
             double[] hazards = new double[targetTracts.size()];
             for (int i = 0; i <= targetTracts.size() - 1; i++) {
                 hazards[i] = substModel.targetTractHazards.get(substModel.targetTractDict.get(targetTracts.get(i))) * scaleHazard;
 
             }
+
             double hazardSum = Arrays.stream(hazards).sum();
             double[] normalizedHazards = hazards;
             for (int i = 0; i <= hazards.length - 1; i++) {
                 normalizedHazards[i] = normalizedHazards[i] / hazardSum;
-
             }
 
             Double minTime = Randomizer.nextExponential(hazardSum);

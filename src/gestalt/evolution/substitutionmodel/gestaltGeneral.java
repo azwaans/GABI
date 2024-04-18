@@ -51,21 +51,25 @@ public class gestaltGeneral extends SubstitutionModel.Base {
             "Rates at which each target is cut in the barcode",
             new ArrayList<>());
     final public Input<RealParameter> doubleCutWeightInput = new Input<>("doubleCutWeight",
-            "Rate, at which editing regions are lost", new RealParameter("0.3"));
+            "Rate at which editing regions are lost (weigth)", new RealParameter("0.3"));
+
+    final public Input<List<RealParameter>> longTrimFactorsInput = new Input<>("longTrimScalingFactors",
+            "Scaling factor to get the rate at which long deletions left and right of the cut sites", new ArrayList<>());
 
     //indel parameters input
-    final public Input<List<RealParameter>> longTrimFactorsInput = new Input<>("longTrimScalingFactors",
-            "Scaling factor for long deletions left and right of the cut sites", new ArrayList<>());
+    //probability of zero deletions
     final public Input<List<RealParameter>> trimZeroProbsInput = new Input<>("trimZeroProbs",
             "Probablilties of a length zero deletion for indel types: focal-left, intertarget-left, focal right, intertarget-right", new ArrayList<>());
-    final public Input<List<RealParameter>> trimShortParamsInput = new Input<>("trimShortParams",
-            "Means for the short deletion length distribution, left and right of the cut (poisson)", new ArrayList<>());
-    final public Input<List<RealParameter>> trimLongParamsInput = new Input<>("trimLongParams",
-            "Means for the long deletion length distribution, left and right of the cut (poisson)", new ArrayList<>());
-    final public Input<List<RealParameter>> insertParamsInput = new Input<>("insertParams",
-            "Mean for the insert length distribution (poisson)", new ArrayList<>());
     final public Input<RealParameter> insertZeroProbInput = new Input<>("insertZeroProb",
             "Length zero insertion probability", new RealParameter("0.5"));
+    //Log(means) for the distributions on the short deletions lengths left and right of the cut
+    final public Input<List<RealParameter>> trimShortParamsInput = new Input<>("trimShortParams",
+            "Log(Mean) x2 for the short deletion length distribution, left and right of the cut (poisson)", new ArrayList<>());
+    //Log(means) for the distributions on the short deletions lengths left and right of the cut
+    final public Input<List<RealParameter>> trimLongParamsInput = new Input<>("trimLongParams",
+            "Log(Mean) x2 for the long deletion length distribution, left and right of the cut (poisson)", new ArrayList<>());
+    final public Input<List<RealParameter>> insertParamsInput = new Input<>("insertParams",
+            "Log(Mean) for the insert length distribution (poisson)", new ArrayList<>());
 
     //penalization parameters input
     public Input<Double> branchPenParamInput = new Input<>("branchPenParam",
@@ -73,58 +77,40 @@ public class gestaltGeneral extends SubstitutionModel.Base {
     public Input<Double> targetLamPenParamInput = new Input<>("cutRatePenParam",
             "Penalty parameter for target cut rates", 0.01);
 
-
     //processed metadata
     static Integer numTargets;
     public BarcodeMeta metaData;
 
-    //target cut parameters
-    //public Double[] cutRates = {1.09459452, 1.03371947, 1.02624685};
+    //target cut type parameters
     public List<RealParameter> cutRates;
-
-    //public Double doubleCutWeight = 0.03;
     public RealParameter doubleCutWeight;
-
-    //toy example clt_calc: public Double doubleCutWeight = 0.3;
-    //tune_topology: public Double doubleCutWeight = 0.1;
-
-    //indel parameters
-    //public Double[] longTrimFactors = {0.04,0.04};
     public List<RealParameter> longTrimFactors;
 
-    //public Double[] trimZeroProbs = {0.5,0.5,0.5,0.5};
+    //indel parameters
     public List<RealParameter> trimZeroProbs;
-
-    //public Double[] trimShortParams = {3.0,3.0};
     public List<RealParameter> trimShortParams;
-
-    //public Double[] trimLongParams = {3.0,3.0};
     public List<RealParameter> trimLongParams;
-
-    //Double insertZeroProb = 0.5;
     public RealParameter insertZeroProb;
-
-
-    //Double[] insertParams = {2.0};
     public List<RealParameter> insertParams;
 
-    //toy example clt_calc: Double[] insertParams = {2.0};
-    //tune_topology: Double[] insertParams = {1.0};
+    //reshaped trimzero probabilities
+    public DoubleMatrix trimZeroProbsDict = DoubleMatrix.zeros(2, 2);
+
+    //choice of distribution for indel lengths
     boolean usePoisson = true;
 
     //penalty parameters
     public Double cutRatesPenalty = 0.0;
     public Double branchLensPenalty = 0.0;
 
-
-    public Hashtable<TargetStatus, Double> hazardAwayDict;
-    static Hashtable<IndelSet.Singleton, Integer> singletonIndexDict = new Hashtable<>();
-
-
-    public DoubleMatrix trimZeroProbsDict = DoubleMatrix.zeros(2, 2);
+    //indel distributions
     public Poisson insertDist;
     public List<AbstractDiscreteDistribution> delShortDist;
     public List<AbstractDiscreteDistribution> delLongDist;
+
+    //parameterised event probabilities
+    public Hashtable<TargetStatus, Double> hazardAwayDict;
+    static Hashtable<IndelSet.Singleton, Integer> singletonIndexDict = new Hashtable<>();
 
     //conditional probabilities of the trims, this needs to be updated for each move involving parameter changes
     static DoubleMatrix singletonCondProb;
@@ -140,7 +126,6 @@ public class gestaltGeneral extends SubstitutionModel.Base {
     //this is to store hazards to potentially avoid recalculation
     public Hashtable<TargetStatus, Hashtable<TargetStatus, DoubleMatrix>> targStatTransitionHazardsDict;
 
-
     @Override
     public void initAndValidate() {
 
@@ -150,73 +135,61 @@ public class gestaltGeneral extends SubstitutionModel.Base {
         crucial[0] = crucialPosInput.get().getValue(0);
         crucial[1] = crucialPosInput.get().getValue(1);
         metaData = new BarcodeMeta(Arrays.asList(barcodeSplit), cutSiteInput.get(), crucial, maxSumStepsInput.get(), maxExtraStepsInput.get());
+        //toDo check why this needs to be in both metadata and here
         numTargets = metaData.nTargets;
 
         //target cut parameters
-        //cutRates = cutRatesInput.get().get(0);
         cutRates = cutRatesInput.get();
-        Log.info.println("cutRates" + cutRates);
-
-        //doubleCutWeight = doubleCutWeightInput.get().getValue();
         doubleCutWeight = doubleCutWeightInput.get();
-        Log.info.println("doubleCutWeight" + doubleCutWeight);
-
-        //indel parameters
-        //longTrimFactors = longTrimFactorsInput.get().get(0).getValues();
         longTrimFactors = longTrimFactorsInput.get();
-        Log.info.println("long trim factors" + longTrimFactors);
 
-        //insertZeroProb = insertZeroProbInput.get().getValue();
+        //parameters controlling indel lengths
         insertZeroProb = insertZeroProbInput.get();
-
-        //trimZeroProbs = trimZeroProbsInput.get().get(0).getValues();
         trimZeroProbs = trimZeroProbsInput.get();
-
-        //trimShortParams = trimShortParamsInput.get().get(0).getValues();
         trimShortParams = trimShortParamsInput.get();
-
-        //trimLongParams = trimLongParamsInput.get().get(0).getValues();
         trimLongParams = trimLongParamsInput.get();
-
-        //insertParams = insertParamsInput.get().get(0).getValues();
         insertParams = insertParamsInput.get();
 
         //penalization parameters
         branchLensPenalty = branchPenParamInput.get();
         cutRatesPenalty = targetLamPenParamInput.get();
 
-
+        //simple checks:
         for (int i = 0; i < cutRates.size(); i++) {
 
-            if (cutRates.get(i).getValue() <= 0) {
+            if (cutRates.get(i).getValue() < 0) {
                 throw new RuntimeException("All cut rates must be positive!");
             }
-
-        }
-
-
-        for (int i = 0; i < longTrimFactors.size(); i++) {
-
-            if (longTrimFactors.get(i).getValue() > 1 || longTrimFactors.get(i).getValue() < 0) {
-                throw new RuntimeException("long trim factors are assumed to be less than 1");
-            }
-
         }
         if (doubleCutWeight.getValue() < 0) {
             throw new RuntimeException("Double cut weight must be positive!");
+        }
+
+        for (int i = 0; i < longTrimFactors.size(); i++) {
+            if (longTrimFactors.get(i).getValue() < 0) {
+                throw new RuntimeException("long trim factors must be positive!");
+            }
+        }
+        for (int i = 0; i < trimZeroProbs.size(); i++) {
+            if ((trimZeroProbs.get(i).getValue() >= 1) || (trimZeroProbs.get(i).getValue() <= 0)) {
+                throw new RuntimeException("The probability of deleting no sequence must be >=0 and <=1!");
+            }
+
+        }
+        if ((insertZeroProb.getValue() >= 1) || (insertZeroProb.getValue() <= 0)) {
+            throw new RuntimeException("The probability of inserting no sequence must be >=0 and <=1!");
         }
 
         if (metaData.nTargets <= 0) {
             throw new RuntimeException("Empty barcodes are impossible, number of targets must be positive!");
         }
 
-
+        //initialise reparameterised event probabilities
         targStatTransitionsDict = TargetStatus.getAllTransitions(numTargets);
         Pair<DoubleMatrix, Hashtable<IndelSet.TargetTract, Integer>> doubleMatrixHashtablePair = createAllTargetTractHazards();
 
         targetTractHazards = doubleMatrixHashtablePair.getFirst();
         targetTractDict = doubleMatrixHashtablePair.getSecond();
-
 
         targStatTransitionHazardsDict = new Hashtable<>();
 
@@ -224,9 +197,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
             Hashtable<TargetStatus, DoubleMatrix> empty = new Hashtable<>();
             targStatTransitionHazardsDict.put(stat, empty);
         }
-
         createTrimInsertDistributions(10);
-
     }
 
 
@@ -345,7 +316,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
 
         }
 
-        //exit log space
+        //exit log scale
         expi(hazard);
         return hazard;
 
@@ -666,8 +637,6 @@ public class gestaltGeneral extends SubstitutionModel.Base {
         createTrimInsertDistributions(singletons.size());
 
         singletonCondProb = expi(createLogIndelProbs(singletons));
-        //Log.info.println("singletonCondProb" + singletonCondProb);
-
 
     }
 
@@ -676,24 +645,27 @@ public class gestaltGeneral extends SubstitutionModel.Base {
      */
 
     public void createTrimInsertDistributions(int numSingletons) {
+
         DoubleMatrix trimLongParamReshaped = new DoubleMatrix(2, 1);
-//        trimLongParams_reshaped.put(0,trimLongParams[0]);
-//        trimLongParams_reshaped.put(1,trimLongParams[1]);
+        //left log(mean)
         trimLongParamReshaped.put(0, trimLongParams.get(0).getValue(0));
+        //right log(mean)
         trimLongParamReshaped.put(1, trimLongParams.get(0).getValue(1));
 
-        DoubleMatrix trimShortParams_reshaped = new DoubleMatrix(2, 1);
-//        trimShortParams_reshaped.put(0,trimShortParams[0]);
-//        trimShortParams_reshaped.put(1,trimShortParams[1]);
-        trimShortParams_reshaped.put(0, trimShortParams.get(0).getValue(0));
-        trimShortParams_reshaped.put(1, trimShortParams.get(0).getValue(1));
-        //reshaping must be done here
-        delShortDist = makeDelDist(trimShortParams_reshaped, 2, usePoisson);
-        delLongDist = makeDelDist(trimLongParamReshaped, 2, true);
-        if (usePoisson) {
+        DoubleMatrix trimShortParamsReshaped = new DoubleMatrix(2, 1);
+        //left log(mean)
+        trimShortParamsReshaped.put(0, trimShortParams.get(0).getValue(0));
+        //right log(mean)
+        trimShortParamsReshaped.put(1, trimShortParams.get(0).getValue(1));
 
+
+        delShortDist = makeDelDist(trimShortParamsReshaped, 2, usePoisson);
+        delLongDist = makeDelDist(trimLongParamReshaped, 2, usePoisson);
+        if (usePoisson) {
             insertDist = new Poisson(exp(insertParams.get(0).getValue(0)), RandomEngine.makeDefault());
         }
+
+        //in original ML implementation, the option of having Negative Binomial distributions for insert lengths was available
        /*else {
 
             insertDist = new NegativeBinomial(insertParams[1].intValue(),exp(insertParams[0]),RandomEngine.makeDefault());
@@ -743,17 +715,12 @@ public class gestaltGeneral extends SubstitutionModel.Base {
             DoubleMatrix leftDelProb = createLeftDelProbs(singletons);
             DoubleMatrix rightDelProb = createRightDelProbs(singletons);
             DoubleMatrix insertProb = createInsertProbs(singletons);
-            //Log.info.println("insertProb" + insertProb);
-            //Log.info.println("rightDelProb" + rightDelProb);
-            //Log.info.println("leftDelProb" + leftDelProb);
+
             //combine everything
             DoubleMatrix allLogProbs = (logi(leftDelProb)).addi(logi(rightDelProb)).addi(logi(insertProb));
 
-            //Log.info.println("allLogProbs" + allLogProbs);
-
-            //SOMETHING TO INITIALIZE
+            //initialise normalization
             Double logShortFocalNormalization = log(1 - (trimZeroProbsDict.get(0, 0) * trimZeroProbsDict.get(1, 0) * insertZeroProb.getValue()));
-            //Log.info.println("logShortFocalNormalization" + logShortFocalNormalization);
 
             boolean[] isLongIndel = new boolean[singletons.size()];
             for (int i = 0; i < singletons.size(); i++) {
@@ -833,7 +800,6 @@ public class gestaltGeneral extends SubstitutionModel.Base {
         }
         DoubleMatrix leftTrimLens = minTargetSites.subi(startpos);
 
-
         return createDelProbs(leftTrimLens, isLeftLongs, isIntertargets, leftTrimLongMin, leftTrimLongMax, false);
 
 
@@ -865,19 +831,9 @@ public class gestaltGeneral extends SubstitutionModel.Base {
             rightTrimLongMin.put(i, metaData.rightLongTrimMin.get(maxTargets.get(i)));
             rightTrimLongMax.put(i, metaData.rightMaxTrim.get(maxTargets.get(i)));
         }
-        //CAREFUL HERE!
+        //todo check that the lengths add up correctly
         DoubleMatrix rightTrimLen = endpos.subi(maxTargetSites);
-
-
-       /* max_target_sites = tf.constant([self.bcode_meta.abs_cut_sites[mt] for mt in max_targets], dtype=tf.float64)
-        right_trim_len = del_ends - max_target_sites
-
-        right_trim_long_min = tf.constant([self.bcode_meta.right_long_trim_min[mt] for mt in max_targets], dtype=tf.float64)
-        right_trim_long_max = tf.constant([self.bcode_meta.right_max_trim[mt] for mt in max_targets], dtype=tf.float64)*/
-
         return createDelProbs(rightTrimLen, isRightLongs, isIntertargets, rightTrimLongMin, rightTrimLongMax, true);
-
-
     }
 
 
@@ -898,13 +854,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
             }
         }
 
-/*
-
-        del_short_dist = self.del_short_dist[is_right]
-        short_nonzero_prob = (1 - trim_zero_prob) * del_short_dist.prob(tf.maximum(trim_len - 1, 0))/del_short_dist.cdf(trim_maxs - 1)
-*/
-
-        Poisson delShortD = (Poisson) delShortDist.get(0);
+        Poisson delShortD = (Poisson) delShortDist.get(esRight);
         DoubleMatrix shortNonZeroProb = new DoubleMatrix(trimZeroProbs.length);
         length = trimZeroProbs.length;
         for (int i = 0; i < length; i++) {
@@ -912,8 +862,6 @@ public class gestaltGeneral extends SubstitutionModel.Base {
             int cdfInput = (int) trimMaxs.get(i) - 1;
             shortNonZeroProb.put(i, (1 - trimZeroProbs.get(i)) * delShortD.pdf(pdfInput) / (delShortD.cdf(cdfInput)));
         }
-        //(1- trimZeroProbs.get(i))* delShortD.pdf(pdfInput)/(delShortD.cdf(cdfInput))
-
 
         Poisson delLongD = (Poisson) delLongDist.get(esRight);
         DoubleMatrix LongProb = new DoubleMatrix(trimZeroProbs.length);

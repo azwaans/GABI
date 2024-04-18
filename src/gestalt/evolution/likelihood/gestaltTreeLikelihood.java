@@ -20,6 +20,7 @@ import gestalt.evolution.alignment.IndelSet;
 import gestalt.evolution.alignment.TargetStatus;
 import gestalt.evolution.alignment.TransitionWrap;
 import gestalt.evolution.substitutionmodel.gestaltGeneral;
+import org.apache.commons.math3.util.Pair;
 import org.jblas.DoubleMatrix;
 
 import java.util.*;
@@ -106,14 +107,12 @@ public class gestaltTreeLikelihood extends Distribution {
         m_branchLengths = new double[nodeCount];
         storedBranchLengths = new double[nodeCount];
 
-        //CHANGE BLOCK
         likelihoodCore = new gestaltLikelihoodCore();
         initCore();
 
 
     }
 
-    //CHANGE BLOCK
     protected void initCore() {
         final int nodeCount = treeInput.get().getNodeCount();
         likelihoodCore.init(nodeCount);
@@ -127,9 +126,7 @@ public class gestaltTreeLikelihood extends Distribution {
     }
 
     public double calculateLogP() {
-
         final TreeInterface tree = treeInput.get();
-        //Log.info.println(tree.toString());
         //recording time
         long start1 = System.nanoTime();
         hasDirt=Tree.IS_FILTHY;
@@ -138,11 +135,10 @@ public class gestaltTreeLikelihood extends Distribution {
 
         //if the tree has changed, update everything
         //todo make this a traversal/part of the traversal
-        if (tree.somethingIsDirty() || likelihoodCore.transitionWraps == null) {
+        if ( likelihoodCore.transitionWraps == null || isSomeNodeIsFilthy()) {
 
             //finds the set of likely ancestral states at each internal node based on leaf sequences
             Hashtable<Integer, AncStates> statesDict = TransitionWrap.createStatesDict(tree, dataInput.get(), substitutionModel.metaData.posSites, substitutionModel.metaData.nTargets);
-
             //extract all single indel events from the possible ancestral states to compute conditional probabilities
             singletonList = substitutionModel.getAllSingletons(tree, statesDict);
 
@@ -150,6 +146,13 @@ public class gestaltTreeLikelihood extends Distribution {
             likelihoodCore.transitionWraps = TransitionWrap.createTransitionWraps(tree, substitutionModel.metaData, statesDict);
 
             substitutionModel.initSingletonProbs(singletonList);
+
+
+            Pair<DoubleMatrix, Hashtable<IndelSet.TargetTract, Integer>> doubleMatrixHashtablePair = substitutionModel.createAllTargetTractHazards();
+
+           substitutionModel.targetTractHazards = doubleMatrixHashtablePair.getFirst();
+           substitutionModel.targetTractDict = doubleMatrixHashtablePair.getSecond();
+
 
             //update target status rates: this depends only on mutation parameters
             substitutionModel.hazardAwayDict = substitutionModel.createHazardAwayDict();
@@ -164,12 +167,20 @@ public class gestaltTreeLikelihood extends Distribution {
         }
 
        //update combined parameters of the substitution model. This should only happen if a parameter of substitutionModel changes
+
         else if (m_siteModel.isDirtyCalculation()) {
+            //todo refine when things are updated: eg: when singletonCond is not same as when hazards need to be updated!!
 
             substitutionModel.initSingletonProbs(singletonList);
 
             //update target status rates: this depends only on mutation parameters
             substitutionModel.hazardAwayDict = substitutionModel.createHazardAwayDict();
+
+            //update target tract rates: this depends only on mutation parameters
+            Pair<DoubleMatrix, Hashtable<IndelSet.TargetTract, Integer>> doubleMatrixHashtablePair = substitutionModel.createAllTargetTractHazards();
+
+            substitutionModel.targetTractHazards = doubleMatrixHashtablePair.getFirst();
+            substitutionModel.targetTractDict = doubleMatrixHashtablePair.getSecond();
 
             //empty targStatTransitionHazardsDict
             substitutionModel.targStatTransitionHazardsDict = new Hashtable<>();
@@ -270,11 +281,11 @@ public class gestaltTreeLikelihood extends Distribution {
         //get the likelihood from the root partial
         int rootIndex = tree.getRoot().getNr();
         DoubleMatrix logLikAlleles = logi(likelihoodCore.getNodePartials(rootIndex)).addi(fullScaling);
-        //Log.info.println("LOG LIKELIHOOD ALLELES"+logLikAlleles.get(0));
         logP = logLikAlleles.get(0);
 
     }
 
+//penalization factors from Feng et al. Not used
 
 //    protected double penalization() {
 //
@@ -325,6 +336,18 @@ public class gestaltTreeLikelihood extends Distribution {
         }
         return treeInput.get().somethingIsDirty();
     }
+
+    public boolean isSomeNodeIsFilthy(){
+        Node[] nodes = treeInput.get().getNodesAsArray();
+        boolean isFilthy = false;
+        for(Node node : nodes){
+            if(node.isDirty() == Tree.IS_FILTHY) {
+                isFilthy = true;
+            }
+        }
+        return isFilthy;
+    }
+
 
 
 }
