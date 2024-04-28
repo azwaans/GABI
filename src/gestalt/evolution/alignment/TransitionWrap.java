@@ -247,7 +247,7 @@ public class TransitionWrap extends BEASTObject {
             List<IndelSet.TargetTract> innerinitNull = new ArrayList<>();
             initNull.add(innerinitNull);
             TransitionWrap temp = new TransitionWrap(initNull, statesDict.get(node.getNr()), node.isLeaf());
-            wrapDict.put(node.getNr(), temp);
+            wrapDict.put(node.getNr() +1, temp);
         }
         //dictionary of all singleton states (not node assigned)
         Hashtable<Integer, List<IndelSet.Singleton>> parsimDict = new Hashtable<>();
@@ -260,7 +260,7 @@ public class TransitionWrap extends BEASTObject {
         for (int reverseIt = preorderList.size() - 1; reverseIt >= 0; reverseIt--) {
             Node parentNode = preorderList.get(reverseIt);
 
-            List<List<IndelSet.TargetTract>> parentNodeTuples = wrapDict.get(parentNode.getNr()).targetTractsTuples;
+            List<List<IndelSet.TargetTract>> parentNodeTuples = wrapDict.get(parentNode.getNr() +1 ).targetTractsTuples;
             List<List<IndelSet.TargetTract>> filteredtargetTractsTupless = parentNodeTuples;
 
             for (Node childNode : parentNode.getChildren()) {
@@ -281,7 +281,7 @@ public class TransitionWrap extends BEASTObject {
                 List<TargetStatus> cleanTTUPLES = finalWrap.transStatuses;
                 Collections.reverse(cleanTTUPLES);
                 finalWrap.transStatuses = cleanTTUPLES;
-                wrapDict.put(childNode.getNr(), finalWrap);
+                wrapDict.put(childNode.getNr() +1, finalWrap);
 
             }
         }

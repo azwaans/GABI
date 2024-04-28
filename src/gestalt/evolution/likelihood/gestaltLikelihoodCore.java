@@ -1,15 +1,16 @@
 package gestalt.evolution.likelihood;
 
 
+import beast.base.core.Log;
 import beast.base.evolution.likelihood.LikelihoodCore;
 import beast.base.evolution.tree.Node;
-import gestalt.evolution.alignment.TargetStatus;
-import gestalt.evolution.alignment.TransitionWrap;
+import gestalt.evolution.alignment.*;
 import gestalt.evolution.substitutionmodel.gestaltGeneral;
 import org.jblas.DoubleMatrix;
 
-import java.util.Hashtable;
+import java.util.*;
 
+import static gestalt.evolution.alignment.TransitionWrap.getCloseTransitionWrap;
 import static java.lang.Math.max;
 import static org.jblas.DoubleMatrix.ones;
 import static org.jblas.DoubleMatrix.zeros;
@@ -23,17 +24,25 @@ public class gestaltLikelihoodCore extends LikelihoodCore {
     protected int nrOfNodes;
 
     protected Hashtable<Integer, TransitionWrap> transitionWraps;
+    protected Hashtable<Integer, TransitionWrap> storedtransitionWraps;
 
     protected Hashtable<Integer, DoubleMatrix> ptMat;
     protected Hashtable<Integer, DoubleMatrix> partials;
     protected Hashtable<Integer, Double> logScalingTerms;
 
+    protected int currentWrapIndex;
+    protected int storedWrapIndex;
 
     protected int[] currentMatrixIndex;
     protected int[] storedMatrixIndex;
 
     protected int[] currentPartialsIndex;
     protected int[] storedPartialsIndex;
+
+    protected int[] currentScalingTermsIndex;
+    protected int[] storedScalingTermsIndex;
+
+
 
 
     public gestaltLikelihoodCore() {
@@ -52,6 +61,11 @@ public class gestaltLikelihoodCore extends LikelihoodCore {
 
         currentPartialsIndex = new int[nodeCount];
         storedPartialsIndex = new int[nodeCount];
+
+        currentScalingTermsIndex = new int[nodeCount];
+        storedScalingTermsIndex = new int[nodeCount];
+
+
     }
 
 
@@ -95,12 +109,19 @@ public class gestaltLikelihoodCore extends LikelihoodCore {
         this.partials = new Hashtable<>();
         this.ptMat = new Hashtable<>();
         this.logScalingTerms = new Hashtable<>();
+        this.transitionWraps = null;
 
         currentMatrixIndex = new int[nodeCount];
         storedMatrixIndex = new int[nodeCount];
 
         currentPartialsIndex = new int[nodeCount];
         storedPartialsIndex = new int[nodeCount];
+
+        currentScalingTermsIndex = new int[nodeCount];
+        storedScalingTermsIndex = new int[nodeCount];
+
+        currentWrapIndex = 0;
+        storedWrapIndex = 0;
 
     }
 
@@ -121,6 +142,12 @@ public class gestaltLikelihoodCore extends LikelihoodCore {
 
         currentMatrixIndex = null;
         storedMatrixIndex = null;
+
+        currentWrapIndex = 0;
+        storedWrapIndex = 0;
+
+        currentScalingTermsIndex = null;
+        storedScalingTermsIndex = null;
 
         partials = null;
         ptMat = null;
@@ -152,29 +179,44 @@ public class gestaltLikelihoodCore extends LikelihoodCore {
      * set leaf partials in likelihood core *
      */
     protected void setLeafPartials(Node node) {
-
-
-        TransitionWrap nodeWrap = transitionWraps.get(node.getNr());
+        TransitionWrap nodeWrap = transitionWraps.get(node.getNr() +1);
         DoubleMatrix leafPartials = zeros(nodeWrap.numStatuses + 1, 1);
         Integer observedStateKey = nodeWrap.statusMap.get(nodeWrap.leafState);
         leafPartials.put(observedStateKey, 1.0);
-        setNodePartials(node.getNr(), leafPartials);
+        partials.put(makeCachingIndexPartials(node.getNr()) , leafPartials);
     }
-
-
-    @Override
-    public void setNodeMatrixForUpdate(int nodeIndex) {
-        currentMatrixIndex[nodeIndex] = 1 - currentMatrixIndex[nodeIndex];
-    }
-
 
     public void setNodePartials(int nodeIndex, DoubleMatrix partial) {
-        partials.put(nodeIndex + currentPartialsIndex[nodeIndex] * nodeIndex, partial);
+        partials.put(makeCachingIndexPartials(nodeIndex) , partial);
     }
 
-
+    public void setScalingTerm(int nodeIndex, Double ScalingTerm) {
+        logScalingTerms.put(makeCachingIndexScalingTerm(nodeIndex) , ScalingTerm);
+    }
     public void setNodeMatrix(int nodeIndex, DoubleMatrix Mat) {
-        ptMat.put(nodeIndex + currentPartialsIndex[nodeIndex] * nodeIndex, Mat);
+        ptMat.put(makeCachingIndexMatrix(nodeIndex), Mat);
+    }
+
+    //todo find a more elegant way of unambiguously caching all values
+    int makeCachingIndexMatrix(int nodeIndex) {
+        int node = nodeIndex + 1;
+        String forHashing = node + "" +  currentMatrixIndex[nodeIndex] + ""+ node;
+        return forHashing.hashCode();
+
+    }
+
+    int makeCachingIndexScalingTerm(int nodeIndex) {
+        int node = nodeIndex + 1;
+        String forHashing = node + "" +  currentScalingTermsIndex[nodeIndex] + ""+ node;
+        return forHashing.hashCode();
+
+    }
+
+    int makeCachingIndexPartials(int nodeIndex) {
+        int node = nodeIndex + 1;
+        String forHashing = node + "" +  currentPartialsIndex[nodeIndex] + ""+ node;
+        return forHashing.hashCode();
+
     }
 
 
@@ -193,6 +235,15 @@ public class gestaltLikelihoodCore extends LikelihoodCore {
     @Override
     public void setNodePartialsForUpdate(int nodeIndex) {
         currentPartialsIndex[nodeIndex] = 1 - currentPartialsIndex[nodeIndex];
+    }
+
+    @Override
+    public void setNodeMatrixForUpdate(int nodeIndex) {
+        currentMatrixIndex[nodeIndex] = 1 - currentMatrixIndex[nodeIndex];
+    }
+
+    public void setLogScalingTermsForUpdate(int nodeIndex) {
+        currentScalingTermsIndex[nodeIndex] = 1 - currentScalingTermsIndex[nodeIndex];
     }
 
 
@@ -218,19 +269,21 @@ public class gestaltLikelihoodCore extends LikelihoodCore {
 
         //here, combine child 1 + child 2 partial
         for (Node child : node.getChildren()) {
+
             int childNum = child.getNr();
-            TransitionWrap childNodeWrap = transitionWraps.get(childNum);
-            DoubleMatrix Mat = ptMat.get(childNum + currentMatrixIndex[childNum] * childNum);
+            TransitionWrap childNodeWrap = transitionWraps.get((childNum + 1));
+            DoubleMatrix Mat = ptMat.get(makeCachingIndexMatrix(childNum));
+
             //Get the probability for the data descended from the child node, assuming that the node
             //has a particular target tract repr.
             //These down probs are ordered according to the child node's numbering of the TTs states
-            DoubleMatrix chOrderedDownProbs = Mat.mmul(partials.get(childNum + currentPartialsIndex[childNum] * childNum));
+            DoubleMatrix chOrderedDownProbs = Mat.mmul(partials.get(makeCachingIndexPartials(childNum)));
             DoubleMatrix downProbs = new DoubleMatrix();
 
             if (!node.isRoot()) {
 
                 // Reorder summands according to node's numbering of tract_repr states
-                downProbs = gestaltGeneral.reorderLikelihoods(chOrderedDownProbs, transitionWraps.get(node.getNr()), childNodeWrap);
+                downProbs = gestaltGeneral.reorderLikelihoods(chOrderedDownProbs, transitionWraps.get(node.getNr() + 1), childNodeWrap);
 
             }
 
@@ -249,13 +302,75 @@ public class gestaltLikelihoodCore extends LikelihoodCore {
             //Double leafAbundanceWeight = 1.0;
             hasPosProb = downProbs.ge(0);
 
-
             //protection against states with zero probability.
             nodeLogPartials = nodeLogPartials.addi(logi(downProbs.addi((hasPosProb.neg()).add(1).mul(1e-30))));
+
+
         }
         Double logScalingTerm = nodeLogPartials.max();
-        logScalingTerms.put(node.getNr(), logScalingTerm);
+        setLogScalingTermsForUpdate(node.getNr());
+        setScalingTerm(node.getNr(), logScalingTerm);
+
         return expi((nodeLogPartials.subi(logScalingTerm)).muli(hasPosProb));
+
+    }
+
+    /**
+     * Creates a transition wrap for all nodes in the tree
+     */
+
+    public Hashtable<Integer, TransitionWrap> createTransitionWraps(beast.base.evolution.tree.TreeInterface tree,
+                                      BarcodeMeta metaData,
+                                      Hashtable<Integer,
+                                              AncStates> statesDict) {
+
+        Hashtable<Integer, TransitionWrap> wrap = new Hashtable<>();
+
+        for (Node node : tree.listNodesPostOrder(null, null)) {
+            //creating an empty transition wrap, avoiding to use NULL as we need empty entries( not null)
+            List<List<IndelSet.TargetTract>> initNull = new ArrayList<>();
+            List<IndelSet.TargetTract> innerinitNull = new ArrayList<>();
+            initNull.add(innerinitNull);
+            TransitionWrap temp = new TransitionWrap(initNull, statesDict.get(node.getNr()), node.isLeaf());
+            wrap.put(node.getNr() + 1, temp);
+        }
+        //dictionary of all singleton states (not node assigned)
+        Hashtable<Integer, List<IndelSet.Singleton>> parsimDict = new Hashtable<>();
+        for (Integer key : statesDict.keySet()) {
+            parsimDict.put(key, statesDict.get(key).getSingletons());
+        }
+
+        //traverse the tree to fill up the dictionary of wraps
+        List<Node> preorderList = Arrays.asList(tree.listNodesPostOrder(null, null));
+        for (int reverseIt = preorderList.size() - 1; reverseIt >= 0; reverseIt--) {
+            Node parentNode = preorderList.get(reverseIt);
+
+            List<List<IndelSet.TargetTract>> parentNodeTuples = wrap.get((parentNode.getNr() + 1)).targetTractsTuples;
+            List<List<IndelSet.TargetTract>> filteredtargetTractsTupless = parentNodeTuples;
+
+            for (Node childNode : parentNode.getChildren()) {
+
+                TransitionWrap filterWrap = getCloseTransitionWrap(parentNode, childNode, statesDict, parsimDict, parentNodeTuples, metaData.maxSumSteps, metaData.maxExtraSteps, metaData.nTargets);
+                filteredtargetTractsTupless = IndelSet.TargetTract.intersect(filteredtargetTractsTupless, filterWrap.targetTractsTuples);
+                //removing duplicates
+                Set noDup = new LinkedHashSet();
+                noDup.addAll(filteredtargetTractsTupless);
+                filteredtargetTractsTupless.clear();
+                filteredtargetTractsTupless.addAll(noDup);
+
+            }
+
+            for (Node childNode : parentNode.getChildren()) {
+
+                TransitionWrap finalWrap = getCloseTransitionWrap(parentNode, childNode, statesDict, parsimDict, filteredtargetTractsTupless, metaData.maxSumSteps, metaData.maxExtraSteps, metaData.nTargets);
+                List<TargetStatus> cleanTTUPLES = finalWrap.transStatuses;
+                Collections.reverse(cleanTTUPLES);
+                finalWrap.transStatuses = cleanTTUPLES;
+                wrap.put((childNode.getNr() + 1) , finalWrap);
+
+            }
+        }
+        return wrap;
 
     }
 
@@ -265,7 +380,7 @@ public class gestaltLikelihoodCore extends LikelihoodCore {
      */
     @Override
     public void restore() {
-        // Rather than copying the stored stuff back, just swap the pointers...
+//        // Rather than copying the stored stuff back, just swap the pointers...
         int[] tmp1 = currentMatrixIndex;
         currentMatrixIndex = storedMatrixIndex;
         storedMatrixIndex = tmp1;
@@ -274,12 +389,20 @@ public class gestaltLikelihoodCore extends LikelihoodCore {
         currentPartialsIndex = storedPartialsIndex;
         storedPartialsIndex = tmp2;
 
+        int[] tmp3 = currentScalingTermsIndex;
+        currentScalingTermsIndex = storedScalingTermsIndex;
+        storedScalingTermsIndex = tmp3;
+
+        transitionWraps = new Hashtable<>(storedtransitionWraps);
+
     }
 
     @Override
     public void unstore() {
+        Log.info.println("UNSTORE");
         System.arraycopy(storedMatrixIndex, 0, currentMatrixIndex, 0, nrOfNodes);
         System.arraycopy(storedPartialsIndex, 0, currentPartialsIndex, 0, nrOfNodes);
+        System.arraycopy(storedScalingTermsIndex, 0, currentScalingTermsIndex, 0, nrOfNodes);
 
     }
 
@@ -290,10 +413,12 @@ public class gestaltLikelihoodCore extends LikelihoodCore {
     public void store() {
         System.arraycopy(currentMatrixIndex, 0, storedMatrixIndex, 0, nrOfNodes);
         System.arraycopy(currentPartialsIndex, 0, storedPartialsIndex, 0, nrOfNodes);
+        System.arraycopy(currentScalingTermsIndex, 0, storedScalingTermsIndex, 0, nrOfNodes);
+        storedtransitionWraps = new Hashtable<>(transitionWraps);
     }
 
     public DoubleMatrix getNodePartials(int nodeIndex) {
-        return partials.get(nodeIndex + currentPartialsIndex[nodeIndex] * nodeIndex);
+        return partials.get(makeCachingIndexPartials(nodeIndex));
     }
 
     @Override

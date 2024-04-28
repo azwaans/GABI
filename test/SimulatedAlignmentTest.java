@@ -109,7 +109,7 @@ public class SimulatedAlignmentTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         gestaltModel.initAndValidate();
-        gestaltModel.createTrimInsertDistributions(10);
+        gestaltModel.createTrimInsertDistributions();
         //initialise the site model with subst model
         SiteModel siteM = new SiteModel();
         RealParameter mutationRate = new RealParameter("100");
@@ -208,7 +208,7 @@ public class SimulatedAlignmentTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         gestaltModel.initAndValidate();
-        gestaltModel.createTrimInsertDistributions(10);
+        gestaltModel.createTrimInsertDistributions();
         //initialise the site model with subst model
         SiteModel siteM = new SiteModel();
         RealParameter mutationRate = new RealParameter("1.5");
@@ -345,7 +345,7 @@ public class SimulatedAlignmentTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         gestaltModel.initAndValidate();
-        gestaltModel.createTrimInsertDistributions(10);
+        gestaltModel.createTrimInsertDistributions();
         //initialise the site model with subst model
         SiteModel siteM = new SiteModel();
         RealParameter mutationRate = new RealParameter("10.0");
@@ -400,7 +400,7 @@ public class SimulatedAlignmentTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         gestaltModel.initAndValidate();
-        gestaltModel.createTrimInsertDistributions(10);
+        gestaltModel.createTrimInsertDistributions();
         //initialise the site model with subst model
         SiteModel siteM = new SiteModel();
         RealParameter mutationRate = new RealParameter("10.0");
@@ -457,7 +457,7 @@ public class SimulatedAlignmentTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         gestaltModel.initAndValidate();
-        gestaltModel.createTrimInsertDistributions(10);
+        gestaltModel.createTrimInsertDistributions();
         //initialise the site model with subst model
         SiteModel siteM = new SiteModel();
         RealParameter mutationRate = new RealParameter("10.0");
@@ -513,7 +513,7 @@ public class SimulatedAlignmentTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         gestaltModel.initAndValidate();
-        gestaltModel.createTrimInsertDistributions(10);
+        gestaltModel.createTrimInsertDistributions();
         //initialise the site model with subst model
         SiteModel siteM = new SiteModel();
         RealParameter mutationRate = new RealParameter("10.0");
@@ -569,7 +569,7 @@ public class SimulatedAlignmentTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         gestaltModel.initAndValidate();
-        gestaltModel.createTrimInsertDistributions(10);
+        gestaltModel.createTrimInsertDistributions();
         //initialise the site model with subst model
         SiteModel siteM = new SiteModel();
         RealParameter mutationRate = new RealParameter("10.0");
@@ -624,7 +624,7 @@ public class SimulatedAlignmentTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         gestaltModel.initAndValidate();
-        gestaltModel.createTrimInsertDistributions(10);
+        gestaltModel.createTrimInsertDistributions();
         //initialise the site model with subst model
         SiteModel siteM = new SiteModel();
         RealParameter mutationRate = new RealParameter("10.0");
@@ -674,7 +674,7 @@ public class SimulatedAlignmentTest {
                 "maxSumSteps", maxSumSteps, "maxExtraSteps", maxExtraSteps,"cutRates",cutRates,"longTrimScalingFactors",longTrimScaling,"doubleCutWeight",doubleCutWeight,"frequencies",frequencies,"insertZeroProb",insertZeroProb, "trimZeroProbs",trimZeroProbs,"trimShortParams",trimShortParams,"trimLongParams",trimLongParams,"insertParams",insertParams);
 
         gestaltModel.initAndValidate();
-        gestaltModel.createTrimInsertDistributions(10);
+        gestaltModel.createTrimInsertDistributions();
         //initialise the site model with subst model
         SiteModel siteM = new SiteModel();
         RealParameter mutationRate = new RealParameter("10.0");

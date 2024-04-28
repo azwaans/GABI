@@ -185,19 +185,21 @@ public class gestaltGeneral extends SubstitutionModel.Base {
         }
 
         //initialise reparameterised event probabilities
+
+        //this only needs to happen once
         targStatTransitionsDict = TargetStatus.getAllTransitions(numTargets);
-        Pair<DoubleMatrix, Hashtable<IndelSet.TargetTract, Integer>> doubleMatrixHashtablePair = createAllTargetTractHazards();
-
-        targetTractHazards = doubleMatrixHashtablePair.getFirst();
-        targetTractDict = doubleMatrixHashtablePair.getSecond();
-
-        targStatTransitionHazardsDict = new Hashtable<>();
-
-        for (TargetStatus stat : targStatTransitionsDict.keySet()) {
-            Hashtable<TargetStatus, DoubleMatrix> empty = new Hashtable<>();
-            targStatTransitionHazardsDict.put(stat, empty);
-        }
-        createTrimInsertDistributions(10);
+//        Pair<DoubleMatrix, Hashtable<IndelSet.TargetTract, Integer>> doubleMatrixHashtablePair = createAllTargetTractHazards();
+//
+//        targetTractHazards = doubleMatrixHashtablePair.getFirst();
+//        targetTractDict = doubleMatrixHashtablePair.getSecond();
+//
+//        targStatTransitionHazardsDict = new Hashtable<>();
+//
+//        for (TargetStatus stat : targStatTransitionsDict.keySet()) {
+//            Hashtable<TargetStatus, DoubleMatrix> empty = new Hashtable<>();
+//            targStatTransitionHazardsDict.put(stat, empty);
+//        }
+        //createTrimInsertDistributions(10);
     }
 
 
@@ -220,6 +222,8 @@ public class gestaltGeneral extends SubstitutionModel.Base {
      */
     public Pair<DoubleMatrix, Hashtable<IndelSet.TargetTract, Integer>> createAllTargetTractHazards() {
         TargetStatus targetStatusAllActive = new TargetStatus();
+
+        //this is done on a fully active target status, which means it is not tree dependent, but only dependent on mutation parameters
         List<IndelSet.TargetTract> allTargetTracts = targetStatusAllActive.getPossibleTargetTracts(new ArrayList<>(), metaData.nTargets);
         Hashtable<IndelSet.TargetTract, Integer> ttDict = new Hashtable<>();
         int size = allTargetTracts.size();
@@ -334,7 +338,6 @@ public class gestaltGeneral extends SubstitutionModel.Base {
 
         //Create the probability matrix exp(Qt)
         final double branchTime = branchLength * rate;
-        //Log.info.println("Clock rate"+branchRate);
         DoubleMatrix rateM = this.createRateMatrix(wrap);
         DoubleMatrix ptma = (expm(rateM.muli(branchTime)));
         return ptma;
@@ -634,8 +637,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
         for (int i = 0; i < singletons.size(); i++) {
             singletonIndexDict.put(singletons.get(i), i);
         }
-        createTrimInsertDistributions(singletons.size());
-
+        createTrimInsertDistributions();
         singletonCondProb = expi(createLogIndelProbs(singletons));
 
     }
@@ -644,7 +646,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
      * Creates the basic trim + insert helper distributions
      */
 
-    public void createTrimInsertDistributions(int numSingletons) {
+    public void createTrimInsertDistributions() {
 
         DoubleMatrix trimLongParamReshaped = new DoubleMatrix(2, 1);
         //left log(mean)
