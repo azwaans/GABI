@@ -1,7 +1,7 @@
-gestalt:  Phylogenetics using gestalt barcode data
+GABI - GESTALT Analysis using Bayesian Inference in BEAST2:
 ==================================
 
-This is an implementation/adaptation of the likelihood described in Feng et Al., 2021 10.1214/20-aoas1400. 
+In this repository, we develop a BEAST 2 package to estimate time-scaled lineage trees and cell population dynamics from GESTALT data, implementing the phylogenetic likelihood in [GAPML](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9387344/).
 
 
 Building from source
