@@ -12,11 +12,11 @@
                         :beast.base.evolution.sitemodel
                         :beast.base.evolution.substitutionmodel
                         :beast.base.evolution.likelihood
-                        :evolution.datatype.gestaltData'
+                        :gestalt.evolution.datatype.gestaltData'
     >
     <!-- dataType has to be set to gestaltData and the value must contain a ',' s.t. the class recognizes it as a comma separated string of integers-->
     <data  id="gestaltTest" spec="Alignment" name="alignment" >
-        <userDataType spec="beast.base.evolution.datatype.gestaltData"/>
+        <userDataType spec="gestalt.evolution.datatype.gestaltData"/>
         <sequence id="6" spec="Sequence" taxon="6"  value="38_1_0_0_TGGAGTCGAGAGCGCGCTCGTCGa,115_144_3_8_,271_11_9_9_a,None,None,None,"/>
         <sequence id="1" spec="Sequence" taxon="1"  value="37_2_0_0_ATaa,64_3_1_1_,114_14_3_3_,141_53_4_5_,197_4_6_6_a,244_34_8_8_,"/>
         <sequence id="2" spec="Sequence" taxon="2"  value="29_10_0_0_aaa,101_204_3_9_,None,None,None,None,"/>

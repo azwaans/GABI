@@ -278,7 +278,7 @@ public class AncStates extends BEASTObject {
         //create an ancestral state set for observed sequences at leaves
         //todo check if this split with ":" is necessary.
         String[] strings = sequenceInput.split(":");
-        List<String> event_strings = new LinkedList<String>(Arrays.asList(strings[0].split(",")));
+        List<String> event_strings = new LinkedList<String>(Arrays.asList(strings[1].split(",")));
         event_strings.removeAll(Collections.singleton("None"));
         //create a SGWC list.
         List<GestaltEvent> eventList = new ArrayList<>();
