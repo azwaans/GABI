@@ -3,7 +3,7 @@
 
     <mergewith point='substModelTemplates'>
         <!-- GAPML substitution model -->
-        <subtemplate id='generalGestalt' class='gestalt.evolution.substitutionmodel.gestaltGeneral' mainid='generalGestalt.s:$(n)'
+        <subtemplate id='GAPML' class='gestalt.evolution.substitutionmodel.gestaltGeneral' mainid='generalGestalt.s:$(n)'
                      suppressInputs='gestalt.evolution.substitutionmodel.gestaltGeneral.frequencies
                     '>
             <![CDATA[

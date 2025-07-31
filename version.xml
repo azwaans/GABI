@@ -21,14 +21,14 @@
         <provider classname="gestalt.evolution.likelihood.gestaltLikelihoodCore"/>
         <provider classname="gestalt.evolution.likelihood.gestaltTreeLikelihood"/>
         <provider classname="gestalt.evolution.substitutionmodel.gestaltGeneral"/>
-        <provider classname="gestalt.gestalt.util.NexusParser"/>
-        <provider classname="gestalt.gestalt.util.NexusImporter"/>
-        <provider classname="gestalt.gestalt.util.AlignmentFromFile"/>
-        <provider classname="gestalt.gestalt.util.AlignmentFromNexus"/>
+        <provider classname="gestalt.util.NexusParser"/>
+        <provider classname="gestalt.util.NexusImporter"/>
+        <provider classname="gestalt.util.AlignmentFromFile"/>
+        <provider classname="gestalt.util.AlignmentFromNexus"/>
 </service>
 
 <service type="beastfx.app.inputeditor.AlignmentImporter">
-<provider classname="gestalt.gestalt.util.NexusImporter"/>
+<provider classname="gestalt.util.NexusImporter"/>
 </service>
 
 </package>

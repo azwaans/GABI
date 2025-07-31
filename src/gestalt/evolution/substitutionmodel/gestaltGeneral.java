@@ -46,7 +46,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
     public Input<Integer> maxExtraStepsInput = new Input<>("maxExtraSteps",
             "Max steps past parsimony state taken");
     public Input<Boolean> processSequencesFormatGSM =
-            new Input<Boolean>("inputFormatGSM", "if true the input sequence is in GSM format that needs to be converted to events", false);
+            new Input<Boolean>("inputFormatGSM", "if true the input sequence is in GSM format that needs to be converted to events", true);
     public Input<Integer> mergeThreshold =
             new Input<Integer>("mergeThreshold", "When converting from GSM format, threshold (in bp) below which 2 edits are merged into one", 4);
     public Input<Integer> padLength =

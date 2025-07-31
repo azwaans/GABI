@@ -157,6 +157,7 @@
                                     longTrimScalingFactors="@longTrimScaling"
                                     doubleCutWeight="@doubleCutWeight"
                                     trimShortParams="@shortTrim"
+                                    inputFormatGSM="false"
 
 
                                     >

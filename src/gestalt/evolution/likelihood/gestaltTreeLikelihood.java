@@ -108,6 +108,7 @@ public class gestaltTreeLikelihood extends GenericTreeLikelihood {
         initCore();
 
         //if the input format is GSM, process the sequences
+
         if (substitutionModel.GSMformat) {
             try {
                 processedAlignment = processGSMAlignment(treeInput.get(), dataInput.get());
@@ -452,7 +453,12 @@ public class gestaltTreeLikelihood extends GenericTreeLikelihood {
     public Hashtable<Integer, String> processGSMAlignment(beast.base.evolution.tree.TreeInterface tree,
                                                           Alignment alinmt) throws IOException {
         Hashtable<Integer, String> processedAlignmentDict = new Hashtable<>();
-        Log.info.println("Processing GSM sequences: \n");
+        Log.info.println("\nConverting alignment from GSM to the GESTALT Event format \n");
+        Log.info.println("Conversion parameters :" );
+        Log.info.println("Merge threshold (bp) = " +  substitutionModel.mergingThreshold );
+        Log.info.println("Padding length (bp) = " +  substitutionModel.paddingLength );
+        Log.info.println("Start position offset (bp) = " +  substitutionModel.minPosition + "\n");
+
         for (Node node : tree.listNodesPostOrder(null, null)) {
 
             if (node.isLeaf()) {
@@ -462,8 +468,8 @@ public class gestaltTreeLikelihood extends GenericTreeLikelihood {
                 String leafSeqGABIformat = processSequence(leafSeqGSMformat);
                 String leafSeqWithTaxon = taxonAndLeafSeq[0] + ":" + leafSeqGABIformat;
                 Log.info.println("Taxon " + taxonAndLeafSeq[0]);
-                Log.info.println("Input sequence: " + leafSeqGSMformat);
-                Log.info.println("Processed sequence: " + leafSeqGABIformat);
+                Log.info.println("Input GSM sequence: " + leafSeqGSMformat);
+                Log.info.println("Processed sequence: " + leafSeqGABIformat + "\n");
 
                 processedAlignmentDict.put(node.getNr(), leafSeqWithTaxon);
             }
