@@ -94,20 +94,34 @@ public class GestaltEvent extends BEASTObject implements Comparable<GestaltEvent
         org.apache.commons.math3.util.Pair<Integer, Integer> MinMaxDeactTargets = new org.apache.commons.math3.util.Pair(minDeacTarg, maxDeacTarg);
         return MinMaxDeactTargets;
     }
-        /*if self.min_target > 0 and self.start_pos <= bcode_meta.pos_sites[self.min_target - 1][1]:
-        min_deact_target = self.min_target - 1
-        else:
-        min_deact_target = self.min_target
 
-        if self.max_target < bcode_meta.n_targets - 1 and bcode_meta.pos_sites[self.max_target + 1][0] < self.del_end:
-        max_deact_target = self.max_target + 1
-        else:
-        max_deact_target = self.max_target
+    public int getDelEnd() {
+        return delEnd;
+    }
 
-        assert min_deact_target is not None
-        assert max_deact_target is not None
-        return min_deact_target, max_deact_target
-*/
+    public int getDelLen() {
+        return delLen;
+    }
+
+    public int getMaxTarg() {
+        return maxTarg;
+    }
+
+    public int getMinTarg() {
+        return minTarg;
+    }
+
+    public String getInsSeq() {
+        return insSeq;
+    }
+
+    public int getStartPos() {
+        return startPos;
+    }
+
+    public String getString() {
+        return dataInput.get();
+    }
 
 
 }

@@ -20,7 +20,7 @@ public class BarcodeMeta extends BEASTObject {
     /**
      * unedited barcode sequence, as a list of target sequences. Positions are indexed starting from 0.
      */
-    protected List<String> uneditedBarcode;
+    public List<String> uneditedBarcode;
 
     /**
      * number of targets
@@ -74,6 +74,11 @@ public class BarcodeMeta extends BEASTObject {
      */
     public DoubleMatrix absCutSites;
 
+    /**
+     * length of the unedited barcode
+     */
+    public int origLength;
+
 
     /**
      * Range of positions for each target
@@ -101,6 +106,7 @@ public class BarcodeMeta extends BEASTObject {
             barcodeSubstringsLengths.add(str.length());
             origLength = origLength + str.length();
         }
+        this.origLength = (int) origLength;
         nTargets = Math.floorDiv(uneditedBarcode.size() - 1, 2);
 
         absCutSites = new DoubleMatrix(nTargets);

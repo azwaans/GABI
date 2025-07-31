@@ -5,7 +5,7 @@ import beast.base.core.Description;
 import beast.base.core.Input;
 import beast.base.core.Log;
 import beast.base.evolution.datatype.DataType;
-import beast.base.evolution.datatype.Nucleotide;
+import gestalt.evolution.datatype.gestaltData;
 import beast.base.evolution.substitutionmodel.EigenDecomposition;
 import beast.base.evolution.substitutionmodel.SubstitutionModel;
 import beast.base.evolution.tree.Node;
@@ -45,23 +45,33 @@ public class gestaltGeneral extends SubstitutionModel.Base {
             "Max total number of steps from the parsimony states on each branch allowed to be taken");
     public Input<Integer> maxExtraStepsInput = new Input<>("maxExtraSteps",
             "Max steps past parsimony state taken");
+    public Input<Boolean> processSequencesFormatGSM =
+            new Input<Boolean>("inputFormatGSM", "if true the input sequence is in GSM format that needs to be converted to events", false);
+    public Input<Integer> mergeThreshold =
+            new Input<Integer>("mergeThreshold", "When converting from GSM format, threshold (in bp) below which 2 edits are merged into one", 4);
+    public Input<Integer> padLength =
+            new Input<Integer>("padLength", "When converting from GSM format, amount of padding added to the unedited barcode to accommodate for long deletions ", 20);
+    public Input<Integer> minPos =
+            new Input<Integer>("minPosition", "When converting from GSM format, relative start position of the GESTALT barcode in sequenced reads", 122);
+
+
+    final public Input<RealParameter> doubleCutWeightInput = new Input<>("doubleCutWeight",
+            "Rate at which editing regions are lost (weight)", new RealParameter("0.3"));
+    //indel parameters input
+    //probability of zero deletions
+    final public Input<RealParameter> insertZeroProbInput = new Input<>("insertZeroProb",
+            "Length zero insertion probability", new RealParameter("0.5"));
+    final public Input<List<RealParameter>> trimZeroProbsInput = new Input<>("trimZeroProbs",
+            "Probablilties of a length zero deletion for indel types: focal-left, intertarget-left, focal right, intertarget-right", new ArrayList<>());
 
     //target cut parameters input
     final public Input<List<RealParameter>> cutRatesInput = new Input<>("cutRates",
             "Rates at which each target is cut in the barcode",
-            new ArrayList<>());
-    final public Input<RealParameter> doubleCutWeightInput = new Input<>("doubleCutWeight",
-            "Rate at which editing regions are lost (weigth)", new RealParameter("0.3"));
-
+            new ArrayList<RealParameter>());
     final public Input<List<RealParameter>> longTrimFactorsInput = new Input<>("longTrimScalingFactors",
             "Scaling factor to get the rate at which long deletions left and right of the cut sites", new ArrayList<>());
 
-    //indel parameters input
-    //probability of zero deletions
-    final public Input<List<RealParameter>> trimZeroProbsInput = new Input<>("trimZeroProbs",
-            "Probablilties of a length zero deletion for indel types: focal-left, intertarget-left, focal right, intertarget-right", new ArrayList<>());
-    final public Input<RealParameter> insertZeroProbInput = new Input<>("insertZeroProb",
-            "Length zero insertion probability", new RealParameter("0.5"));
+
     //Log(means) for the distributions on the short deletions lengths left and right of the cut
     final public Input<List<RealParameter>> trimShortParamsInput = new Input<>("trimShortParams",
             "Log(Mean) x2 for the short deletion length distribution, left and right of the cut (poisson)", new ArrayList<>());
@@ -80,6 +90,10 @@ public class gestaltGeneral extends SubstitutionModel.Base {
     //processed metadata
     static Integer numTargets;
     public BarcodeMeta metaData;
+    public boolean GSMformat;
+    public int mergingThreshold;
+    public int minPosition;
+    public int paddingLength;
 
     //target cut type parameters
     public List<RealParameter> cutRates;
@@ -137,6 +151,10 @@ public class gestaltGeneral extends SubstitutionModel.Base {
         metaData = new BarcodeMeta(Arrays.asList(barcodeSplit), cutSiteInput.get(), crucial, maxSumStepsInput.get(), maxExtraStepsInput.get());
         //toDo check why this needs to be in both metadata and here
         numTargets = metaData.nTargets;
+        GSMformat = processSequencesFormatGSM.get();
+        paddingLength = padLength.get();
+        mergingThreshold = mergeThreshold.get();
+        minPosition = minPos.get();
 
         //target cut parameters
         cutRates = cutRatesInput.get();
@@ -352,7 +370,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
 
     @Override
     public boolean canHandleDataType(DataType dataType) {
-        return dataType instanceof Nucleotide;
+        return dataType instanceof gestaltData;
     }
 
 
@@ -699,7 +717,6 @@ public class gestaltGeneral extends SubstitutionModel.Base {
     }
 
 
-
     /**
      * Create the conditional probability of indels
      */
@@ -911,6 +928,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
         return hazardAwayDict;
 
     }
+
 
 }
 

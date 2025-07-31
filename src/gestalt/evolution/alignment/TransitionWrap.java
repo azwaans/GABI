@@ -4,6 +4,7 @@ import beast.base.core.BEASTObject;
 import beast.base.core.Log;
 import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.tree.Node;
+import gestalt.evolution.likelihood.gestaltTreeLikelihood;
 import org.apache.commons.math3.util.Pair;
 
 import java.util.*;
@@ -231,6 +232,46 @@ public class TransitionWrap extends BEASTObject {
     }
 
     /**
+     * in original implementation: annotate_ancestral_states
+     * finds all possible Ancestral States at internal nodes with the GSM converted
+     */
+    public static Hashtable<Integer, AncStates> createStatesDictGSM(beast.base.evolution.tree.TreeInterface tree,
+                                                                    Hashtable<Integer, String> alinmt,
+                                                                    List<Pair<Integer, Integer>> posSites,
+                                                                    int nTargets) {
+        Hashtable<Integer, AncStates> statesDict = new Hashtable<>();
+        for (Node node : tree.listNodesPostOrder(null, null)) {
+
+            if (node.isLeaf()) {
+                String leafSeq = alinmt.get(node.getNr());
+
+                AncStates leafState = AncStates.createObservedAlleleSet(leafSeq, posSites, nTargets);
+                statesDict.put(node.getNr(), leafState);
+
+                //create anc state set based on the observed allele
+            } else if (node.isRoot()) {
+                //root node: create an empty AncState, as the root has no ancestral states (unedited barcode)
+                statesDict.put(node.getNr(), new AncStates());
+
+            } else {
+                //it is an internal node. The node's ancestral state is the intersection of its children's ancestral states
+                List<Node> childrn = node.getChildren();
+                AncStates parntStat = statesDict.get((childrn.get(0)).getNr());
+                for (int i = 1; i < childrn.size(); i++) {
+                    AncStates otherChild = statesDict.get((childrn.get(i)).getNr());
+                    parntStat = AncStates.intersect(parntStat, otherChild);
+                }
+
+                statesDict.put(node.getNr(), parntStat);
+
+            }
+
+        }
+        return statesDict;
+    }
+
+
+    /**
      * Creates a transition wrap for all nodes in the tree
      */
 
@@ -247,7 +288,7 @@ public class TransitionWrap extends BEASTObject {
             List<IndelSet.TargetTract> innerinitNull = new ArrayList<>();
             initNull.add(innerinitNull);
             TransitionWrap temp = new TransitionWrap(initNull, statesDict.get(node.getNr()), node.isLeaf());
-            wrapDict.put(node.getNr() +1, temp);
+            wrapDict.put(node.getNr() + 1, temp);
         }
         //dictionary of all singleton states (not node assigned)
         Hashtable<Integer, List<IndelSet.Singleton>> parsimDict = new Hashtable<>();
@@ -260,7 +301,7 @@ public class TransitionWrap extends BEASTObject {
         for (int reverseIt = preorderList.size() - 1; reverseIt >= 0; reverseIt--) {
             Node parentNode = preorderList.get(reverseIt);
 
-            List<List<IndelSet.TargetTract>> parentNodeTuples = wrapDict.get(parentNode.getNr() +1 ).targetTractsTuples;
+            List<List<IndelSet.TargetTract>> parentNodeTuples = wrapDict.get(parentNode.getNr() + 1).targetTractsTuples;
             List<List<IndelSet.TargetTract>> filteredtargetTractsTupless = parentNodeTuples;
 
             for (Node childNode : parentNode.getChildren()) {
@@ -281,7 +322,7 @@ public class TransitionWrap extends BEASTObject {
                 List<TargetStatus> cleanTTUPLES = finalWrap.transStatuses;
                 Collections.reverse(cleanTTUPLES);
                 finalWrap.transStatuses = cleanTTUPLES;
-                wrapDict.put(childNode.getNr() +1, finalWrap);
+                wrapDict.put(childNode.getNr() + 1, finalWrap);
 
             }
         }
