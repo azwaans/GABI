@@ -392,7 +392,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
     }
 
     /**
-     * Creates the matrix for rates for the introduction of target tracts into barcodes with specific satuses.
+     * Creates the matrix for rates for the introduction of target tracts into barcodes with specific statuses.
      */
     public DoubleMatrix createMarginalTransitionMatrixLeft(TransitionWrap wrapper) {
         //first component in the factorization
@@ -400,9 +400,14 @@ public class gestaltGeneral extends SubstitutionModel.Base {
         //                and target tracts. The last row corresponds to the sink state.
         //                We omit the last column since its parent function will handle its creation
         Set specialTts = new HashSet();
-        for (IndelSet sgwc : wrapper.ancStates.getSingletonWCs()) {
-            specialTts.add(sgwc.getTargetTract());
+        if (wrapper.ancStates != null) {
+            for (IndelSet sgwc : wrapper.ancStates.getSingletonWCs())
+                specialTts.add(sgwc.getTargetTract());
         }
+        else {throw new RuntimeException("A branch was found with no states to build transition probabilities \n" +
+                "Suggestion: set maxSumSteps higher.\n");}
+
+
 
         Set possibleStates = new HashSet();
         possibleStates.addAll(wrapper.transStatuses);
