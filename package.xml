@@ -1,5 +1,5 @@
 <packages>
-<package name="gabi" version="0.0.1" url="https://github.com/azwaans/GABI/releases/download/Pre-release/gestalt.v0.0.1.zip" projectURL="https://github.com/azwaans/GABI" description="GABI: GESTALT Analysis using Bayesian Inference for BEAST2">
+<package name="GABI" version="0.0.1" url="https://github.com/azwaans/GABI/releases/download/Pre-release/gestalt.v0.0.1.zip" projectURL="https://github.com/azwaans/GABI" description="GABI: GESTALT Analysis using Bayesian Inference for BEAST2">
 <depends on='BEAST.base' atleast='2.7.0'/>
 <depends on='BEAST.app' atleast='2.7.0'/>
 <depends on="feast" atleast="10.0.0"/>
