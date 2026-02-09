@@ -3,7 +3,7 @@ GABI - GESTALT Analysis using Bayesian Inference in BEAST2:
 
 GABI (GESTALT Analysis using Bayesian Inference) is a [BEAST 2](http://www.beast2.org/) package to estimate time-scaled lineage trees and cell population dynamics from alignments of barcodes that accumulate Cas9-mediated indels, such as GESTALT,  as described [here](https://doi.org/10.1126/science.aaf7907).
 GABI implements a phylogenetic likelihood adapted from [GAPML](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9387344/), adapted for time-scaled lineage tree inference by incoporating a molecular clock rate.
-The preprint describing GABI's implementation and example applications can be found [here](https://doi.org/10.1098/rstb.2023.0318).
+The manuscript describing GABI's implementation and example applications can be found [here](https://doi.org/10.1098/rstb.2023.0318).
 
 Installation
 -------
