@@ -405,7 +405,7 @@ public class gestaltGeneral extends SubstitutionModel.Base {
                 specialTts.add(sgwc.getTargetTract());
         }
         else {throw new RuntimeException("A branch was found with no states to build transition probabilities \n" +
-                "Suggestion: set maxSumSteps higher.\n");}
+                "Suggestion: set maxSumSteps or maxExtraSteps higher.\n");}
 
 
 
